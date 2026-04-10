@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Swami Dental Care - Patient Portal</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0a1628;
+            --navy-mid: #112240;
+            --teal: #00b4a6;
+            --teal-light: #00d4c4;
+            --cream: #faf8f5;
+            --sand: #f0ece4;   
+            --text-main: #1a1a2e;
+            --text-muted: #6b7280;
+            --red-em: #e63946;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+        /* ── NAV ── */
+        .site-nav {
+            background: rgba(250,248,245,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,180,166,0.12);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            gap: 1rem;
+        }
+
+        .logo-mark {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--navy), #1d4ed8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-text h1 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; color: var(--navy); line-height:1.2; }
+        .logo-text p { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-link:hover { color: var(--navy); background: var(--sand); }
+
+        .nav-link.active {
+            color: white;
+            background: var(--navy);
+            font-weight: 600;
+        }
+
+        .nav-link.chatbot-link {
+            background: linear-gradient(135deg, var(--teal), #1d4ed8);
+            color: white;
+        }
+
+        .nav-link.chatbot-link:hover { opacity: 0.9; color: white; }
+
+        .nav-link.login-link {
+            border: 1.5px solid #e5e7eb;
+            color: var(--text-main);
+        }
+
+        .nav-link.login-link:hover { border-color: var(--navy); }
+
+        /* ── HERO ── */
+        .hero {
+            background: var(--navy);
+            position: relative;
+            overflow: hidden;
+            padding: 7rem 2rem 6rem;
+        }
+
+        .hero-bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.06;
+            background: var(--teal);
+        }
+        .hero-bg-circle.c1 { width: 700px; height: 700px; top: -200px; right: -150px; }
+        .hero-bg-circle.c2 { width: 400px; height: 400px; bottom: -150px; left: -100px; }
+
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0,180,166,0.04) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,180,166,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .hero-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,180,166,0.15);
+            border: 1px solid rgba(0,180,166,0.3);
+            color: var(--teal-light);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            color: white;
+            line-height: 1.12;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 span {
+            color: var(--teal-light);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            max-width: 560px;
+            margin: 0 auto 2.5rem;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary:hover { background: var(--teal-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,180,166,0.35); }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            padding: 0.85rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: white; }
+
+        /* ── STATS ── */
+        .stats-bar {
+            background: white;
+            border-bottom: 1px solid #f0ece4;
+        }
+
+        .stats-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat-item {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-right: 1px solid #f0ece4;
+            position: relative;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-number span { color: var(--teal); }
+
+        .stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+
+        /* ── EMERGENCY ── */
+        .emergency-section {
+            max-width: 1280px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .emergency-card {
+            background: var(--navy);
+            border-radius: 20px;
+            padding: 2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 300px;
+            background: linear-gradient(135deg, transparent, rgba(230,57,70,0.15));
+        }
+
+        .emergency-left { display: flex; align-items: center; gap: 1.2rem; }
+
+        .em-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(230,57,70,0.2);
+            border: 1.5px solid rgba(230,57,70,0.4);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b6b;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            animation: pulse-em 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-em {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(230,57,70,0); }
+        }
+
+        .em-text h3 { font-size: 1.2rem; color: white; margin-bottom: 0.25rem; }
+        .em-text p { font-size: 0.85rem; color: rgba(255,255,255,0.5); font-weight: 300; }
+
+        .em-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; position: relative; z-index: 2; }
+
+        .em-btn-red {
+            background: var(--red-em);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 9px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .em-btn-red:hover { background: #c1121f; }
+
+        .em-btn-white {
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 9px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .em-btn-white:hover { background: rgba(255,255,255,0.18); }
+
+        /* ── SECTIONS SHARED ── */
+        .section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem 5rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .section-header { margin-bottom: 2.5rem; }
+
+        /* ── QUICK ACTIONS ── */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .qa-card {
+            background: white;
+            border: 1.5px solid #eee;
+            border-radius: 16px;
+            padding: 1.75rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .qa-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 12px 40px rgba(0,180,166,0.12);
+            transform: translateY(-4px);
+        }
+
+        .qa-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .qa-card h3 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--navy); }
+        .qa-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
+        .qa-arrow {
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: auto;
+            padding-top: 0.5rem;
+        }
+
+        /* ── SERVICE CARDS ── */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 18px;
+            padding: 2rem;
+            border: 1.5px solid #eee;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-color: transparent; }
+        .service-card:hover::before { opacity: 1; }
+
+        .s-blue::before { background: linear-gradient(90deg, #1d4ed8, var(--teal)); }
+        .s-green::before { background: linear-gradient(90deg, #059669, #10b981); }
+        .s-purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+
+        .s-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .service-card h3 { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--navy); }
+        .service-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; }
+
+        .s-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .s-price { font-weight: 700; font-size: 0.9rem; }
+        .s-book { font-size: 0.82rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.3rem; }
+        .s-book:hover { text-decoration: underline; }
+
+        /* ── DOCTOR CARDS ── */
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .doctor-card {
+            background: white;
+            border: 1.5px solid #eee;
+            border-radius: 18px;
+            padding: 1.75rem;
+            transition: all 0.25s;
+        }
+
+        .doctor-card:hover { box-shadow: 0 16px 45px rgba(0,0,0,0.09); transform: translateY(-4px); }
+
+        .dr-head {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dr-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .dr-name { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--navy); }
+        .dr-title { font-size: 0.78rem; font-weight: 500; }
+        .doctor-card p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.1rem; }
+
+        .dr-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .avail-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+        }
+
+        .avail-today { background: #dcfce7; color: #15803d; }
+        .avail-tmr { background: #fef3c7; color: #b45309; }
+
+        .dr-book { font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+        .dr-book:hover { text-decoration: underline; }
+
+        /* ── WHY US ── */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .why-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.75rem;
+            border: 1.5px solid #eee;
+            text-align: center;
+            transition: all 0.25s;
+        }
+
+        .why-card:hover { box-shadow: 0 12px 35px rgba(0,0,0,0.08); transform: translateY(-3px); }
+
+        .why-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .why-card h3 { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+        .why-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
+
+        /* ── CTA ── */
+        .cta-section {
+            background: var(--navy);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            max-width: 1280px;
+            margin: 0 auto 5rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            top: -200px; right: -100px;
+            background: radial-gradient(circle, rgba(0,180,166,0.15), transparent 60%);
+            border-radius: 50%;
+        }
+
+        .cta-section h2 { color: white; font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 0.75rem; position: relative; }
+        .cta-section p { color: rgba(255,255,255,0.55); font-size: 1rem; margin-bottom: 2.5rem; max-width: 500px; margin-left: auto; margin-right: auto; font-weight: 300; position: relative; }
+
+        .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+
+        .cta-btn-main {
+            background: var(--teal);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .cta-btn-main:hover { background: var(--teal-light); transform: translateY(-2px); }
+
+        .cta-btn-sec {
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .cta-btn-sec:hover { background: rgba(255,255,255,0.08); border-color: white; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #0a0f1e;
+            color: rgba(255,255,255,0.7);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+            gap: 3rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .footer-brand p { font-size: 0.85rem; line-height: 1.7; margin: 0.75rem 0 1.25rem; color: rgba(255,255,255,0.45); }
+        .footer-brand h3 { color: white; font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 700; }
+
+        .social-links { display: flex; gap: 0.75rem; }
+
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .social-btn:hover { background: var(--teal); border-color: var(--teal); color: white; }
+
+        .footer-col h4 { color: white; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 1.25rem; }
+
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.6rem; }
+        .footer-col ul li a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .footer-col ul li a:hover { color: var(--teal-light); }
+
+        .contact-item { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.85rem; }
+        .contact-item i { margin-top: 2px; font-size: 0.85rem; flex-shrink: 0; }
+        .contact-item span { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* ── WHATSAPP FLOAT ── */
+        .wa-float {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            width: 54px;
+            height: 54px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 24px rgba(37,211,102,0.4);
+            text-decoration: none;
+            transition: all 0.25s;
+            z-index: 999;
+        }
+
+        .wa-float:hover { transform: scale(1.1); box-shadow: 0 10px 30px rgba(37,211,102,0.5); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .qa-grid, .why-grid { grid-template-columns: repeat(2, 1fr); }
+            .services-grid, .doctors-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .stat-item:nth-child(2) { border-right: none; }
+            .stat-item:nth-child(3) { border-top: 1px solid #f0ece4; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-inner { flex-direction: column; height: auto; padding: 1rem; }
+            .nav-links { justify-content: center; }
+            .qa-grid, .why-grid, .services-grid, .doctors-grid { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+            .emergency-card { flex-direction: column; }
+            .hero { padding: 4rem 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge { animation: fadeUp 0.5s ease both; }
+        .hero h1 { animation: fadeUp 0.6s 0.1s ease both; }
+        .hero p { animation: fadeUp 0.6s 0.2s ease both; }
+        .hero-btns { animation: fadeUp 0.6s 0.3s ease both; }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav class="site-nav">
+    <div class="nav-inner">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
+            <div class="logo-mark">
+                <i class="fas fa-tooth" style="color:white;font-size:1.1rem;"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Swami Dental Care</h1>
+                <p>Patient Portal</p>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="appointments.html" class="nav-link">
+                <i class="fas fa-calendar-check"></i> Appointments
+            </a>
+            <a href="feedback.html" class="nav-link">
+                <i class="fas fa-stethoscope"></i> Feedback
+            </a>
+            <a href="doctors.html" class="nav-link">
+                <i class="fas fa-user-md"></i> Dentists
+            </a>
+            <a href="report page.html" class="nav-link">
+                <i class="fas fa-file-medical"></i> Report
+            </a>
+            <a href="contact.html" class="nav-link">
+                <i class="fas fa-phone"></i> Contact
+            </a>
+            <a href="Consultation.html" class="nav-link login-link">
+                <i class="fas fa-sign-in-alt"></i> Online Consultation
+            </a>
+            <a href="CHATBOAT.HTML" class="nav-link chatbot-link">
+                <i class="fab fa-rocketchat"></i> ChatBot
+            </a>
+            <a href="login.html" class="nav-link chatbot-link">
+                <i class="fab fa-rocketchat"></i> Admin site 
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+    <div class="hero-bg-circle c1"></div>
+    <div class="hero-bg-circle c2"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-star" style="font-size:0.7rem;"></i>
+            Premium Dental Care · Kurduwadi, Solapur
+        </div>
+        <h1>Your Smile Deserves<br>the <span>Best Care</span></h1>
+        <p>Experience premium dental care with advanced technology and expert dentists. Book your appointment online in just 2 minutes.</p>
+        <div class="hero-btns">
+            <button onclick="location.href='appointments.html'" class="btn-primary">
+                <i class="fas fa-calendar-plus"></i>
+                Book Appointment Now
+            </button>
+            <button onclick="location.href='contact.html'" class="btn-outline">
+                <i class="fas fa-phone-alt"></i>
+                Emergency: Call Now
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <div class="stat-number"><span id="patientsCount">0</span>+</div>
+            <div class="stat-label">Happy Patients</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><span id="experienceCount">0</span>+</div>
+            <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><span id="doctorsCount">0</span></div>
+            <div class="stat-label">Expert Dentists</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><span id="successRate">0</span>%</div>
+            <div class="stat-label">Success Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── EMERGENCY ── -->
+<div class="emergency-section">
+    <div class="emergency-card">
+        <div class="emergency-left">
+            <div class="em-icon">
+                <i class="fas fa-ambulance"></i>
+            </div>
+            <div class="em-text">
+                <h3>Dental Emergency?</h3>
+                <p>We're available 24/7 for urgent dental cases</p>
+            </div>
+        </div>
+        <div class="em-btns">
+            <a href="tel:108" class="em-btn-red">
+                <i class="fas fa-phone"></i>
+                Call Ambulance (108)
+            </a>
+            <a href="tel:+918208466052" class="em-btn-white">
+                <i class="fas fa-user-md"></i>
+                Emergency Dentist
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<main>
+
+    <!-- Quick Actions -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Quick Actions</h2>
+            <p class="section-sub">Everything you need, right at your fingertips</p>
+        </div>
+        <div class="qa-grid">
+            <a href="appointments.html" class="qa-card">
+                <div class="qa-icon" style="background:#eff6ff;">
+                    <i class="fas fa-calendar-check" style="color:#1d4ed8;"></i>
+                </div>
+                <h3>Book Appointment</h3>
+                <p>Schedule your dental visit online in minutes</p>
+                <span class="qa-arrow" style="color:#1d4ed8;">Get Started <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></span>
+            </a>
+
+            <a href="facilities.html" class="qa-card">
+                <div class="qa-icon" style="background:#f0fdf4;">
+                    <i class="fas fa-stethoscope" style="color:#15803d;"></i>
+                </div>
+                <h3>View Services</h3>
+                <p>Check treatments & transparent pricing</p>
+                <span class="qa-arrow" style="color:#15803d;">Explore <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></span>
+            </a>
+
+            <a href="doctors.html" class="qa-card">
+                <div class="qa-icon" style="background:#faf5ff;">
+                    <i class="fas fa-user-md" style="color:#7c3aed;"></i>
+                </div>
+                <h3>Our Dentists</h3>
+                <p>Meet our expert dental professionals</p>
+                <span class="qa-arrow" style="color:#7c3aed;">Meet Team <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></span>
+            </a>
+
+            <a href="contact.html" class="qa-card">
+                <div class="qa-icon" style="background:#fff1f2;">
+                    <i class="fas fa-phone-alt" style="color:#e63946;"></i>
+                </div>
+                <h3>Contact Clinic</h3>
+                <p>Call or visit our clinic anytime</p>
+                <span class="qa-arrow" style="color:#e63946;">Contact Us <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Popular Services -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Our Popular Services</h2>
+            <p class="section-sub">Advanced treatments with state-of-the-art technology</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card s-blue" onclick="location.href='appointments.html'">
+                <div class="s-icon" style="background:#eff6ff;">
+                    <i class="fas fa-tooth" style="color:#1d4ed8;font-size:1.4rem;"></i>
+                </div>
+                <h3>Root Canal Treatment</h3>
+                <p>Advanced painless root canal treatment using modern laser technology for complete comfort.</p>
+                <div class="s-footer">
+                    <span class="s-price" style="color:#1d4ed8;">₹5,000 – ₹15,000</span>
+                    <a href="appointments.html" class="s-book" style="color:#1d4ed8;">Book Now <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></a>
+                </div>
+            </div>
+
+            <div class="service-card s-green" onclick="location.href='appointments.html'">
+                <div class="s-icon" style="background:#f0fdf4;">
+                    <i class="fas fa-smile" style="color:#15803d;font-size:1.4rem;"></i>
+                </div>
+                <h3>Teeth Whitening</h3>
+                <p>Professional-grade whitening for a dramatically brighter, more confident smile.</p>
+                <div class="s-footer">
+                    <span class="s-price" style="color:#15803d;">₹8,000 – ₹25,000</span>
+                    <a href="appointments.html" class="s-book" style="color:#15803d;">Book Now <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></a>
+                </div>
+            </div>
+
+            <div class="service-card s-purple" onclick="location.href='appointments.html'">
+                <div class="s-icon" style="background:#faf5ff;">
+                    <i class="fas fa-teeth" style="color:#7c3aed;font-size:1.4rem;"></i>
+                </div>
+                <h3>Dental Implants</h3>
+                <p>Permanent, natural-looking tooth replacement with titanium implants that last a lifetime.</p>
+                <div class="s-footer">
+                    <span class="s-price" style="color:#7c3aed;">₹20,000 – ₹50,000</span>
+                    <a href="appointments.html" class="s-book" style="color:#7c3aed;">Book Now <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Dentists -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Meet Our Expert Dentists</h2>
+            <p class="section-sub">Experienced professionals dedicated to your dental health</p>
+        </div>
+        <div class="doctors-grid">
+            <div class="doctor-card">
+                <div class="dr-head">
+                    <div class="dr-avatar" style="background:#eff6ff;">
+                        <i class="fas fa-user-md" style="color:#1d4ed8;"></i>
+                    </div>
+                    <div>
+                        <div class="dr-name">Dr. Vijay Wagh</div>
+                        <div class="dr-title" style="color:#1d4ed8;">Chief Dental Surgeon</div>
+                    </div>
+                </div>
+                <p>18+ years experience in advanced dentistry and implantology.</p>
+                <div class="dr-footer">
+                    <span class="avail-badge avail-today"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Available Today</span>
+                    <a href="appointments.html?doctor=vijay" class="dr-book" style="color:#1d4ed8;">Book Slot →</a>
+                </div>
+            </div>
+
+            <div class="doctor-card">
+                <div class="dr-head">
+                    <div class="dr-avatar" style="background:#f0fdf4;">
+                        <i class="fas fa-user-nurse" style="color:#15803d;"></i>
+                    </div>
+                    <div>
+                        <div class="dr-name">Dr. Meera Kulkarni</div>
+                        <div class="dr-title" style="color:#15803d;">Pediatric Dentist</div>
+                    </div>
+                </div>
+                <p>Specialized in child dentistry with gentle, pain-free treatments.</p>
+                <div class="dr-footer">
+                    <span class="avail-badge avail-today"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Available Today</span>
+                    <a href="appointments.html?doctor=meera" class="dr-book" style="color:#15803d;">Book Slot →</a>
+                </div>
+            </div>
+
+            <div class="doctor-card">
+                <div class="dr-head">
+                    <div class="dr-avatar" style="background:#faf5ff;">
+                        <i class="fas fa-user-md" style="color:#7c3aed;"></i>
+                    </div>
+                    <div>
+                        <div class="dr-name">Dr. Rahul Sharma</div>
+                        <div class="dr-title" style="color:#7c3aed;">Orthodontist</div>
+                    </div>
+                </div>
+                <p>Expert in braces, Invisalign, and complete smile correction.</p>
+                <div class="dr-footer">
+                    <span class="avail-badge avail-tmr"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Available Tomorrow</span>
+                    <a href="appointments.html?doctor=rahul" class="dr-book" style="color:#7c3aed;">Book Slot →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose Swami Dental Care?</h2>
+            <p class="section-sub">Our commitment to your health and comfort</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon" style="background:#eff6ff;">
+                    <i class="fas fa-shield-alt" style="color:#1d4ed8;"></i>
+                </div>
+                <h3>Sterilized Equipment</h3>
+                <p>100% sterilized instruments for maximum patient safety at all times.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:#f0fdf4;">
+                    <i class="fas fa-clock" style="color:#15803d;"></i>
+                </div>
+                <h3>Minimal Wait Time</h3>
+                <p>Average wait time under 15 minutes with efficient scheduling.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:#faf5ff;">
+                    <i class="fas fa-rupee-sign" style="color:#7c3aed;"></i>
+                </div>
+                <h3>Transparent Pricing</h3>
+                <p>No hidden charges, completely clear treatment costs upfront.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon" style="background:#fff1f2;">
+                    <i class="fas fa-ambulance" style="color:#e63946;"></i>
+                </div>
+                <h3>24/7 Emergency</h3>
+                <p>Round-the-clock emergency dental care whenever you need it.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="padding:0 2rem;">
+        <div class="cta-section">
+            <h2>Ready for Your Dental Visit?</h2>
+            <p>Book your appointment now and get ₹500 off on your first consultation!</p>
+            <div class="cta-btns">
+                <button onclick="location.href='appointments.html'" class="cta-btn-main">
+                    <i class="fas fa-calendar-check"></i>
+                    Book Appointment Now
+                </button>
+                <button onclick="location.href='contact.html'" class="cta-btn-sec">
+                    <i class="fas fa-phone-alt"></i>
+                    Call: +91 8208 466052
+                </button>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>Swami Dental Care</h3>
+                <p>Premium dental care with advanced technology and expert dentists committed to your smile.</p>
+                <div class="social-links">
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/chaitnay84/" target="_blank" rel="noopener noreferrer" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="https://wa.me/918208466052" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="appointments.html">Book Appointment</a></li>
+                    <li><a href="facilities.html">Services & Pricing</a></li>
+                    <li><a href="doctors.html">Our Dentists</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="CHATBOAT.HTML">ChatBot</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Our Services</h4>
+                <ul>
+                    <li><a href="#">Root Canal Treatment</a></li>
+                    <li><a href="#">Dental Implants</a></li>
+                    <li><a href="#">Teeth Whitening</a></li>
+                    <li><a href="#">Braces & Invisalign</a></li>
+                    <li><a href="#">Emergency Dentistry</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact Info</h4>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt" style="color:#00b4a6;"></i>
+                    <span>Kurduwadi Branch, Solapur District</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone" style="color:#4ade80;"></i>
+                    <span>+91 8208 466052</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope" style="color:#a78bfa;"></i>
+                    <span>info@swamidentalcare.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock" style="color:#fbbf24;"></i>
+                    <span>Mon–Sat: 9AM–8PM<br>Sun: Emergency Only</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 Swami Dental Care Centre. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/918208466052" target="_blank" class="wa-float">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+    function animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        let current = 0;
+        const increment = targetValue / 80;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= targetValue) {
+                element.textContent = targetValue.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 20);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        animateCounter('patientsCount', 10000);
+        animateCounter('experienceCount', 18);
+        animateCounter('doctorsCount', 12);
+        animateCounter('successRate', 99);
+
+        document.querySelectorAll('[href^="tel:"]').forEach(link => {
+            link.addEventListener('click', function (e) {
+                if (!confirm('Do you want to call this number?')) e.preventDefault();
+            });
+        });
+    });
+</script>
+</body> 
+</html>

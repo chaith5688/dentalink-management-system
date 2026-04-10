@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DentaFlow · Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f5fafd; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+
+    .dashboard-split { display: flex; width: 100%; max-width: 1360px; background: #fff; border-radius: 48px; box-shadow: 0 30px 70px -25px rgba(0,100,150,.25), 0 12px 30px -15px rgba(0,80,120,.15); overflow: hidden; min-height: 750px; }
+
+    /* LEFT */
+    .brand-panel { flex: 1.2; background: linear-gradient(155deg, #0b6e9c 0%, #2ba0cf 45%, #b3e0f5 100%); padding: 3.5rem 3rem; display: flex; flex-direction: column; position: relative; isolation: isolate; }
+    .brand-panel::after { content: ''; position: absolute; inset: 0; background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDYwMCA2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGw2MDAgNjAwTTYwMCAwTDAgNjAwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNykiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg=='); opacity: .2; z-index: 0; }
+    .brand-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; }
+    .logo-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; }
+    .logo-icon { background: rgba(255,255,255,.25); backdrop-filter: blur(5px); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 25px -8px rgba(0,40,60,.3); border: 2px solid rgba(255,255,255,.5); }
+    .logo-icon i { font-size: 36px; color: white; filter: drop-shadow(0 4px 6px #0a4b6e); }
+    .logo-text { font-size: 1.9rem; font-weight: 700; color: white; letter-spacing: -.02em; text-shadow: 0 2px 5px rgba(0,50,70,.3); }
+    .logo-text span { font-weight: 300; display: block; font-size: .95rem; opacity: .9; letter-spacing: .4px; }
+    .tagline-big { margin-top: 2.5rem; font-size: 2.4rem; font-weight: 700; line-height: 1.2; color: white; max-width: 500px; text-shadow: 0 4px 12px rgba(6,70,100,.4); }
+    .tagline-big i { font-style: normal; background: rgba(255,255,255,.2); padding: .1rem .8rem; border-radius: 60px; display: inline-block; margin-top: .8rem; font-size: 1.6rem; backdrop-filter: blur(3px); }
+    .illustration-wrapper { margin-top: auto; margin-bottom: 2rem; display: flex; justify-content: center; align-items: flex-end; }
+    .illustration-card { background: rgba(255,255,255,.15); backdrop-filter: blur(12px); border-radius: 42px; padding: 1.8rem 2rem; width: 100%; border: 2px solid rgba(255,255,255,.25); box-shadow: 0 30px 40px -20px rgba(0,60,100,.5); }
+    .illustration-row { display: flex; align-items: center; gap: 1.5rem; color: white; }
+    .illustration-row i { font-size: 3rem; opacity: .9; }
+    .illustration-row span { font-weight: 500; font-size: 1.25rem; }
+    .illustration-row small { opacity: .8; display: block; font-size: .95rem; margin-top: .2rem; }
+
+    /* RIGHT */
+    .login-panel { flex: .9; background: #fff; padding: 3.5rem 3rem; display: flex; flex-direction: column; justify-content: center; }
+    .login-header { margin-bottom: 2.2rem; }
+    .login-header h1 { font-size: 2.5rem; font-weight: 700; color: #103d4f; letter-spacing: -.02em; }
+    .login-header p { font-size: 1.1rem; color: #4e6f80; margin-top: .5rem; }
+
+    .demo-banner { background: #e3f2fd; border-radius: 16px; padding: 1rem 1.3rem; margin-bottom: 1.8rem; border-left: 6px solid #1177b0; display: flex; align-items: center; gap: 1rem; }
+    .demo-banner i { font-size: 1.4rem; color: #1177b0; }
+    .demo-banner-content { flex: 1; }
+    .demo-banner-title { font-weight: 700; color: #0a4b6e; margin-bottom: .2rem; }
+    .demo-banner-text { font-size: .9rem; color: #235d78; }
+    .demo-banner-text span { font-family: monospace; background: rgba(255,255,255,.7); padding: .2rem .5rem; border-radius: 8px; font-weight: 600; }
+
+    .error-banner { background: #ffebea; border-radius: 24px; padding: 1rem 1.3rem; display: none; align-items: center; gap: 1rem; margin-bottom: 1.8rem; border-left: 6px solid #c3423a; }
+    .error-banner i { font-size: 1.4rem; color: #bc3b33; }
+    .error-banner span { font-weight: 500; color: #871f18; }
+
+    .input-group { margin-bottom: 1.75rem; }
+    .input-label { display: block; font-weight: 600; font-size: .9rem; color: #1e4f68; margin-bottom: .5rem; }
+    .input-field { position: relative; display: flex; align-items: center; }
+    .input-field i:not(.toggle-password) { position: absolute; left: 18px; color: #6b9eb8; font-size: 1.2rem; pointer-events: none; }
+    .input-field input { width: 100%; padding: 1.1rem 1.1rem 1.1rem 3.2rem; border: 2px solid #e4eef5; border-radius: 28px; font-size: 1rem; background: #fbfdff; transition: border .2s, box-shadow .2s; font-family: 'Inter', sans-serif; outline: none; }
+    .input-field input:focus { border-color: #1f8bcb; box-shadow: 0 0 0 5px rgba(30,140,210,.1); background: #fff; }
+    .toggle-password { position: absolute; right: 18px; color: #608ea8; font-size: 1.3rem; cursor: pointer; background: white; padding: .2rem; border-radius: 50%; }
+
+    .options-row { display: flex; justify-content: space-between; align-items: center; margin: 1.2rem 0 2rem; }
+    .remember { display: flex; align-items: center; gap: .6rem; color: #235d78; font-weight: 500; font-size: .95rem; cursor: pointer; }
+    .remember input { width: 18px; height: 18px; accent-color: #1f8bcb; }
+    .forgot-link { color: #1a78aa; text-decoration: none; font-weight: 600; font-size: .95rem; cursor: pointer; }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .login-btn { background: #1177b0; color: white; width: 100%; border: none; padding: 1.2rem; border-radius: 40px; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: .8rem; cursor: pointer; box-shadow: 0 15px 25px -10px #0c6ca0; transition: background .2s, transform .1s, box-shadow .2s; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif; }
+    .login-btn:enabled:hover { background: #0d5e8c; box-shadow: 0 22px 30px -12px #0a5985; transform: scale(1.01); }
+    .login-btn:enabled:active { transform: scale(.98); }
+    .login-btn:disabled { background: #8db9d6; cursor: not-allowed; box-shadow: none; }
+
+    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,.4); border-top: 3px solid white; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    .quick-demo { margin-top: 1rem; text-align: center; }
+    .quick-demo-btn { background: none; border: 2px dashed #8db9d6; color: #1e4f68; padding: .8rem 1.5rem; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all .2s; font-size: .95rem; font-family: 'Inter', sans-serif; }
+    .quick-demo-btn:hover { background: #e3f0fa; border-color: #1177b0; }
+
+    .divider { display: flex; align-items: center; color: #7fa1b5; font-size: .9rem; margin: 1.5rem 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 2px solid #dceaf2; }
+    .divider span { margin: 0 1rem; font-weight: 600; }
+
+    .social-btns { display: flex; gap: 1rem; margin-bottom: 2.2rem; }
+    .social-btn { flex: 1; background: #f2f8fe; border: 2px solid #cde1ef; border-radius: 40px; padding: 1rem .5rem; font-weight: 600; color: #1b5777; display: flex; align-items: center; justify-content: center; gap: .7rem; cursor: pointer; transition: background .2s, border-color .2s; font-size: 1rem; font-family: 'Inter', sans-serif; }
+    .social-btn i { font-size: 1.3rem; }
+    .social-btn .fa-google { color: #DB4437; }
+    .social-btn .fa-facebook-f { color: #1877F2; }
+    .social-btn:hover { background: #e3f0fa; border-color: #95c6e7; }
+    .social-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .signup-text { text-align: center; font-size: 1rem; color: #325f77; }
+    .signup-text a { color: #1277b5; font-weight: 700; text-decoration: none; margin-left: .5rem; }
+    .signup-text a:hover { text-decoration: underline; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 1000; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 2.5rem; border-radius: 32px; max-width: 400px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,.3); }
+    .modal-content h2 { color: #103d4f; margin-bottom: .5rem; }
+    .modal-content p { color: #4e6f80; margin-bottom: 1.5rem; }
+    .modal-content input { width: 100%; padding: 1rem; border: 2px solid #e4eef5; border-radius: 16px; font-size: 1rem; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif; outline: none; }
+    .modal-content input:focus { border-color: #1f8bcb; }
+    .modal-buttons { display: flex; gap: 1rem; }
+    .modal-btn { flex: 1; padding: 1rem; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .modal-btn.primary { background: #1177b0; color: white; }
+    .modal-btn.primary:hover { background: #0d5e8c; }
+    .modal-btn.secondary { background: #e4eef5; color: #1e4f68; }
+    .modal-btn.secondary:hover { background: #d0e0eb; }
+    .modal-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-top: 3px solid white; border-radius: 50%; animation: spin .8s linear infinite; margin-left: .5rem; }
+
+    .debug-btn { position: fixed; bottom: 20px; left: 20px; background: #1177b0; color: white; border: none; padding: 8px 15px; border-radius: 30px; font-size: 12px; cursor: pointer; z-index: 9999; font-family: 'Inter', sans-serif; }
+    .debug-panel { position: fixed; bottom: 60px; left: 20px; background: white; border: 2px solid #1177b0; border-radius: 12px; padding: 15px; max-width: 420px; max-height: 320px; overflow: auto; font-size: 12px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,.2); display: none; }
+    .debug-panel.show { display: block; }
+    .debug-title { font-weight: bold; color: #1177b0; margin-bottom: 10px; font-size: 14px; }
+    .debug-log { color: #333; border-bottom: 1px solid #eee; padding: 5px 0; font-family: monospace; }
+    .debug-error { color: #dc3545; }
+    .debug-success { color: #28a745; }
+
+    @media (max-width: 1000px) { .dashboard-split { flex-direction: column; min-height: auto; } .brand-panel { padding: 2.5rem 2rem; } .tagline-big { font-size: 2rem; } }
+    @media (max-width: 600px) { .login-panel { padding: 2rem 1.5rem; } .social-btns { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+  <button class="debug-btn" id="debugBtn">🐛 Debug Log</button>
+  <div class="debug-panel" id="debugPanel">
+    <div class="debug-title">🔍 Firebase Debug Log</div>
+    <div id="debugLogs"></div>
+  </div>
+
+  <div class="dashboard-split">
+
+    <!-- LEFT BRANDING -->
+    <div class="brand-panel">
+      <div class="brand-content">
+        <div class="logo-wrap">
+          <div class="logo-icon"><i class="fas fa-tooth"></i></div>
+          <div class="logo-text">DentaFlow<span>clinic OS</span></div>
+        </div>
+        <div class="tagline-big">
+          Smart Dental Clinic<br>Management
+          <i>✨ paperless · insights</i>
+        </div>
+        <div class="illustration-wrapper">
+          <div class="illustration-card">
+            <div class="illustration-row">
+              <i class="fas fa-calendar-check"></i>
+              <div>
+                <span>Today's schedule</span>
+                <small>8 appointments · 2 cleanings</small>
+              </div>
+            </div>
+            <div style="margin-top:1.4rem;display:flex;gap:1.2rem;color:rgba(255,255,255,0.8);">
+              <i class="fas fa-chart-line"></i>
+              <span style="font-weight:300;">+22% patient flow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT LOGIN -->
+    <div class="login-panel">
+      <div class="login-header">
+        <h1>Welcome back</h1>
+        <p>Login to your account</p>
+      </div>
+
+      <div class="demo-banner">
+        <i class="fas fa-flask"></i>
+        <div class="demo-banner-content">
+          <div class="demo-banner-title">Demo Account Available</div>
+          <div class="demo-banner-text">Use <span>demo@dental.com</span> / <span>12345678</span> to test</div>
+        </div>
+      </div>
+
+      <div class="error-banner" id="errorBox">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="errorMessage">Invalid email or password</span>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Email address</label>
+        <div class="input-field">
+          <i class="far fa-envelope"></i>
+          <input type="email" id="email" placeholder="doctor@dentaflow.com" value="demo@dental.com">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Password</label>
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="········" value="12345678">
+          <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <div class="options-row">
+        <label class="remember">
+          <input type="checkbox" id="rememberMe"> <span>Remember me</span>
+        </label>
+        <a class="forgot-link" id="forgotPassword">Forgot password?</a>
+      </div>
+
+      <button class="login-btn" id="loginBtn">
+        <span id="loginText">Login</span>
+        <div class="spinner hidden" id="loginSpinner"></div>
+      </button>
+
+      <div class="quick-demo">
+        <button class="quick-demo-btn" id="quickDemoBtn">
+          <i class="fas fa-rocket"></i> Quick Demo Access
+        </button>
+      </div>
+
+      <div class="divider"><span>OR</span></div>
+
+      <!-- Google + Facebook -->
+      <div class="social-btns">
+        <button class="social-btn" id="googleLogin">
+          <i class="fab fa-google"></i> Google
+        </button>
+        <button class="social-btn" id="facebookLogin">
+          <i class="fab fa-facebook-f"></i> Facebook
+        </button>
+      </div>
+
+      <div class="signup-text">
+        New to DentaFlow? <a href="CREATEACC.html" id="signupLink">Create account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal" id="forgotModal">
+    <div class="modal-content">
+      <h2>Reset password</h2>
+      <p>Enter your email and we'll send a reset link.</p>
+      <input type="email" id="resetEmail" placeholder="Enter your email">
+      <div class="modal-buttons">
+        <button class="modal-btn secondary" id="closeModal">Cancel</button>
+        <button class="modal-btn primary" id="sendResetLink">
+          <span>Send link</span>
+          <span class="modal-spinner hidden" id="resetSpinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       FIREBASE 12.11.0  —  ALL LOGIN METHODS FIXED
+  ══════════════════════════════════════════════════ -->
+  <script type="module">
+
+    // ── 1. IMPORTS  (v12.11.0 — matches your CDN) ─────────────────────────
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAnalytics }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+    import {
+      getAuth, signInWithEmailAndPassword, signInWithPopup,
+      GoogleAuthProvider, FacebookAuthProvider,
+      sendPasswordResetEmail, onAuthStateChanged,
+      createUserWithEmailAndPassword, signOut
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, serverTimestamp,
+      getDocs, query, limit, setDoc, doc
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    // ── 2. FIREBASE CONFIG ────────────────────────────────────────────────
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+      authDomain:        "dentalink-e3d20.firebaseapp.com",
+      databaseURL:       "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+      projectId:         "dentalink-e3d20",
+      storageBucket:     "dentalink-e3d20.firebasestorage.app",
+      messagingSenderId: "22170715728",
+      appId:             "1:22170715728:web:d175aa5e780bc3c926f355",
+      measurementId:     "G-X3Z8RYKWBM"
+    };
+
+    // ── 3. INIT ───────────────────────────────────────────────────────────
+    const app            = initializeApp(firebaseConfig);
+    const analytics      = getAnalytics(app);
+    const auth           = getAuth(app);
+    const db             = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+    const fbProvider     = new FacebookAuthProvider();
+
+    // ── 4. DOM ────────────────────────────────────────────────────────────
+    const emailInput    = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn      = document.getElementById('loginBtn');
+    const loginText     = document.getElementById('loginText');
+    const loginSpinner  = document.getElementById('loginSpinner');
+    const errorBox      = document.getElementById('errorBox');
+    const errorMsg      = document.getElementById('errorMessage');
+    const togglePwd     = document.getElementById('togglePassword');
+    const rememberChk   = document.getElementById('rememberMe');   // ✅ FIXED — was split across two lines
+    const forgotLink    = document.getElementById('forgotPassword');
+    const googleBtn     = document.getElementById('googleLogin');
+    const fbBtn         = document.getElementById('facebookLogin');
+    const quickDemoBtn  = document.getElementById('quickDemoBtn');
+    const forgotModal   = document.getElementById('forgotModal');
+    const closeModal    = document.getElementById('closeModal');
+    const sendReset     = document.getElementById('sendResetLink');
+    const resetEmail    = document.getElementById('resetEmail');
+    const resetSpinner  = document.getElementById('resetSpinner');
+    const debugBtn      = document.getElementById('debugBtn');
+    const debugPanel    = document.getElementById('debugPanel');
+    const debugLogs     = document.getElementById('debugLogs');
+
+    // ── 5. DEBUG ─────────────────────────────────────────────────────────
+    function log(msg, type = 'info') {
+      const d = document.createElement('div');
+      d.className = 'debug-log' + (type==='error'?' debug-error':type==='success'?' debug-success':'');
+      d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      debugLogs.appendChild(d);
+      debugLogs.scrollTop = debugLogs.scrollHeight;
+      console.log('[DentaFlow]', msg);
+    }
+    debugBtn.addEventListener('click', () => {
+      debugPanel.classList.toggle('show');
+      if (debugPanel.classList.contains('show')) {
+        debugLogs.innerHTML = '';
+        log('Firebase 12.11.0 ready', 'success');
+        log('Demo: demo@dental.com / 12345678');
+      }
+    });
+
+    // ── 6. UI HELPERS ─────────────────────────────────────────────────────
+    function showError(html) {
+      errorMsg.innerHTML = html;
+      errorBox.style.display = 'flex';
+    }
+    function hideError() { errorBox.style.display = 'none'; }
+    function setLoading(on) {
+      loginBtn.disabled = on;
+      loginText.textContent = on ? 'Logging in…' : 'Login';
+      on ? loginSpinner.classList.remove('hidden') : loginSpinner.classList.add('hidden');
+    }
+
+    // ── 7. PASSWORD TOGGLE ────────────────────────────────────────────────
+    togglePwd.addEventListener('click', () => {
+      const show = passwordInput.type === 'password';
+      passwordInput.type = show ? 'text' : 'password';
+      togglePwd.classList.toggle('fa-eye', show);
+      togglePwd.classList.toggle('fa-eye-slash', !show);
+    });
+
+    // ── 8. REMEMBER ME ────────────────────────────────────────────────────
+    const saved = localStorage.getItem('rememberedEmail');
+    if (saved) { emailInput.value = saved; rememberChk.checked = true; }
+    rememberChk.addEventListener('change', () =>
+      rememberChk.checked
+        ? localStorage.setItem('rememberedEmail', emailInput.value.trim())
+        : localStorage.removeItem('rememberedEmail')
+    );
+    emailInput.addEventListener('input', () => {
+      if (rememberChk.checked) localStorage.setItem('rememberedEmail', emailInput.value.trim());
+      hideError();
+    });
+    passwordInput.addEventListener('input', hideError);
+
+    // ── 9. SAVE LOGIN ACTIVITY TO FIRESTORE ──────────────────────────────
+    async function saveActivity(user, method) {
+      try {
+        let ip = 'unknown';
+        try { ip = (await (await fetch('https://api.ipify.org?format=json')).json()).ip; } catch {}
+        const ref = await addDoc(collection(db, 'login_activities'), {
+          email: user.email, userId: user.uid,
+          name: user.displayName || 'User', method,
+          status: 'success', timestamp: serverTimestamp(),
+          ip, deviceInfo: navigator.userAgent,
+          loginDate: new Date().toISOString(), app: 'DentaFlow'
+        });
+        log(`✅ Activity saved: ${ref.id}`, 'success');
+      } catch (e) { log(`❌ Firestore: ${e.message}`, 'error'); }
+    }
+
+    // ── 10. AUTO-CREATE DEMO ACCOUNT ─────────────────────────────────────
+    (async () => {
+      log('Checking demo account…');
+      try {
+        await signInWithEmailAndPassword(auth, 'demo@dental.com', '12345678');
+        await signOut(auth);
+        log('✅ Demo account ready', 'success');
+      } catch (e) {
+        if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+          try {
+            const c = await createUserWithEmailAndPassword(auth, 'demo@dental.com', '12345678');
+            await setDoc(doc(db,'users',c.user.uid), { email:'demo@dental.com', name:'Demo User', role:'demo', createdAt: serverTimestamp() });
+            await signOut(auth);
+            log('✅ Demo account created', 'success');
+          } catch (ce) { log(`❌ Demo: ${ce.message}`, 'error'); }
+        }
+      }
+    })();
+
+    // ── 11. FIRESTORE CONNECTION TEST ─────────────────────────────────────
+    (async () => {
+      try {
+        await getDocs(query(collection(db,'login_activities'), limit(1)));
+        log('✅ Firestore connected', 'success');
+      } catch(e) { log(`❌ Firestore: ${e.message}`, 'error'); }
+    })();
+
+    // ════════════════════════════════════════════════════════
+    //  EMAIL / PASSWORD LOGIN  — FIXED
+    //  • Correct error codes handled
+    //  • Stores user in localStorage
+    //  • Redirects to profile.html
+    // ════════════════════════════════════════════════════════
+    async function doEmailLogin() {
+      const email = emailInput.value.trim();
+      const pass  = passwordInput.value;
+      if (!email || !pass) { showError('Email and password are required.'); return; }
+
+      hideError();
+      setLoading(true);
+      log(`Email login: ${email}`);
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        log(`✅ Logged in: ${cred.user.email}`, 'success');
+
+        // Save to localStorage so profile.html can read it
+        localStorage.setItem('currentUser', JSON.stringify({
+          email:    cred.user.email,
+          name:     cred.user.displayName || 'User',
+          uid:      cred.user.uid,
+          photoURL: cred.user.photoURL || null
+        }));
+
+        await saveActivity(cred.user, 'email');
+        window.location.href = 'profile.html';  // ← change to dashboard.html if preferred
+
+      } catch (err) {
+        log(`❌ ${err.code}`, 'error');
+        const map = {
+          'auth/user-not-found':
+            'No account found. <a href="CREATEACC.html" style="color:#1177b0;font-weight:700;text-decoration:underline">Create one?</a>',
+          'auth/wrong-password':         'Incorrect password. Try again.',
+          'auth/invalid-email':          'Invalid email format.',
+          'auth/too-many-requests':      'Too many attempts. Wait a moment and try again.',
+          'auth/network-request-failed': 'Network error — check your internet connection.',
+          'auth/invalid-credential':
+            'Wrong email or password. Use the demo account or <a href="CREATEACC.html" style="color:#1177b0;font-weight:700;text-decoration:underline">sign up</a>.'
+        };
+        showError(map[err.code] || `Login failed (${err.code}).`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loginBtn.addEventListener('click', doEmailLogin);
+    passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') doEmailLogin(); });
+
+    // ── QUICK DEMO ─────────────────────────────────────────────────────
+    quickDemoBtn.addEventListener('click', () => {
+      emailInput.value    = 'demo@dental.com';
+      passwordInput.value = '12345678';
+      setTimeout(doEmailLogin, 150);
+    });
+
+    // ════════════════════════════════════════════════════════
+    //  GOOGLE LOGIN  — FIXED
+    //  • Always shows account picker (prompt: select_account)
+    //  • Saves name + email + photoURL to localStorage
+    //  • Redirects to profile.html
+    // ════════════════════════════════════════════════════════
+    googleBtn.addEventListener('click', async () => {
+      googleBtn.disabled = true;
+      googleBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Signing in…`;
+      log('Google login…');
+
+      try {
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+        const result = await signInWithPopup(auth, googleProvider);
+        const user   = result.user;
+
+        log(`✅ Google: ${user.email}`, 'success');
+
+        // Store all three pieces of data — profile.html displays them
+        const userData = {
+          name:     user.displayName || 'Google User',
+          email:    user.email,
+          photoURL: user.photoURL   || null,
+          uid:      user.uid
+        };
+        localStorage.setItem('googleUser',  JSON.stringify(userData));
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+
+        await saveActivity(user, 'google');
+        window.location.href = 'profile.html';
+
+      } catch (err) {
+        log(`❌ Google: ${err.code}`, 'error');
+        if (err.code === 'auth/popup-closed-by-user') {
+          showError('Google sign-in was cancelled.');
+        } else if (err.code === 'auth/popup-blocked') {
+          showError('Popup blocked — please allow popups for this site and try again.');
+        } else if (err.code !== 'auth/cancelled-popup-request') {
+          showError(`Google sign-in failed. (${err.code})`);
+        }
+      } finally {
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = `<i class="fab fa-google"></i> Google`;
+      }
+    });
+
+    // ════════════════════════════════════════════════════════
+    //  FACEBOOK LOGIN
+    //  ⚠️  Requires Facebook enabled in Firebase Console:
+    //  Authentication → Sign-in providers → Facebook → Enable
+    //  Then add App ID + Secret from developers.facebook.com
+    // ════════════════════════════════════════════════════════
+    fbBtn.addEventListener('click', async () => {
+      fbBtn.disabled = true;
+      fbBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Signing in…`;
+      log('Facebook login…');
+
+      try {
+        fbProvider.addScope('email');
+        fbProvider.addScope('public_profile');
+
+        const result = await signInWithPopup(auth, fbProvider);
+        const user   = result.user;
+
+        log(`✅ Facebook: ${user.email}`, 'success');
+
+        const userData = {
+          name:     user.displayName || 'Facebook User',
+          email:    user.email,
+          photoURL: user.photoURL   || null,
+          uid:      user.uid
+        };
+        localStorage.setItem('googleUser',  JSON.stringify(userData));
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+
+        await saveActivity(user, 'facebook');
+        window.location.href = 'profile.html';
+
+      } catch (err) {
+        log(`❌ Facebook: ${err.code}`, 'error');
+        if (err.code === 'auth/popup-closed-by-user') {
+          showError('Facebook sign-in was cancelled.');
+        } else if (err.code === 'auth/popup-blocked') {
+          showError('Popup blocked — please allow popups for this site.');
+        } else if (err.code === 'auth/operation-not-allowed') {
+          showError('Facebook login is not enabled yet. Enable it in Firebase Console → Authentication → Sign-in providers.');
+        } else if (err.code !== 'auth/cancelled-popup-request') {
+          showError(`Facebook sign-in failed. (${err.code})`);
+        }
+      } finally {
+        fbBtn.disabled = false;
+        fbBtn.innerHTML = `<i class="fab fa-facebook-f"></i> Facebook`;
+      }
+    });
+
+    // ── FORGOT PASSWORD MODAL ─────────────────────────────────────────
+    forgotLink.addEventListener('click', e => {
+      e.preventDefault();
+      if (emailInput.value.trim()) resetEmail.value = emailInput.value.trim();
+      forgotModal.classList.add('active');
+    });
+    closeModal.addEventListener('click', () => { forgotModal.classList.remove('active'); resetEmail.value = ''; });
+    forgotModal.addEventListener('click', e => {
+      if (e.target === forgotModal) { forgotModal.classList.remove('active'); resetEmail.value = ''; }
+    });
+    sendReset.addEventListener('click', async () => {
+      const email = resetEmail.value.trim();
+      if (!email) { alert('Please enter your email.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email.'); return; }
+      sendReset.disabled = true;
+      resetSpinner.classList.remove('hidden');
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert(`📧 Reset link sent to ${email}. Check your inbox.`);
+        forgotModal.classList.remove('active');
+        resetEmail.value = '';
+      } catch (err) {
+        const m = { 'auth/user-not-found': 'No account with this email.', 'auth/invalid-email': 'Invalid email.' };
+        alert(m[err.code] || 'Failed to send reset email.');
+      } finally {
+        sendReset.disabled = false;
+        resetSpinner.classList.add('hidden');
+      }
+    });
+
+    // ── AUTH STATE ────────────────────────────────────────────────────
+    onAuthStateChanged(auth, user => {
+      if (user) log(`Auth: signed in as ${user.email}`, 'success');
+      else log('Auth: no user signed in');
+    });
+
+    log('🔥 Firebase 12.11.0 — email & Google login fixed', 'success');
+  </script>
+</body>
+</html>

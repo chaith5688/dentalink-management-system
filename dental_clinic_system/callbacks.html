@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dentalink Pro · Callback Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #fff;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 20px 0;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .date-badge {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 24px;
+            animation: slideIn 0.5s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.blue { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .stat-icon.amber { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .stat-icon.green { background: rgba(16,185,129,0.2); color: #10b981; }
+        .stat-icon.purple { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .stat-trend {
+            font-size: 13px;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 24px;
+            animation: scaleIn 0.5s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            color: #e2e8f0;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-header i {
+            color: #3b82f6;
+        }
+
+        .chart-container {
+            height: 200px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Device Status Cards */
+        .device-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .device-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .device-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .device-percent {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            transition: width 1s ease;
+            width: 0%;
+        }
+
+        .process-list {
+            margin-top: 12px;
+        }
+
+        .process-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .process-name {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .process-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 100px;
+            padding: 16px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-wrapper input:focus {
+            border-color: #3b82f6;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .search-wrapper input::placeholder {
+            color: #64748b;
+        }
+
+        .filter-select {
+            padding: 14px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .filter-select option {
+            background: #1e293b;
+        }
+
+        .reset-btn {
+            padding: 14px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        /* Callback Cards Grid */
+        .callbacks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .callback-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: scaleIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .callback-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .callback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .callback-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .phone-number {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .phone-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .callback-card:hover .phone-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .phone-number h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pending {
+            background: rgba(245,158,11,0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245,158,11,0.3);
+        }
+
+        .status-completed {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+
+        .card-body {
+            margin: 16px 0;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            align-items: center;
+        }
+
+        .info-icon {
+            width: 32px;
+            color: #64748b;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .reason-box {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .reason-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reason-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            font-style: italic;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .timestamp {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-whatsapp {
+            background: #25D366 !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E !important;
+            transform: scale(1.05);
+        }
+
+        .btn-complete {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+
+        .btn-complete:hover {
+            background: #10b981;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-delete {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Loading Skeleton */
+        .loading-skeleton {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .skeleton-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 24px;
+            padding: 24px;
+            height: 300px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .device-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters-bar {
+                flex-direction: column;
+                border-radius: 30px;
+            }
+            .filter-select {
+                width: 100%;
+            }
+            .reset-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-phone-alt" style="color: #3b82f6; margin-right: 12px;"></i>Callback Analytics</h1>
+                <p>Real-time monitoring of callback requests and system performance</p>
+            </div>
+            <div class="date-badge" id="current-date"></div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="stat-label">Total Requests</span>
+                </div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up"></i> all time
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon amber">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-value" id="stat-pending">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-clock"></i> need attention
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <span class="stat-label">Completed</span>
+                </div>
+                <div class="stat-value" id="stat-completed">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-check"></i> done
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <span class="stat-label">Today</span>
+                </div>
+                <div class="stat-value" id="stat-today">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-sun"></i> new requests
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Multi-line Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Callback Request Trends</h3>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 24px; margin-top: 16px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 12px; height: 12px; background: #3b82f6; border-radius: 3px;"></span>
+                        <span style="font-size: 12px; color: #94a3b8;">Device 1 (76%)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 12px; height: 12px; background: #f59e0b; border-radius: 3px;"></span>
+                        <span style="font-size: 12px; color: #94a3b8;">Device 2 (82%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Status -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-microchip"></i> System Performance</h3>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                
+                <!-- Device 1 -->
+                <div class="device-card" style="margin-bottom: 16px;">
+                    <div class="device-header">
+                        <span class="device-name">Device 1 - Call Processor</span>
+                        <span class="device-percent" id="device1Percent">76%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="device1Progress" style="width: 76%;"></div>
+                    </div>
+                    <div class="process-list">
+                        <div class="process-item">
+                            <span class="process-name">Process 1 - Queue</span>
+                            <span class="process-value" id="process1Value">51%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device 2 -->
+                <div class="device-card">
+                    <div class="device-header">
+                        <span class="device-name">Device 2 - Response Handler</span>
+                        <span class="device-percent" id="device2Percent">82%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="device2Progress" style="width: 82%;"></div>
+                    </div>
+                    <div class="process-list">
+                        <div class="process-item">
+                            <span class="process-name">Process 2 - Resolution</span>
+                            <span class="process-value" id="process2Value">19%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by phone number or reason...">
+            </div>
+            <select id="statusFilter" class="filter-select">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+            <button class="reset-btn" onclick="resetFilters()">
+                <i class="fas fa-redo-alt"></i> Reset
+            </button>
+        </div>
+
+        <!-- Callbacks Grid -->
+        <div class="callbacks-grid" id="callbacksGrid">
+            <div class="loading-skeleton" id="loadingSkeleton">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+            authDomain: "dentalink-e3d20.firebaseapp.com",
+            databaseURL: "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+            projectId: "dentalink-e3d20",
+            storageBucket: "dentalink-e3d20.firebasestorage.app",
+            messagingSenderId: "22170715728",
+            appId: "1:22170715728:web:d175aa5e780bc3c926f355",
+            measurementId: "G-X3Z8RYKWBM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State
+        let allCallbacks = [];
+        let trendChart;
+
+        // Set current date
+        document.getElementById('current-date').innerHTML = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            // Generate time labels (20:15 to 20:55)
+            const timeLabels = [];
+            for (let i = 0; i <= 8; i++) {
+                const minutes = 15 + i * 5;
+                const hour = 20;
+                timeLabels.push(`${hour}:${minutes.toString().padStart(2, '0')}`);
+            }
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [
+                        {
+                            label: 'Device 1',
+                            data: [100, 90, 85, 95, 88, 92, 87, 94, 89],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59,130,246,0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Device 2',
+                            data: [80, 75, 82, 78, 85, 79, 83, 77, 81],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245,158,11,0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { 
+                                color: '#94a3b8',
+                                callback: (value) => value.toFixed(0)
+                            }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { 
+                                color: '#94a3b8',
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Animated counter
+        function animateValue(element, start, end, duration = 1000) {
+            if (!element) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Update device stats based on callback data
+        function updateDeviceStats() {
+            const total = allCallbacks.length;
+            const pending = allCallbacks.filter(c => c.status === 'pending').length;
+            const completed = allCallbacks.filter(c => c.status === 'completed').length;
+            
+            // Calculate percentages
+            const device1Percent = total > 0 ? Math.round((pending / total) * 100) : 76;
+            const device2Percent = total > 0 ? Math.round((completed / total) * 100) : 82;
+            const process1Percent = total > 0 ? Math.round((pending / total) * 100) : 51;
+            const process2Percent = total > 0 ? Math.round((completed / total) * 100) : 19;
+
+            // Update displays
+            document.getElementById('device1Percent').textContent = device1Percent + '%';
+            document.getElementById('device2Percent').textContent = device2Percent + '%';
+            document.getElementById('process1Value').textContent = process1Percent + '%';
+            document.getElementById('process2Value').textContent = process2Percent + '%';
+            
+            document.getElementById('device1Progress').style.width = device1Percent + '%';
+            document.getElementById('device2Progress').style.width = device2Percent + '%';
+        }
+
+        // Listen to callbacks collection
+        onSnapshot(query(collection(db, "callbacks"), orderBy("timestamp", "desc")), (snapshot) => {
+            allCallbacks = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allCallbacks.push({
+                    id: doc.id,
+                    phone: data.phone || 'Not provided',
+                    preferredTime: data.preferredTime || data.time || 'Not specified',
+                    reason: data.reason || 'No reason provided',
+                    status: data.status || 'pending',
+                    type: data.type || 'callback',
+                    timestamp: data.timestamp || new Date()
+                });
+            });
+            document.getElementById('loadingSkeleton').style.display = 'none';
+            renderCallbacks();
+            updateStats();
+            updateDeviceStats();
+        }, (error) => {
+            console.error("Firebase error:", error);
+            document.getElementById('callbacksGrid').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    <h3>Error Loading Data</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        });
+
+        // Update statistics
+        function updateStats() {
+            const total = allCallbacks.length;
+            const pending = allCallbacks.filter(c => c.status === 'pending').length;
+            const completed = allCallbacks.filter(c => c.status === 'completed').length;
+            
+            // Today's requests
+            const today = new Date().toDateString();
+            const todayCount = allCallbacks.filter(c => {
+                try {
+                    const date = c.timestamp?.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
+                    return date.toDateString() === today;
+                } catch {
+                    return false;
+                }
+            }).length;
+
+            animateValue(document.getElementById('stat-total'), 0, total);
+            animateValue(document.getElementById('stat-pending'), 0, pending);
+            animateValue(document.getElementById('stat-completed'), 0, completed);
+            animateValue(document.getElementById('stat-today'), 0, todayCount);
+        }
+
+        // WhatsApp Call function
+        window.makeWhatsAppCall = function(phone) {
+            // फोन नंबरमधून spaces काढा
+            const cleanPhone = phone.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            
+            // WhatsApp Web उघडा
+            window.open(`https://web.whatsapp.com/send?phone=${cleanPhone}`, '_blank');
+            
+            // Toast message दाखवा
+            alert('✅ WhatsApp Web उघडला! कॉल करून Complete बटन दाबा.');
+            
+            return false;
+        };
+
+        // Render callbacks
+        function renderCallbacks() {
+            let filtered = [...allCallbacks];
+
+            // Apply search
+            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            if (searchTerm) {
+                filtered = filtered.filter(c => 
+                    c.phone.toLowerCase().includes(searchTerm) ||
+                    c.reason.toLowerCase().includes(searchTerm) ||
+                    c.preferredTime.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply status filter
+            const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(c => c.status === statusFilter);
+            }
+
+            const grid = document.getElementById('callbacksGrid');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>No callback requests found</h3>
+                        <p>${searchTerm ? 'Try adjusting your search' : 'New requests will appear here'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((c, index) => {
+                let dateStr = 'Recently';
+                try {
+                    const date = c.timestamp?.toDate ? c.timestamp.toDate() : new Date(c.timestamp);
+                    if (!isNaN(date.getTime())) {
+                        dateStr = date.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                } catch (e) {}
+
+                const isPending = c.status === 'pending';
+
+                return `
+                    <div class="callback-card" style="animation: scaleIn 0.5s ease-out ${index * 0.1}s both;">
+                        <div class="card-header">
+                            <div class="phone-number">
+                                <div class="phone-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h3>${c.phone}</h3>
+                            </div>
+                            <span class="status-badge ${isPending ? 'status-pending' : 'status-completed'}">
+                                <i class="fas fa-${isPending ? 'clock' : 'check-circle'}"></i>
+                                ${isPending ? 'Pending' : 'Completed'}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <div class="info-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Preferred Time</div>
+                                    <div class="info-value">${c.preferredTime}</div>
+                                </div>
+                            </div>
+                            <div class="reason-box">
+                                <div class="reason-label">
+                                    <i class="fas fa-comment"></i> Reason for Callback
+                                </div>
+                                <div class="reason-text">"${escapeHtml(c.reason)}"</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span class="timestamp">
+                                <i class="far fa-calendar"></i> ${dateStr}
+                            </span>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                                ${isPending ? `
+                                    <button onclick="makeWhatsAppCall('${c.phone}')" class="action-btn btn-whatsapp" title="WhatsApp वर कॉल करा">
+                                        <i class="fab fa-whatsapp"></i> 📞 WhatsApp
+                                    </button>
+                                    <button onclick="markAsCompleted('${c.id}')" class="action-btn btn-complete">
+                                        <i class="fas fa-check"></i> Complete
+                                    </button>
+                                ` : ''}
+                                <button onclick="deleteCallback('${c.id}')" class="action-btn btn-delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper functions
+        function escapeHtml(s) {
+            if (!s) return '';
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        // Mark as completed
+        window.markAsCompleted = async (id) => {
+            try {
+                await updateDoc(doc(db, "callbacks", id), {
+                    status: 'completed'
+                });
+                console.log('Callback marked as completed');
+            } catch (error) {
+                console.error('Error updating callback:', error);
+                alert('Error updating status');
+            }
+        };
+
+        // Delete callback
+        window.deleteCallback = async (id) => {
+            if (confirm('Are you sure you want to delete this callback request?')) {
+                try {
+                    await deleteDoc(doc(db, "callbacks", id));
+                    console.log('Callback deleted');
+                } catch (error) {
+                    console.error('Error deleting callback:', error);
+                    alert('Error deleting callback');
+                }
+            }
+        };
+
+        // Reset filters
+        window.resetFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            renderCallbacks();
+        };
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderCallbacks);
+        document.getElementById('statusFilter').addEventListener('change', renderCallbacks);
+
+        // Initialize chart
+        window.addEventListener('load', initChart);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DentaFlow · Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- EmailJS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: #f8fafd;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+
+    .split-card {
+      display: flex; width: 100%; max-width: 1200px;
+      background: white; border-radius: 48px;
+      box-shadow: 0 30px 60px -15px rgba(0,40,70,0.2);
+      overflow: hidden; min-height: 700px;
+    }
+
+    /* ── LEFT BRAND PANEL ── */
+    .brand-panel {
+      flex: 1.1;
+      background: linear-gradient(155deg, #0b6e9c 0%, #2ba0cf 45%, #b3e0f5 100%);
+      padding: 4rem 3rem; display: flex; flex-direction: column;
+      color: white; position: relative; isolation: isolate;
+    }
+    .brand-panel::after {
+      content: ''; position: absolute; inset: 0;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDYwMCA2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGw2MDAgNjAwTTYwMCAwTDAgNjAwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNykiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==');
+      opacity: 0.2; z-index: 0;
+    }
+    .brand-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+    .logo-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; }
+    .logo-icon {
+      background: rgba(255,255,255,0.25); backdrop-filter: blur(5px);
+      width: 56px; height: 56px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 10px 20px rgba(0,40,60,0.3);
+    }
+    .logo-icon i { font-size: 28px; color: white; }
+    .logo-text { font-size: 1.8rem; font-weight: 700; color: white; }
+    .logo-text span { font-weight: 300; display: block; font-size: 0.9rem; opacity: 0.85; }
+    .main-headline {
+      font-size: 2.4rem; font-weight: 700; line-height: 1.25;
+      margin-bottom: 2rem; text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .main-headline em {
+      font-style: normal; background: rgba(255,255,255,0.2);
+      padding: 0.1rem 0.8rem; border-radius: 60px; backdrop-filter: blur(4px);
+    }
+    .feature-list { list-style: none; margin-bottom: 2rem; }
+    .feature-list li { display: flex; align-items: center; gap: 0.8rem; font-size: 1rem; margin-bottom: 0.9rem; opacity: 0.92; }
+    .feature-list li i {
+      width: 32px; height: 32px; background: rgba(255,255,255,0.2);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .testimonial {
+      margin-top: auto; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px);
+      border-radius: 28px; padding: 1.8rem 2rem; border: 2px solid rgba(255,255,255,0.2);
+    }
+    .testimonial p { font-size: 1.05rem; line-height: 1.6; margin-bottom: 1rem; }
+    .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+    .testimonial-author img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); }
+
+    /* ── RIGHT FORM PANEL ── */
+    .form-panel {
+      flex: 0.9; background: white; padding: 2.8rem 2.8rem;
+      display: flex; flex-direction: column; justify-content: center; overflow-y: auto;
+    }
+
+    /* ── STEP INDICATOR ── */
+    .step-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 1.8rem; }
+    .step-col { display: flex; flex-direction: column; align-items: center; }
+    .step-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 700;
+      border: 2px solid #e2e8f0; color: #94a3b8; background: white;
+      transition: all 0.35s; flex-shrink: 0;
+    }
+    .step-dot.active { background: #1177b0; border-color: #1177b0; color: white; box-shadow: 0 4px 14px rgba(17,119,176,0.35); }
+    .step-dot.done   { background: #22c55e; border-color: #22c55e; color: white; }
+    .step-label { font-size: 0.7rem; font-weight: 600; color: #94a3b8; margin-top: 4px; white-space: nowrap; }
+    .step-dot.active + .step-label, .step-dot.done + .step-label { color: #1177b0; }
+    .step-line-wrap { flex: 1; padding-top: 17px; padding-bottom: 0; }
+    .step-line { height: 2px; background: #e2e8f0; transition: background 0.35s; }
+    .step-line.done { background: #22c55e; }
+
+    .form-header { margin-bottom: 1.4rem; }
+    .form-header h2 { font-size: 1.9rem; font-weight: 700; color: #0f172a; margin-bottom: 0.3rem; }
+    .form-header p  { color: #64748b; font-size: 0.93rem; }
+
+    /* Social buttons */
+    .social-row { display: flex; gap: 1rem; margin-bottom: 1.2rem; }
+    .social-btn {
+      flex: 1; background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 40px;
+      padding: 0.9rem 0.4rem; font-weight: 600; color: #1e293b;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-family: 'Sora', sans-serif;
+    }
+    .social-btn i { font-size: 1rem; }
+    .social-btn .fa-google { color: #DB4437; }
+    .social-btn .fa-facebook-f { color: #1877F2; }
+    .social-btn:hover { background: white; border-color: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    .social-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .divider { display: flex; align-items: center; color: #94a3b8; font-size: 0.84rem; margin: 0.9rem 0 1.2rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 2px solid #e2e8f0; }
+    .divider span { margin: 0 1rem; font-weight: 600; color: #64748b; }
+
+    /* Inputs */
+    .input-group { margin-bottom: 1.1rem; }
+    .input-group label { display: block; font-weight: 600; font-size: 0.84rem; color: #1e293b; margin-bottom: 0.38rem; }
+    .input-field { position: relative; display: flex; align-items: center; }
+    .input-field > i.fi { position: absolute; left: 16px; color: #94a3b8; font-size: 0.95rem; pointer-events: none; }
+    .input-field input {
+      width: 100%; padding: 0.95rem 0.95rem 0.95rem 3rem;
+      border: 2px solid #e2e8f0; border-radius: 28px;
+      font-size: 0.92rem; background: #f8fafc;
+      transition: all 0.2s; font-family: 'Sora', sans-serif; outline: none;
+    }
+    .input-field input:focus { border-color: #1177b0; background: white; box-shadow: 0 0 0 4px rgba(17,119,176,0.1); }
+    .input-field input.error { border-color: #ef4444; background: #fff8f8; }
+    .input-field input:disabled { opacity: 0.55; cursor: not-allowed; background: #f1f5f9; }
+    .toggle-eye { position: absolute; right: 16px; color: #94a3b8; cursor: pointer; font-size: 0.95rem; }
+    .toggle-eye:hover { color: #1177b0; }
+
+    /* Email row with inline Send OTP button */
+    .email-row { display: flex; gap: 0.5rem; align-items: center; }
+    .email-row input { flex: 1; }
+    .send-otp-btn {
+      background: #1177b0; color: white; border: none;
+      padding: 0 1.1rem; border-radius: 28px; height: 48px;
+      font-weight: 700; font-size: 0.8rem; cursor: pointer;
+      white-space: nowrap; transition: all 0.2s; font-family: 'Sora', sans-serif;
+      display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;
+    }
+    .send-otp-btn:hover:not(:disabled) { background: #0d5e8c; transform: translateY(-1px); }
+    .send-otp-btn:disabled { background: #8db9d6; cursor: not-allowed; transform: none; }
+
+    /* OTP section */
+    .otp-section { display: none; }
+    .otp-section.show { display: block; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .otp-info {
+      background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px;
+      padding: 0.75rem 1rem; margin-bottom: 0.9rem;
+      font-size: 0.86rem; color: #166534;
+      display: flex; align-items: flex-start; gap: 0.6rem;
+    }
+    .otp-info i { flex-shrink: 0; margin-top: 2px; }
+
+    .otp-boxes { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.7rem; }
+    .otp-box {
+      width: 50px; height: 56px; border: 2px solid #e2e8f0; border-radius: 14px;
+      text-align: center; font-size: 1.45rem; font-weight: 700; color: #0f172a;
+      font-family: 'Sora', sans-serif; outline: none; transition: all 0.2s; background: #f8fafc;
+    }
+    .otp-box:focus  { border-color: #1177b0; background: white; box-shadow: 0 0 0 4px rgba(17,119,176,0.12); }
+    .otp-box.filled { border-color: #22c55e; background: #f0fdf4; color: #166534; }
+    .otp-box.wrong  { border-color: #ef4444; background: #fff8f8; animation: shake 0.45s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+    .otp-resend { text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 0.4rem; }
+    .otp-resend button { background: none; border: none; color: #1177b0; font-weight: 700; cursor: pointer; font-size: 0.8rem; font-family: 'Sora', sans-serif; }
+    .otp-resend button:disabled { color: #94a3b8; cursor: not-allowed; }
+    #resendTimer { font-weight: 700; color: #0d5e8c; }
+
+    /* Verified badge */
+    .verified-badge {
+      display: none; align-items: center; gap: 0.5rem;
+      background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px;
+      padding: 0.65rem 1rem; margin-bottom: 0.9rem;
+      font-size: 0.88rem; font-weight: 600; color: #166534;
+    }
+    .verified-badge.show { display: flex; }
+
+    /* Password strength */
+    .strength-wrap { margin-top: 0.4rem; padding: 0 4px; }
+    .strength-bar { height: 4px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 4px; width: 0; transition: width 0.3s, background 0.3s; }
+    .strength-text { font-size: 0.7rem; font-weight: 600; margin-top: 3px; color: #94a3b8; }
+
+    /* Field errors */
+    .field-error { font-size: 0.75rem; color: #ef4444; font-weight: 500; margin-top: 0.3rem; padding-left: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    /* Duplicate box */
+    .info-box {
+      background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 16px;
+      padding: 0.9rem 1.1rem; margin-bottom: 1rem;
+      display: none; align-items: flex-start; gap: 0.7rem; font-size: 0.87rem; color: #1e3a5f;
+    }
+    .info-box.show { display: flex; }
+    .info-box i { color: #2563eb; font-size: 1.05rem; flex-shrink: 0; margin-top: 2px; }
+    .info-box strong { display: block; font-weight: 700; margin-bottom: 0.15rem; }
+    .info-box a { color: #1177b0; font-weight: 700; text-decoration: underline; }
+
+    /* Create button */
+    .create-btn {
+      width: 100%; background: #1177b0; color: white; border: none;
+      padding: 1.05rem; border-radius: 40px; font-size: 1.02rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 14px 24px -10px rgba(17,119,176,0.4);
+      margin: 1.2rem 0 1rem; font-family: 'Sora', sans-serif;
+    }
+    .create-btn:hover:not(:disabled) { background: #0d5e8c; transform: translateY(-2px); }
+    .create-btn:active:not(:disabled) { transform: scale(0.98); }
+    .create-btn:disabled { background: #8db9d6; cursor: not-allowed; box-shadow: none; }
+
+    .login-link { text-align: center; color: #64748b; font-size: 0.9rem; }
+    .login-link a { color: #1177b0; font-weight: 700; text-decoration: none; margin-left: 0.3rem; }
+    .login-link a:hover { text-decoration: underline; }
+
+    .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.35); border-top: 3px solid white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    /* Toast */
+    .toast {
+      position: fixed; top: 24px; right: 24px;
+      padding: 1rem 1.4rem; border-radius: 18px; font-weight: 600; font-size: 0.9rem;
+      z-index: 9999; display: flex; align-items: center; gap: 0.7rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15); transform: translateX(130%);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 360px; font-family: 'Sora', sans-serif;
+    }
+    .toast.show    { transform: translateX(0); }
+    .toast.success { background: #dcfce7; color: #166534; border: 2px solid #bbf7d0; }
+    .toast.error   { background: #fee2e2; color: #991b1b; border: 2px solid #fecaca; }
+    .toast.info    { background: #dbeafe; color: #1e40af; border: 2px solid #bfdbfe; }
+    .toast.warning { background: #fefce8; color: #854d0e; border: 2px solid #fde68a; }
+
+    @media (max-width: 900px) {
+      .split-card { flex-direction: column; border-radius: 32px; }
+      .brand-panel { padding: 2.5rem 2rem; }
+      .main-headline { font-size: 2rem; }
+    }
+    @media (max-width: 500px) {
+      .form-panel { padding: 2rem 1.4rem; }
+      .social-row { flex-direction: column; }
+      .otp-box { width: 42px; height: 50px; font-size: 1.25rem; }
+    }
+
+    /* ── EMAILJS FIX BANNER ── */
+    .fix-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+      background: linear-gradient(90deg, #dc2626, #b91c1c);
+      color: white; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; font-size: 0.85rem; font-family: 'Sora', sans-serif;
+      box-shadow: 0 4px 20px rgba(220,38,38,0.4);
+    }
+    .fix-banner strong { font-weight: 800; }
+    .fix-banner a {
+      background: white; color: #dc2626; padding: 4px 12px;
+      border-radius: 20px; font-weight: 700; font-size: 0.8rem;
+      text-decoration: none; white-space: nowrap; flex-shrink: 0;
+    }
+    .fix-banner .close-x {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: monospace;
+    }
+    .fix-banner.hidden { display: none; }
+
+    /* ── DEBUG PANEL ── */
+    .dbg-btn {
+      position: fixed; bottom: 16px; left: 16px; z-index: 9999;
+      background: #0f172a; color: white; border: none;
+      padding: 8px 14px; border-radius: 30px; font-size: 11px;
+      font-family: 'Sora', sans-serif; font-weight: 600;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .dbg-panel {
+      position: fixed; bottom: 54px; left: 16px; z-index: 9998;
+      background: #0f172a; color: #e2e8f0; border-radius: 16px;
+      padding: 14px; width: 360px; max-height: 280px; overflow-y: auto;
+      font-family: monospace; font-size: 11px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4); display: none;
+    }
+    .dbg-panel.show { display: block; }
+    .dbg-panel .dbg-title { font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 8px; font-family: 'Sora', sans-serif; }
+    .dbg-log  { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
+    .dbg-ok   { color: #4ade80; }
+    .dbg-err  { color: #f87171; }
+    .dbg-warn { color: #fbbf24; }
+    .dbg-info { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <!-- ⚠️ EmailJS Fix Banner — hidden once user fixes the template -->
+  <div class="fix-banner" id="fixBanner">
+    <span>⚠️ <strong>Action Required — 2 steps:</strong>
+      &nbsp;①&nbsp;In <strong>template_d93vnyl</strong> → <strong>Settings</strong> → set <strong>"To Email"</strong> to <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:6px">{{to_email}}</code>
+      &nbsp;&nbsp;②&nbsp;In <strong>Email Services</strong> → click <strong>service_8vjhybt</strong> → go to <strong>Email Templates</strong> tab → make sure <strong>template_d93vnyl</strong> is listed there
+    </span>
+    <a href="https://dashboard.emailjs.com/admin/templates/template_d93vnyl" target="_blank">Open Template →</a>
+    <button class="close-x" onclick="document.getElementById('fixBanner').classList.add('hidden');localStorage.setItem('ejsFixDismissed','1')">✕</button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"><i id="toastIcon"></i><span id="toastMsg"></span></div>
+
+  <!-- Debug Panel -->
+  <button class="dbg-btn" id="dbgBtn">🐛 Debug</button>
+  <div class="dbg-panel" id="dbgPanel">
+    <div class="dbg-title">🔍 EmailJS Debug Log</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <input id="dbgTestEmail" type="email" placeholder="test@email.com"
+        style="flex:1;padding:5px 8px;border:1px solid #334155;border-radius:8px;background:#1e293b;color:#e2e8f0;font-size:11px;font-family:monospace;outline:none;min-width:120px">
+      <button id="dbgTestBtn"
+        style="background:#2563eb;color:white;border:none;padding:5px 10px;border-radius:8px;font-size:10px;font-family:'Sora',sans-serif;font-weight:700;cursor:pointer;white-space:nowrap">
+        ▶ Send Test OTP
+      </button>
+      <button id="dbgClearBtn"
+        style="background:#374151;color:#94a3b8;border:none;padding:5px 8px;border-radius:8px;font-size:10px;cursor:pointer">
+        Clear
+      </button>
+    </div>
+    <div id="dbgLogs"></div>
+  </div>
+
+
+  <div class="split-card">
+
+    <!-- ══ LEFT BRAND ══ -->
+    <div class="brand-panel">
+      <div class="brand-content">
+        <div class="logo-wrap">
+          <div class="logo-icon"><i class="fas fa-tooth"></i></div>
+          <div class="logo-text">DentaFlow<span>clinic OS</span></div>
+        </div>
+        <div class="main-headline">Join thousands of dental<br>professionals using<br><em>DentaFlow</em></div>
+        <ul class="feature-list">
+          <li><i class="fas fa-calendar-check"></i> Smart appointment scheduling</li>
+          <li><i class="fas fa-shield-alt"></i> OTP email-verified sign-up</li>
+          <li><i class="fas fa-users"></i> Patient management system</li>
+          <li><i class="fas fa-file-medical"></i> Digital records &amp; reports</li>
+        </ul>
+        <div class="testimonial">
+          <p>"DentaFlow helped me manage my entire clinic with ease. The best dental OS I've used."</p>
+          <div class="testimonial-author">
+            <img src="https://ui-avatars.com/api/?name=Dr+Priya+Shah&size=44&background=0b6e9c&color=fff&bold=true" alt="Dr Priya Shah">
+            <div><strong>Dr. Priya Shah</strong><br><span style="opacity:0.85;font-size:0.88rem;">Dental Surgeon, Pune</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RIGHT FORM ══ -->
+    <div class="form-panel">
+
+      <!-- Step Indicator: Details → Verify OTP → Done -->
+      <div class="step-row">
+        <div class="step-col">
+          <div class="step-dot active" id="dot1">1</div>
+          <div class="step-label">Details</div>
+        </div>
+        <div class="step-line-wrap"><div class="step-line" id="line1"></div></div>
+        <div class="step-col">
+          <div class="step-dot" id="dot2">2</div>
+          <div class="step-label">Verify Email</div>
+        </div>
+        <div class="step-line-wrap"><div class="step-line" id="line2"></div></div>
+        <div class="step-col">
+          <div class="step-dot" id="dot3">3</div>
+          <div class="step-label">Done</div>
+        </div>
+      </div>
+
+      <div class="form-header">
+        <h2>Create Account</h2>
+        <p>Join our community of dental professionals</p>
+      </div>
+
+      <!-- Social Signup -->
+      <div class="social-row">
+        <button class="social-btn" id="googleSignup"><i class="fab fa-google"></i> Google</button>
+        <button class="social-btn" id="facebookSignup"><i class="fab fa-facebook-f"></i> Facebook</button>
+      </div>
+
+      <!-- Duplicate email info box -->
+      <div class="info-box" id="duplicateBox">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <strong id="duplicateTitle">Account already exists</strong>
+          <span id="duplicateMsg">This email is already registered. <a href="login.html">Login instead →</a></span>
+        </div>
+      </div>
+
+      <div class="divider"><span>OR fill in the form</span></div>
+
+      <form id="signupForm" novalidate>
+
+        <!-- Full Name -->
+        <div class="input-group">
+          <label>Full Name</label>
+          <div class="input-field">
+            <i class="fas fa-user fi"></i>
+            <input type="text" id="fullName" placeholder="e.g., Dr. Vijay Wagh" autocomplete="name">
+          </div>
+          <div class="field-error" id="nameError">Please enter your full name.</div>
+        </div>
+
+        <!-- Email + Send OTP button -->
+        <div class="input-group">
+          <label>Email Address</label>
+          <div class="input-field email-row">
+            <i class="fas fa-envelope fi"></i>
+            <input type="email" id="email" placeholder="doctor@clinic.com" autocomplete="email" style="padding-left:3rem">
+            <button type="button" class="send-otp-btn" id="sendOtpBtn">
+              <i class="fas fa-paper-plane"></i> Send OTP
+            </button>
+          </div>
+          <div class="field-error" id="emailError">Please enter a valid email address.</div>
+        </div>
+
+        <!-- OTP entry section (hidden until OTP sent) -->
+        <div class="otp-section" id="otpSection">
+          <div class="otp-info">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>A 6-digit OTP was sent to <strong id="otpSentTo" style="display:inline"></strong>. It expires in 10 minutes.</span>
+          </div>
+          <div class="otp-boxes">
+            <input class="otp-box" id="otp0" maxlength="1" type="text" inputmode="numeric" autocomplete="one-time-code">
+            <input class="otp-box" id="otp1" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" id="otp2" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" id="otp3" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" id="otp4" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" id="otp5" maxlength="1" type="text" inputmode="numeric">
+          </div>
+          <div class="otp-resend">
+            Didn't receive it?
+            <button type="button" id="resendBtn" disabled>Resend OTP</button>
+            <span id="resendTimer"></span>
+          </div>
+        </div>
+
+        <!-- Verified badge (shown after correct OTP) -->
+        <div class="verified-badge" id="verifiedBadge">
+          <i class="fas fa-check-circle" style="color:#22c55e;font-size:1.1rem"></i>
+          Email verified! ✅ You can now create your account.
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label>Password</label>
+          <div class="input-field">
+            <i class="fas fa-lock fi"></i>
+            <input type="password" id="password" placeholder="Min 6 characters" autocomplete="new-password">
+            <i class="fas fa-eye-slash toggle-eye" id="togglePassword"></i>
+          </div>
+          <div class="strength-wrap">
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-text" id="strengthText"></div>
+          </div>
+          <div class="field-error" id="passwordError">Password must be at least 6 characters.</div>
+        </div>
+
+        <button type="submit" class="create-btn" id="createBtn">
+          <span id="btnText">Create Account</span>
+          <div class="spinner hidden" id="btnSpinner"></div>
+        </button>
+
+      </form>
+
+      <div class="login-link">Already have an account? <a href="login.html">Log in</a></div>
+
+    </div><!-- /form-panel -->
+  </div><!-- /split-card -->
+
+
+  <script type="module">
+    // ════════════════════════════════════════════════════════
+    // FIREBASE IMPORTS
+    // ════════════════════════════════════════════════════════
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAnalytics }  from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      updateProfile,
+      GoogleAuthProvider,
+      FacebookAuthProvider,
+      signInWithPopup,
+      fetchSignInMethodsForEmail
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+    // ── Firebase config ──────────────────────────────────────
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+      authDomain:        "dentalink-e3d20.firebaseapp.com",
+      databaseURL:       "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+      projectId:         "dentalink-e3d20",
+      storageBucket:     "dentalink-e3d20.firebasestorage.app",
+      messagingSenderId: "22170715728",
+      appId:             "1:22170715728:web:d175aa5e780bc3c926f355",
+      measurementId:     "G-X3Z8RYKWBM"
+    };
+    const app  = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+
+    // ════════════════════════════════════════════════════════
+    // EMAILJS CONFIG
+    // Your credentials from the EmailJS dashboard
+    // ════════════════════════════════════════════════════════
+    const EJS_SERVICE  = 'service_8vjhybt';   // ← your Email Service ID
+    const EJS_TEMPLATE = 'template_d93vnyl';            // ← FIXED: real template ID from URL
+    const EJS_PUBLIC   = '2wrG65tY6fNlcOFMr'; // ← your Public Key
+
+    // Initialise EmailJS with your Public Key
+    // FIX: use window.emailjs — inside <script type="module">, global
+    // variables from regular <script> tags are only reachable via window.*
+    // We define ejs here but init AFTER dbg() is defined below
+    const ejs = window.emailjs;
+
+    // ── OTP state vars ────────────────────────────────────────
+    let currentOTP   = '';      // generated OTP stored in memory
+    let otpVerified  = false;   // true once user enters correct OTP
+    let otpExpiry    = null;    // timestamp when OTP expires (10 min)
+    let resendTimer  = null;    // interval for resend countdown
+
+    // ── DOM refs ──────────────────────────────────────────────
+    const fullNameEl    = document.getElementById('fullName');
+    const emailEl       = document.getElementById('email');
+    const passwordEl    = document.getElementById('password');
+    const togglePwdBtn  = document.getElementById('togglePassword');
+    const createBtn     = document.getElementById('createBtn');
+    const btnText       = document.getElementById('btnText');
+    const btnSpinner    = document.getElementById('btnSpinner');
+    const googleBtn     = document.getElementById('googleSignup');
+    const fbBtn         = document.getElementById('facebookSignup');
+    const sendOtpBtn    = document.getElementById('sendOtpBtn');
+    const otpSection    = document.getElementById('otpSection');
+    const verifiedBadge = document.getElementById('verifiedBadge');
+    const resendBtn     = document.getElementById('resendBtn');
+    const resendTimerEl = document.getElementById('resendTimer');
+    const dupBox        = document.getElementById('duplicateBox');
+    const dupTitle      = document.getElementById('duplicateTitle');
+    const dupMsg        = document.getElementById('duplicateMsg');
+    const otpBoxes      = Array.from({length:6}, (_,i) => document.getElementById(`otp${i}`));
+
+    // Step dots / lines
+    const dot1  = document.getElementById('dot1');
+    const dot2  = document.getElementById('dot2');
+    const dot3  = document.getElementById('dot3');
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+
+
+    // ════════════════════════════════════════════════════════
+    // TOAST
+    // ════════════════════════════════════════════════════════
+    function showToast(msg, type = 'error') {
+      const el   = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      el.className = `toast ${type}`;
+      icon.className = { success:'fas fa-check-circle', info:'fas fa-info-circle', warning:'fas fa-exclamation-triangle', error:'fas fa-exclamation-circle' }[type];
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 4500);
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // STEP INDICATOR
+    // step 1 = filling details, 2 = entering OTP, 3 = done
+    // ════════════════════════════════════════════════════════
+    function setStep(n) {
+      const dots  = [dot1, dot2, dot3];
+      const lines = [line1, line2];
+      dots.forEach((d, i) => {
+        d.className = 'step-dot';
+        if (i + 1 < n)  { d.classList.add('done');   d.innerHTML = '<i class="fas fa-check" style="font-size:0.72rem"></i>'; }
+        if (i + 1 === n) { d.classList.add('active'); d.textContent = i + 1; }
+        if (i + 1 > n)   d.textContent = i + 1;
+      });
+      lines.forEach((l, i) => {
+        l.className = 'step-line';
+        if (i + 1 < n) l.classList.add('done');
+      });
+    }
+    setStep(1); // start on step 1
+
+
+    // ════════════════════════════════════════════════════════
+    // GENERATE 6-DIGIT OTP
+    // ════════════════════════════════════════════════════════
+    function makeOTP() {
+      return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // DEBUG LOGGER
+    // ════════════════════════════════════════════════════════
+    const dbgPanel = document.getElementById('dbgPanel');
+    const dbgLogs  = document.getElementById('dbgLogs');
+    document.getElementById('dbgBtn').addEventListener('click', () => {
+      dbgPanel.classList.toggle('show');
+    });
+
+    // Clear debug logs
+    document.getElementById('dbgClearBtn').addEventListener('click', () => {
+      dbgLogs.innerHTML = '';
+    });
+
+    // ── TEST BUTTON: send a real OTP to any email directly ──────
+    // Use this to confirm EmailJS works before filling the whole form
+    document.getElementById('dbgTestBtn').addEventListener('click', async () => {
+      const testEmail = document.getElementById('dbgTestEmail').value.trim();
+      if (!testEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) {
+        dbg('Enter a valid email in the test box first', 'warn');
+        return;
+      }
+      const testOTP = String(Math.floor(100000 + Math.random() * 900000));
+      dbg(`─── TEST SEND ───`, 'warn');
+      dbg(`Target: ${testEmail}`, 'info');
+      dbg(`Test OTP: ${testOTP}`, 'warn');
+
+      const btn = document.getElementById('dbgTestBtn');
+      btn.textContent = '⏳ Sending…';
+      btn.disabled = true;
+
+      try {
+        if (!ejs) throw new Error('EmailJS not loaded (window.emailjs is undefined)');
+        const result = await ejs.send(EJS_SERVICE, EJS_TEMPLATE, {
+          // All variants sent so template works whatever names you used
+          to_name: 'Test User',    name: 'Test User',    user_name: 'Test User',
+          to_email: testEmail,     email: testEmail,     user_email: testEmail,  reply_to: testEmail,
+          otp_code: testOTP,       otp: testOTP,         code: testOTP,          passcode: testOTP,
+          verification_code: testOTP,
+          message: `Your DentaFlow verification code is: ${testOTP}`,
+          app_name: 'DentaFlow',   subject: `DentaFlow OTP: ${testOTP}`,
+        });
+        dbg(`✅ TEST SUCCESS! Status ${result.status}`, 'ok');
+        dbg(`Check inbox of ${testEmail}`, 'ok');
+        dbg(`Expected OTP in email: ${testOTP}`, 'ok');
+      } catch (err) {
+        dbg(`❌ TEST FAILED: ${JSON.stringify(err)}`, 'err');
+        if (err.status === 400) dbg('Status 400 → Variable name mismatch in template', 'warn');
+        if (err.status === 401) dbg('Status 401 → Wrong Public Key', 'warn');
+        if (err.status === 404) dbg('Status 404 → Wrong Service or Template ID', 'warn');
+        if (err.status === 422) dbg('Status 422 → Set "To Email" = {{to_email}} in template settings', 'warn');
+        if (!err.status)        dbg('No status → CDN not loaded or network blocked', 'warn');
+      } finally {
+        btn.textContent = '▶ Send Test OTP';
+        btn.disabled = false;
+      }
+    });
+
+    function dbg(msg, type = 'info') {
+      const ts  = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `dbg-log dbg-${type}`;
+      div.textContent = `[${ts}] ${msg}`;
+      dbgLogs.appendChild(div);
+      dbgLogs.scrollTop = dbgLogs.scrollHeight;
+      console.log(`[${type.toUpperCase()}] ${msg}`);
+    }
+
+    // Init EmailJS AFTER dbg() is defined so we can log the result
+    if (ejs) {
+      ejs.init({ publicKey: EJS_PUBLIC });
+      dbg('✅ EmailJS init() success', 'ok');
+    } else {
+      dbg('❌ window.emailjs undefined — CDN failed to load!', 'err');
+    }
+
+    // Show/hide the fix banner based on localStorage
+    if (localStorage.getItem('ejsFixDismissed') === '1') {
+      const fb = document.getElementById('fixBanner');
+      if (fb) fb.classList.add('hidden');
+    }
+
+    // Log initial state
+    dbg('─── DentaFlow EmailJS Debug ───', 'info');
+    dbg(`EmailJS CDN loaded: ${!!window.emailjs}`, window.emailjs ? 'ok' : 'err');
+    dbg(`Service ID : ${EJS_SERVICE}`, 'info');
+    dbg(`Template ID: ${EJS_TEMPLATE}`, 'info');
+    dbg(`Public Key : ${EJS_PUBLIC}`, 'info');
+    dbg('─── Credentials in use ───', 'info');
+    dbg(`Service : service_8vjhybt`, 'ok');
+    dbg(`Template: template_d93vnyl`, 'ok');
+    dbg(`Pub Key : 2wrG65tY6fNlcOFMr`, 'ok');
+    dbg('─── 2 fixes needed in EmailJS dashboard ───', 'warn');
+    dbg('FIX 1: template_d93vnyl → Settings → "To Email" = {{to_email}}', 'err');
+    dbg('FIX 2: Make sure template_d93vnyl is linked to service_8vjhybt', 'err');
+    dbg('How: EmailJS → Email Services → service_8vjhybt → check template is listed', 'warn');
+    dbg('─────────────────────────────────────────', 'info');
+
+    // ════════════════════════════════════════════════════════
+    // SEND OTP VIA EMAILJS
+    //
+    // Template variables needed in EmailJS dashboard:
+    //   {{to_name}}   recipient name
+    //   {{to_email}}  recipient email  ← ALSO set as "To Email" field
+    //   {{otp_code}}  the 6-digit OTP
+    //   {{app_name}}  app name
+    // ════════════════════════════════════════════════════════
+    async function sendOTP(toEmail, toName, otp) {
+      if (!ejs) throw new Error('EmailJS not loaded. Check CDN.');
+
+      dbg(`Sending OTP to: ${toEmail}`, 'info');
+      dbg(`OTP generated: ${otp}`, 'warn');  // visible in debug panel only
+      dbg(`Calling emailjs.send()...`, 'info');
+
+      // ── PARAMS matched to template_d93vnyl ──────────────────
+      // Template uses only {{otp_code}} in content.
+      // IMPORTANT: "To Email" in the template MUST be {{to_email}}
+      // (currently it's set to {{otp_code}} — that's the bug!)
+      const params = {
+        otp_code:  otp,       // ← used in template body as {{otp_code}}
+        to_email:  toEmail,   // ← "To Email" field in template settings
+        to_name:   toName || 'Doctor',
+        // Extra variants just in case
+        email:     toEmail,
+        name:      toName || 'Doctor',
+        message:   `Your DentaFlow OTP is: ${otp}. Valid for 10 minutes.`,
+        app_name:  'DentaFlow',
+      };
+      dbg(`Params: ${JSON.stringify(params)}`, 'info');
+
+      try {
+        const result = await ejs.send(EJS_SERVICE, EJS_TEMPLATE, params);
+        dbg(`SUCCESS! Status: ${result.status} ${result.text}`, 'ok');
+        return result;
+      } catch (err) {
+        // Detailed error breakdown
+        dbg(`FAILED: ${JSON.stringify(err)}`, 'err');
+        dbg(`Status: ${err.status}`, 'err');
+        dbg(`Error text: ${err.text}`, 'err');
+
+        // Common fixes guide
+        if (err.status === 400) dbg('FIX: Template variable names mismatch. Check to_email, to_name, otp_code in your EmailJS template.', 'warn');
+        if (err.status === 401) dbg('FIX: Invalid Public Key. Re-check 2wrG65tY6fNlcOFMr in EmailJS dashboard.', 'warn');
+        if (err.status === 404) dbg('FIX: Service ID or Template ID not found. Check service_8vjhybt and template_d93vnyl.', 'warn');
+        if (err.status === 422) dbg('FIX: "To Email" field in template is wrong. Set it to {{to_email}} in EmailJS template settings.', 'warn');
+        if (!err.status)        dbg('FIX: Network error or CORS issue. Make sure emailjs CDN loaded and localhost is allowed.', 'warn');
+
+        throw err;
+      }
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // RESEND COUNTDOWN TIMER (60 seconds)
+    // ════════════════════════════════════════════════════════
+    function startCountdown() {
+      let secs = 60;
+      resendBtn.disabled = true;
+      resendTimerEl.textContent = `(${secs}s)`;
+      clearInterval(resendTimer);
+      resendTimer = setInterval(() => {
+        secs--;
+        resendTimerEl.textContent = secs > 0 ? `(${secs}s)` : '';
+        if (secs <= 0) { clearInterval(resendTimer); resendBtn.disabled = false; }
+      }, 1000);
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // SEND OTP BUTTON — checks email first, then sends OTP
+    // ════════════════════════════════════════════════════════
+    sendOtpBtn.addEventListener('click', async () => {
+      const email = emailEl.value.trim();
+      const name  = fullNameEl.value.trim() || 'Doctor';
+
+      // Validate email format
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailEl.classList.add('error');
+        document.getElementById('emailError').classList.add('show');
+        showToast('Enter a valid email address first.', 'warning');
+        return;
+      }
+      emailEl.classList.remove('error');
+      document.getElementById('emailError').classList.remove('show');
+      hideDupBox();
+
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking…';
+
+      // ── Step 1: check if email already exists in Firebase ──
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.length > 0) {
+          showDupBox(methods.includes('google.com') ? 'google' : 'password');
+          sendOtpBtn.disabled = false;
+          sendOtpBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+          return;
+        }
+      } catch (e) {
+        console.warn('Firebase check skipped:', e.message);
+        // Continue even if check fails (network issue)
+      }
+
+      // ── Step 2: generate OTP and send via EmailJS ──────────
+      currentOTP  = makeOTP();
+      otpVerified = false;
+      otpExpiry   = Date.now() + 10 * 60 * 1000; // 10 minutes from now
+      verifiedBadge.classList.remove('show');
+      otpBoxes.forEach(b => { b.value = ''; b.className = 'otp-box'; });
+
+      sendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+
+      try {
+        await sendOTP(email, name, currentOTP);
+
+        // Show OTP entry boxes
+        document.getElementById('otpSentTo').textContent = email;
+        otpSection.classList.add('show');
+        setStep(2);
+        emailEl.disabled = true; // lock email while verifying
+        startCountdown();
+        otpBoxes[0].focus();
+        sendOtpBtn.innerHTML = '<i class="fas fa-check"></i> OTP Sent';
+        showToast(`OTP sent to ${email}! Check your inbox.`, 'success');
+
+      } catch (err) {
+        dbg(`Send OTP failed — ${JSON.stringify(err)}`, 'err');
+
+        // Map status codes to user-friendly messages
+        let msg = 'Could not send OTP. ';
+        if (!window.emailjs) {
+          msg += 'EmailJS CDN failed to load. Check your internet.';
+        } else if (err.status === 400) {
+          msg += 'Template variable error. Check {{to_email}} in your EmailJS template.';
+        } else if (err.status === 401) {
+          msg += 'Invalid Public Key. Check EmailJS dashboard.';
+        } else if (err.status === 404) {
+          msg += 'Service or Template ID not found in EmailJS.';
+        } else if (err.status === 422) {
+          msg += 'Set "To Email" field to {{to_email}} in your EmailJS template settings.';
+        } else {
+          msg += 'Click the 🐛 Debug button (bottom-left) for details.';
+        }
+
+        showToast(msg, 'error');
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+        currentOTP = '';
+        // Auto-open debug panel on error
+        dbgPanel.classList.add('show');
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // RESEND OTP BUTTON
+    // ════════════════════════════════════════════════════════
+    resendBtn.addEventListener('click', async () => {
+      const email = emailEl.value.trim();
+      const name  = fullNameEl.value.trim() || 'Doctor';
+
+      currentOTP  = makeOTP();
+      otpVerified = false;
+      otpExpiry   = Date.now() + 10 * 60 * 1000;
+      verifiedBadge.classList.remove('show');
+      otpBoxes.forEach(b => { b.value = ''; b.className = 'otp-box'; });
+
+      resendBtn.disabled = true;
+      try {
+        await sendOTP(email, name, currentOTP);
+        showToast(`New OTP sent to ${email}!`, 'info');
+        startCountdown();
+      } catch (e) {
+        showToast('Failed to resend OTP. Try again.', 'error');
+        resendBtn.disabled = false;
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // OTP BOX KEYBOARD + INPUT HANDLING
+    // Auto-advance, backspace navigation, paste
+    // ════════════════════════════════════════════════════════
+    otpBoxes.forEach((box, i) => {
+      // Allow only digits
+      box.addEventListener('keydown', e => {
+        if (!/^\d$/.test(e.key) && !['Backspace','ArrowLeft','ArrowRight','Tab','Delete'].includes(e.key)) {
+          e.preventDefault();
+        }
+      });
+
+      box.addEventListener('input', e => {
+        const v = e.target.value.replace(/\D/g, '');
+        box.value = v ? v[0] : '';
+
+        if (v) {
+          box.classList.add('filled');
+          if (i < 5) otpBoxes[i + 1].focus();
+          else       checkOTP();        // auto-check when last digit entered
+        } else {
+          box.classList.remove('filled');
+        }
+      });
+
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !box.value && i > 0) {
+          otpBoxes[i - 1].focus();
+        }
+      });
+    });
+
+    // Handle paste of full OTP (e.g. from SMS / email)
+    otpBoxes[0].addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData)
+                       .getData('text').replace(/\D/g,'').substring(0, 6);
+      pasted.split('').forEach((ch, i) => {
+        if (otpBoxes[i]) { otpBoxes[i].value = ch; otpBoxes[i].classList.add('filled'); }
+      });
+      if (pasted.length === 6) checkOTP();
+      else otpBoxes[Math.min(pasted.length, 5)].focus();
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // CHECK OTP — called when all 6 boxes are filled
+    // ════════════════════════════════════════════════════════
+    function checkOTP() {
+      const entered = otpBoxes.map(b => b.value).join('');
+      if (entered.length < 6) return;
+
+      // Check expiry
+      if (Date.now() > otpExpiry) {
+        showToast('OTP has expired. Please request a new one.', 'warning');
+        otpBoxes.forEach(b => { b.value = ''; b.className = 'otp-box'; });
+        otpBoxes[0].focus();
+        return;
+      }
+
+      if (entered === currentOTP) {
+        // ✅ Correct
+        otpVerified = true;
+        otpBoxes.forEach(b => { b.classList.remove('wrong'); b.classList.add('filled'); });
+        otpSection.classList.remove('show');
+        verifiedBadge.classList.add('show');
+        setStep(3);
+        showToast('Email verified successfully! 🎉', 'success');
+        passwordEl.focus();
+      } else {
+        // ❌ Wrong
+        otpBoxes.forEach(b => { b.classList.add('wrong'); });
+        showToast('Wrong OTP. Please check and try again.', 'error');
+        setTimeout(() => {
+          otpBoxes.forEach(b => { b.value = ''; b.className = 'otp-box'; });
+          otpBoxes[0].focus();
+        }, 650);
+      }
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // DUPLICATE EMAIL HELPERS
+    // ════════════════════════════════════════════════════════
+    function showDupBox(method = 'other') {
+      dupBox.classList.add('show');
+      if (method === 'google') {
+        dupTitle.textContent = 'Already signed up with Google';
+        dupMsg.innerHTML = 'This email is linked to a Google account. <a href="login.html">Login with Google →</a>';
+      } else if (method === 'password') {
+        dupTitle.textContent = 'Email already registered';
+        dupMsg.innerHTML = 'This email has a password account. <a href="login.html">Login instead →</a>';
+      } else {
+        dupTitle.textContent = 'Account already exists';
+        dupMsg.innerHTML = 'An account with this email exists. <a href="login.html">Login instead →</a>';
+      }
+    }
+    function hideDupBox() { dupBox.classList.remove('show'); }
+
+    // When user changes email, reset the whole OTP flow
+    emailEl.addEventListener('input', () => {
+      hideDupBox();
+      if (emailEl.disabled) {
+        emailEl.disabled = false;
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+        otpSection.classList.remove('show');
+        verifiedBadge.classList.remove('show');
+        otpVerified = false;
+        currentOTP  = '';
+        setStep(1);
+        otpBoxes.forEach(b => { b.value = ''; b.className = 'otp-box'; });
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // FIELD VALIDATION + PASSWORD STRENGTH
+    // ════════════════════════════════════════════════════════
+    function showFErr(id, show) { document.getElementById(id)?.classList.toggle('show', show); }
+    function markErr(el, e)     { el.classList.toggle('error', e); }
+
+    passwordEl.addEventListener('input', () => {
+      const v = passwordEl.value;
+      const fill = document.getElementById('strengthFill');
+      const text = document.getElementById('strengthText');
+      let s = 0;
+      if (v.length >= 6)          s++;
+      if (v.length >= 10)         s++;
+      if (/[A-Z]/.test(v))        s++;
+      if (/[0-9]/.test(v))        s++;
+      if (/[^A-Za-z0-9]/.test(v)) s++;
+      const levels = [
+        {w:'20%',bg:'#ef4444',l:'Very weak'},
+        {w:'40%',bg:'#f97316',l:'Weak'},
+        {w:'60%',bg:'#eab308',l:'Fair'},
+        {w:'80%',bg:'#22c55e',l:'Strong'},
+        {w:'100%',bg:'#16a34a',l:'Very strong'},
+      ];
+      if (!v) { fill.style.width='0'; text.textContent=''; return; }
+      const lvl = levels[Math.min(s - 1, 4)];
+      fill.style.width = lvl.w; fill.style.background = lvl.bg;
+      text.textContent = lvl.l; text.style.color = lvl.bg;
+    });
+
+    togglePwdBtn.addEventListener('click', () => {
+      const show = passwordEl.type === 'password';
+      passwordEl.type = show ? 'text' : 'password';
+      togglePwdBtn.classList.toggle('fa-eye', show);
+      togglePwdBtn.classList.toggle('fa-eye-slash', !show);
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // FORM SUBMIT — Only allowed after OTP is verified
+    // ════════════════════════════════════════════════════════
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      hideDupBox();
+
+      const name  = fullNameEl.value.trim();
+      const email = emailEl.value.trim();
+      const pass  = passwordEl.value;
+
+      let err = false;
+      if (!name)                                        { markErr(fullNameEl,true);  showFErr('nameError',true);     err=true; } else { markErr(fullNameEl,false);  showFErr('nameError',false); }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { markErr(emailEl,true);   showFErr('emailError',true);    err=true; } else { markErr(emailEl,false);   showFErr('emailError',false); }
+      if (!pass || pass.length < 6)                     { markErr(passwordEl,true); showFErr('passwordError',true);  err=true; } else { markErr(passwordEl,false); showFErr('passwordError',false); }
+      if (err) return;
+
+      // BLOCK if email not verified
+      if (!otpVerified) {
+        if (otpSection.classList.contains('show')) {
+          showToast('Please enter the OTP sent to your email first.', 'warning');
+          otpBoxes[0].focus();
+        } else {
+          showToast('Please verify your email with OTP before creating account.', 'warning');
+          // Highlight the Send OTP button with a pulse
+          sendOtpBtn.style.boxShadow = '0 0 0 4px rgba(17,119,176,0.35)';
+          setTimeout(() => sendOtpBtn.style.boxShadow = '', 1500);
+        }
+        return;
+      }
+
+      // Create the Firebase account
+      createBtn.disabled = true;
+      btnText.textContent = 'Creating…';
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        // Safety-net duplicate check
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.length > 0) {
+          showDupBox(methods.includes('google.com') ? 'google' : 'password');
+          return;
+        }
+
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await updateProfile(cred.user, { displayName: name });
+
+        localStorage.setItem('currentUser', JSON.stringify({ name, email, uid: cred.user.uid }));
+
+        showToast(`🎉 Welcome, ${name}! Account created successfully.`, 'success');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 1800);
+
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') showDupBox('password');
+        else showToast(fbErrMsg(err.code));
+      } finally {
+        createBtn.disabled = false;
+        btnText.textContent = 'Create Account';
+        btnSpinner.classList.add('hidden');
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // GOOGLE SIGN-UP (Google verifies email natively — no OTP)
+    // ════════════════════════════════════════════════════════
+    googleBtn.addEventListener('click', async () => {
+      hideDupBox();
+      googleBtn.disabled = true;
+      googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Google…';
+      try {
+        const prov = new GoogleAuthProvider();
+        prov.setCustomParameters({ prompt: 'select_account' });
+        const r    = await signInWithPopup(auth, prov);
+        const u    = r.user;
+        const isNew = r._tokenResponse?.isNewUser ?? false;
+        const data  = { name: u.displayName||'Google User', email: u.email, photoURL: u.photoURL, uid: u.uid };
+        localStorage.setItem('googleUser',  JSON.stringify(data));
+        localStorage.setItem('currentUser', JSON.stringify(data));
+        showToast(isNew ? `🎉 Welcome, ${u.displayName}!` : `👋 Welcome back, ${u.displayName}!`, isNew ? 'success' : 'info');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 1600);
+      } catch (err) {
+        if (err.code === 'auth/account-exists-with-different-credential') showDupBox('password');
+        else if (!['auth/popup-closed-by-user','auth/cancelled-popup-request'].includes(err.code)) showToast(fbErrMsg(err.code));
+      } finally {
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = '<i class="fab fa-google"></i> Google';
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // FACEBOOK SIGN-UP
+    // ════════════════════════════════════════════════════════
+    fbBtn.addEventListener('click', async () => {
+      hideDupBox();
+      fbBtn.disabled = true;
+      fbBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Facebook…';
+      try {
+        const prov = new FacebookAuthProvider();
+        const r    = await signInWithPopup(auth, prov);
+        const u    = r.user;
+        localStorage.setItem('currentUser', JSON.stringify({ name: u.displayName||'Facebook User', email: u.email, photoURL: u.photoURL, uid: u.uid }));
+        showToast(`🎉 Welcome, ${u.displayName}!`, 'success');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 1600);
+      } catch (err) {
+        if (err.code === 'auth/account-exists-with-different-credential') { showDupBox('google'); showToast('This email is already linked to a Google account.','error'); }
+        else if (err.code !== 'auth/popup-closed-by-user') showToast(fbErrMsg(err.code));
+      } finally {
+        fbBtn.disabled = false;
+        fbBtn.innerHTML = '<i class="fab fa-facebook-f"></i> Facebook';
+      }
+    });
+
+
+    // ════════════════════════════════════════════════════════
+    // FIREBASE ERROR MESSAGES
+    // ════════════════════════════════════════════════════════
+    function fbErrMsg(code) {
+      return {
+        'auth/email-already-in-use':   'This email is already registered.',
+        'auth/invalid-email':          'Invalid email address.',
+        'auth/weak-password':          'Password must be at least 6 characters.',
+        'auth/network-request-failed': 'Network error. Check your connection.',
+        'auth/too-many-requests':      'Too many attempts. Try again later.',
+        'auth/account-exists-with-different-credential': 'Account exists with a different sign-in method.',
+        'auth/popup-blocked':          'Popup blocked. Allow popups for this site.',
+        'auth/operation-not-allowed':  'This sign-in method is not enabled.',
+      }[code] || 'Something went wrong. Please try again.';
+    }
+
+  </script>
+</body>
+</html>

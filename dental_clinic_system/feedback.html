@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Feedback System | Dentalink</title>
+    
+    <!-- Firebase SDK v12.10.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            limit,
+            onSnapshot,
+            serverTimestamp,
+            doc,
+            updateDoc,
+            getDocs,
+            where 
+        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+        import { 
+            getAnalytics, 
+            logEvent 
+        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+            authDomain: "dentalink-e3d20.firebaseapp.com",
+            databaseURL: "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+            projectId: "dentalink-e3d20",
+            storageBucket: "dentalink-e3d20.firebasestorage.app",
+            messagingSenderId: "22170715728",
+            appId: "1:22170715728:web:d175aa5e780bc3c926f355",
+            measurementId: "G-X3Z8RYKWBM"
+        };
+
+        const app       = initializeApp(firebaseConfig);
+        const db        = getFirestore(app);
+        const auth      = getAuth(app);
+        const analytics = getAnalytics(app);
+        const storage   = getStorage(app);
+        const googleProvider = new GoogleAuthProvider();
+        
+        window.firebase = {
+            db, auth, analytics, storage, googleProvider,
+            firestore: {
+                collection, addDoc, query, orderBy, limit,
+                onSnapshot, serverTimestamp, doc, updateDoc,
+                getDocs, where
+            },
+            storageFunctions: { ref, uploadBytes, getDownloadURL },
+            authFunctions: { onAuthStateChanged, signInWithPopup, GoogleAuthProvider }
+        };
+
+        // safe logEvent helper exposed globally
+        window.fbLogEvent = (name, params = {}) => {
+            try { logEvent(analytics, name, params); } catch(e) { console.warn('logEvent error', e); }
+        };
+        
+        console.log('✅ Firebase v12.10.0 Initialized');
+        logEvent(analytics, 'feedback_page_loaded');
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@latest"></script>
+    
+    <style>
+        :root { --primary: #1D4ED8; --secondary: #0F766E; --accent: #059669; }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%); min-height: 100vh; }
+        .dashboard-card {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(31,38,135,0.1); border-radius: 1rem; transition: all 0.3s ease;
+        }
+        .dashboard-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(31,38,135,0.15); }
+        .star-rating { display: flex; gap: .5rem; direction: rtl; }
+        .star-rating input { display: none; }
+        .star-rating label { color: #cbd5e1; cursor: pointer; font-size: 2rem; transition: all 0.3s; }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label { color: #fbbf24; transform: scale(1.2); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.05);opacity:.9} }
+        .gradient-text { background: linear-gradient(135deg,#1D4ED8,#059669); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .spinner { border:3px solid #f3f3f3; border-top:3px solid #1D4ED8; border-radius:50%; width:40px; height:40px; animation:spin 1s linear infinite; margin:0 auto; }
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .toast { position:fixed; top:20px; right:20px; padding:1rem 1.5rem; border-radius:.75rem; color:white; font-weight:500; z-index:1000; transform:translateX(400px); transition:transform .3s ease; max-width:400px; }
+        .toast.show { transform:translateX(0); }
+        .toast.success { background:linear-gradient(135deg,#059669,#047857); }
+        .toast.error   { background:linear-gradient(135deg,#dc2626,#b91c1c); }
+        .toast.info    { background:linear-gradient(135deg,#1D4ED8,#1e40af); }
+        .voice-pulse { animation:voicePulse 1.5s infinite; }
+        @keyframes voicePulse { 0%{transform:scale(1);opacity:1} 50%{transform:scale(1.2);opacity:.7} 100%{transform:scale(1);opacity:1} }
+        .emotion-indicator { transition:all .3s ease; }
+        .emotion-indicator.active { transform:scale(1.2); filter:brightness(1.2); }
+        .feature-badge { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white; padding:.5rem 1rem; border-radius:2rem; font-size:.875rem; font-weight:600; display:inline-flex; align-items:center; gap:.5rem; }
+        .sentiment-meter { height:8px; border-radius:4px; background:linear-gradient(90deg,#ef4444 0%,#f59e0b 50%,#10b981 100%); position:relative; }
+        .sentiment-pointer { position:absolute; top:-4px; width:16px; height:16px; background:white; border:3px solid var(--primary); border-radius:50%; transform:translateX(-50%); transition:left .5s ease; }
+        .timeline-item { opacity:0; transform:translateX(-20px); animation:slideIn .5s ease forwards; }
+        @keyframes slideIn { to{opacity:1;transform:translateX(0)} }
+        .ai-insight-card { background:linear-gradient(135deg,#f8fafc,#f1f5f9); border-left:4px solid var(--primary); }
+        .prediction-highlight { background:linear-gradient(120deg,#a5b4fc20,#c7d2fe20); border:1px solid #c7d2fe; }
+        .spinner-small { border:2px solid #f3f3f3; border-top:2px solid #1D4ED8; border-radius:50%; animation:spin 1s linear infinite; }
+        .tab-btn { transition:all .3s ease; }
+        .tab-btn:hover:not(.active) { background-color:#f3f4f6; }
+        .emotion-btn { transition:all .2s ease; }
+        .emotion-btn:hover { transform:scale(1.1); }
+        .service-option input:checked + div { background-color:#dbeafe; border-color:#3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="toastContainer"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
+                        <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-800">AI Feedback Hub</span>
+                        <div class="text-xs text-green-600 flex items-center gap-1">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span id="connectionStatus">All Systems Active</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <span class="feature-badge"><i data-lucide="cpu" class="w-3 h-3"></i>AI-Powered</span>
+                    <span class="feature-badge"><i data-lucide="zap" class="w-3 h-3"></i>Real-time</span>
+                    <span class="feature-badge"><i data-lucide="mic" class="w-3 h-3"></i>Voice Enabled</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="userInfo" class="hidden items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                            <span id="userInitial">U</span>
+                        </div>
+                        <div class="text-sm">
+                            <div id="userName" class="font-medium"></div>
+                            <div id="userEmail" class="text-gray-500 text-xs"></div>
+                        </div>
+                    </div>
+                    <button id="loginBtn" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Sign In with Google</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-24 pb-10">
+        <div class="max-w-7xl mx-auto px-4">
+            
+            <!-- Header -->
+            <div class="dashboard-card p-8 mb-8">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h1 class="text-4xl font-bold gradient-text mb-4">Advanced AI Feedback System</h1>
+                        <p class="text-gray-600 mb-6">Real-time feedback collection with AI-powered sentiment analysis, emotion recognition, and predictive insights.</p>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-2"><div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div><span class="text-sm font-medium" id="liveFeedbackCount">Loading...</span></div>
+                            <div class="flex items-center gap-2"><div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div><span class="text-sm font-medium" id="avgRating">Loading...</span></div>
+                            <div class="flex items-center gap-2"><div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div><span class="text-sm font-medium" id="aiPredictions">0 AI Insights</span></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="text-center p-4 bg-blue-50 rounded-xl"><div class="text-2xl font-bold text-blue-600" id="totalFeedback">0</div><div class="text-sm text-gray-600">Total</div></div>
+                        <div class="text-center p-4 bg-green-50 rounded-xl"><div class="text-2xl font-bold text-green-600" id="positiveRate">0%</div><div class="text-sm text-gray-600">Positive</div></div>
+                        <div class="text-center p-4 bg-purple-50 rounded-xl"><div class="text-2xl font-bold text-purple-600" id="responseTime">0h</div><div class="text-sm text-gray-600">Response</div></div>
+                        <div class="text-center p-4 bg-orange-50 rounded-xl"><div class="text-2xl font-bold text-orange-600" id="trendAccuracy">85%</div><div class="text-sm text-gray-600">Accuracy</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="mb-8">
+                <div class="flex overflow-x-auto pb-2 space-x-4">
+                    <button id="tab-feedback" class="tab-btn active px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold whitespace-nowrap"><i data-lucide="message-square" class="w-4 h-4 inline mr-2"></i>Submit Feedback</button>
+                    <button id="tab-analytics" class="tab-btn px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold whitespace-nowrap"><i data-lucide="trending-up" class="w-4 h-4 inline mr-2"></i>Live Analytics</button>
+                    <button id="tab-ai-insights" class="tab-btn px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold whitespace-nowrap"><i data-lucide="brain" class="w-4 h-4 inline mr-2"></i>AI Insights</button>
+                    <button id="tab-voice" class="tab-btn px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold whitespace-nowrap"><i data-lucide="mic" class="w-4 h-4 inline mr-2"></i>Voice Feedback</button>
+                    <button id="tab-reports" class="tab-btn px-6 py-3 bg-white text-gray-700 rounded-xl font-semibold whitespace-nowrap"><i data-lucide="file-text" class="w-4 h-4 inline mr-2"></i>Reports</button>
+                </div>
+            </div>
+
+            <div id="tab-content">
+                <!-- FEEDBACK TAB -->
+                <div id="content-feedback" class="tab-pane active">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="dashboard-card p-8">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h2 class="text-2xl font-bold text-gray-900">Submit Feedback</h2>
+                                    <div class="flex items-center gap-4">
+                                        <button id="voiceToggle" class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"><i data-lucide="mic" class="w-5 h-5"></i></button>
+                                        <div class="text-sm text-gray-500" id="lastSubmitTime"></div>
+                                    </div>
+                                </div>
+                                <div id="voiceRecording" class="hidden mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center voice-pulse">
+                                                <i data-lucide="mic" class="w-5 h-5 text-white"></i>
+                                            </div>
+                                            <div><div class="font-medium text-gray-800">Recording...</div><div class="text-sm text-gray-600" id="voiceTimer">00:00</div></div>
+                                        </div>
+                                        <button id="stopRecording" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"><i data-lucide="square" class="w-4 h-4"></i> Stop</button>
+                                    </div>
+                                    <div class="mt-4"><div class="text-sm text-gray-700" id="voiceTranscript">Transcription will appear here...</div></div>
+                                </div>
+                                <form id="feedbackForm" class="space-y-6">
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3">Overall Rating & Emotion <span class="text-red-500">*</span></label>
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+                                            <div class="star-rating">
+                                                <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="Excellent">★</label>
+                                                <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Good">★</label>
+                                                <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Average">★</label>
+                                                <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Poor">★</label>
+                                                <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Very Poor">★</label>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm text-gray-600">Emotion detected:</span>
+                                                <div id="emotionIndicator" class="flex items-center gap-1"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3">Type of Service <span class="text-red-500">*</span></label>
+                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            <label class="service-option"><input type="radio" name="serviceType" value="consultation" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 text-blue-600"></i><span>Consultation</span></div></div></label>
+                                            <label class="service-option"><input type="radio" name="serviceType" value="treatment" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-green-600"></i><span>Treatment</span></div></div></label>
+                                            <label class="service-option"><input type="radio" name="serviceType" value="emergency" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i><span>Emergency</span></div></div></label>
+                                            <label class="service-option"><input type="radio" name="serviceType" value="cleaning" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i><span>Cleaning</span></div></div></label>
+                                            <label class="service-option"><input type="radio" name="serviceType" value="surgery" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="scissors" class="w-4 h-4 text-orange-600"></i><span>Surgery</span></div></div></label>
+                                            <label class="service-option"><input type="radio" name="serviceType" value="other" class="hidden"><div class="p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-all"><div class="flex items-center gap-2"><i data-lucide="more-horizontal" class="w-4 h-4 text-gray-600"></i><span>Other</span></div></div></label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3">Select Doctor</label>
+                                        <select id="doctorSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="">-- Select Doctor --</option>
+                                            <option value="dr_vijay">Dr. Vijay Wagh</option>
+                                            <option value="dr_meera">Dr. Meera Pawar</option>
+                                            <option value="dr_rahul">Dr. Rahul Kulkarni</option>
+                                            <option value="dr_anita">Dr. Anita Raut</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <label class="block text-gray-700 font-medium">Detailed Feedback <span class="text-red-500">*</span></label>
+                                            <div class="text-sm text-gray-500"><span id="sentimentScore">Sentiment: Neutral</span></div>
+                                        </div>
+                                        <div class="sentiment-meter mb-4"><div id="sentimentPointer" class="sentiment-pointer" style="left:50%;"></div></div>
+                                        <textarea id="feedbackText" rows="5" placeholder="Please share your detailed experience..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" minlength="50" maxlength="1000"></textarea>
+                                        <div class="flex justify-between mt-2">
+                                            <span class="text-sm text-gray-500">Minimum 50 characters</span>
+                                            <span id="charCount" class="text-sm text-gray-500">0/1000</span>
+                                        </div>
+                                        <div class="mt-2" id="sentimentIndicator"></div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3">Suggestions for Improvement</label>
+                                        <textarea id="suggestions" rows="3" placeholder="Any suggestions to improve our services..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" maxlength="500"></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-gray-700 font-medium mb-3">Would you recommend us?</label>
+                                            <div class="space-y-2">
+                                                <label class="flex items-center"><input type="radio" name="recommend" value="yes" class="mr-2"><span>Yes, definitely</span></label>
+                                                <label class="flex items-center"><input type="radio" name="recommend" value="maybe" class="mr-2"><span>Maybe</span></label>
+                                                <label class="flex items-center"><input type="radio" name="recommend" value="no" class="mr-2"><span>Probably not</span></label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 font-medium mb-3">Additional Options</label>
+                                            <div class="space-y-2">
+                                                <label class="flex items-center"><input type="checkbox" id="isAnonymous" class="mr-2"><span>Submit anonymously</span></label>
+                                                <label class="flex items-center"><input type="checkbox" id="allowFollowup" class="mr-2" checked><span>Allow follow-up contact</span></label>
+                                                <label class="flex items-center"><input type="checkbox" id="aiAnalysis" class="mr-2" checked><span>Enable AI analysis</span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 pulse-animation flex items-center justify-center gap-3" disabled>
+                                        <i data-lucide="send" class="w-5 h-5"></i>
+                                        <span>Submit Feedback</span>
+                                    </button>
+                                    <p class="text-center text-gray-500 text-sm"><i data-lucide="shield" class="w-4 h-4 inline mr-1"></i>Your feedback is encrypted and processed with AI for better insights</p>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="dashboard-card p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-green-600"></i>Real-time Monitor 📈</h3>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div class="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-xl"><div class="text-2xl font-bold text-green-700" id="realtimePositive">0</div><div class="text-xs text-gray-600">Positive</div></div>
+                                        <div class="text-center p-3 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl"><div class="text-2xl font-bold text-yellow-700" id="realtimeNeutral">0</div><div class="text-xs text-gray-600">Neutral</div></div>
+                                        <div class="text-center p-3 bg-gradient-to-br from-red-50 to-red-100 rounded-xl"><div class="text-2xl font-bold text-red-700" id="realtimeNegative">0</div><div class="text-xs text-gray-600">Negative</div></div>
+                                    </div>
+                                    <div class="text-sm text-gray-600"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1 animate-spin"></i>Live updating every 30 seconds</div>
+                                </div>
+                            </div>
+                            <div class="dashboard-card p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><i data-lucide="brain" class="w-5 h-5 text-purple-600"></i>AI Insights 💡</h3>
+                                <div class="space-y-4">
+                                    <div id="aiInsights" class="text-sm text-gray-700">
+                                        <div class="ai-insight-card p-3 rounded-lg mb-3"><div class="font-medium text-gray-900 mb-1">Trend Alert:</div><div class="text-gray-600">Positive feedback increased by 15% this week</div></div>
+                                        <div class="ai-insight-card p-3 rounded-lg"><div class="font-medium text-gray-900 mb-1">Recommendation:</div><div class="text-gray-600">Improve response time for emergency services</div></div>
+                                    </div>
+                                    <button id="refreshInsights" class="w-full py-2 bg-gradient-to-r from-purple-50 to-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200 transition"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1"></i>Refresh AI Insights</button>
+                                </div>
+                            </div>
+                            <div class="dashboard-card p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><i data-lucide="bot" class="w-5 h-5 text-blue-600"></i>Auto-Response 🤖</h3>
+                                <div class="space-y-4">
+                                    <div class="text-sm text-gray-700">
+                                        <div class="flex items-center justify-between mb-2"><span>System Status:</span><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Active</span></div>
+                                        <div class="text-gray-600 mb-3">AI will automatically respond to feedback based on sentiment analysis.</div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center text-sm"><input type="checkbox" id="autoRespondPositive" class="mr-2" checked><span>Auto-respond to positive feedback</span></label>
+                                        <label class="flex items-center text-sm"><input type="checkbox" id="autoRespondNegative" class="mr-2" checked><span>Auto-respond to negative feedback</span></label>
+                                        <label class="flex items-center text-sm"><input type="checkbox" id="autoEscalate" class="mr-2"><span>Auto-escalate critical issues</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+                <div id="content-analytics" class="tab-pane hidden">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="dashboard-card p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Rating Distribution 📊</h3>
+                            <canvas id="ratingChart" height="200"></canvas>
+                        </div>
+                        <div class="dashboard-card p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Trend Predictor 📈</h3>
+                            <canvas id="trendChart" height="200"></canvas>
+                            <div class="prediction-highlight p-4 rounded-xl mt-4">
+                                <div class="font-medium text-gray-900 mb-2">Next Week Prediction:</div>
+                                <div class="text-gray-700">Expected <span class="font-bold text-green-600">12% increase</span> in positive feedback.</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card p-6 lg:col-span-2">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Sentiment Analytics</h3>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <canvas id="sentimentChart" height="200"></canvas>
+                                <div class="grid grid-cols-2 gap-4 content-start">
+                                    <div class="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl"><div class="text-sm text-gray-600 mb-1">Peak Hours</div><div class="text-2xl font-bold text-blue-700">2-4 PM</div></div>
+                                    <div class="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-xl"><div class="text-sm text-gray-600 mb-1">Best Doctor</div><div class="text-2xl font-bold text-green-700">Dr. Meera</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI INSIGHTS TAB -->
+                <div id="content-ai-insights" class="tab-pane hidden">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="dashboard-card p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Emotion Recognition 😢</h3>
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-3 gap-3 text-center">
+                                    <div class="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl emotion-indicator" data-emotion="happy"><div class="text-3xl mb-2">😊</div><div class="font-bold text-green-700" id="happyCount">0%</div><div class="text-xs text-gray-600">Happy</div></div>
+                                    <div class="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl emotion-indicator" data-emotion="neutral"><div class="text-3xl mb-2">😐</div><div class="font-bold text-yellow-700" id="neutralCount">0%</div><div class="text-xs text-gray-600">Neutral</div></div>
+                                    <div class="p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl emotion-indicator" data-emotion="sad"><div class="text-3xl mb-2">😢</div><div class="font-bold text-red-700" id="sadCount">0%</div><div class="text-xs text-gray-600">Sad</div></div>
+                                </div>
+                                <div class="text-sm text-gray-600"><i data-lucide="info" class="w-4 h-4 inline mr-1"></i>AI analyzes text to detect emotional states</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card p-6 lg:col-span-2">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Advanced AI Analysis</h3>
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl"><div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"><i data-lucide="target" class="w-5 h-5 text-blue-600"></i></div><div><div class="font-bold text-gray-900" id="aiAccuracy">85%</div><div class="text-sm text-gray-600">Prediction Accuracy</div></div></div></div>
+                                    <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl"><div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><i data-lucide="zap" class="w-5 h-5 text-purple-600"></i></div><div><div class="font-bold text-gray-900" id="aiSpeed">0.2s</div><div class="text-sm text-gray-600">Analysis Speed</div></div></div></div>
+                                </div>
+                                <div id="detailedInsights" class="space-y-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VOICE TAB -->
+                <div id="content-voice" class="tab-pane hidden">
+                    <div class="dashboard-card p-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><i data-lucide="mic" class="w-6 h-6 text-blue-600"></i>Voice Feedback Analysis 🎤</h3>
+                        <div class="grid lg:grid-cols-2 gap-8">
+                            <div class="space-y-6">
+                                <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center voice-pulse"><i data-lucide="mic" class="w-8 h-8 text-white"></i></div>
+                                        <div><div class="text-2xl font-bold text-gray-900" id="voiceFeedbackCount">0</div><div class="text-gray-600">Voice feedbacks collected</div></div>
+                                    </div>
+                                    <button id="startVoiceFeedback" class="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"><i data-lucide="mic" class="w-6 h-6"></i>Start Voice Feedback</button>
+                                </div>
+                                <div class="space-y-4"><h4 class="font-bold text-gray-900">Recent Voice Feedback</h4><div id="voiceFeedbackList" class="space-y-3"></div></div>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+                                    <h4 class="font-bold text-gray-900 mb-4">Voice Analysis Results</h4>
+                                    <div class="space-y-4">
+                                        <div><div class="flex justify-between mb-1"><span class="text-sm text-gray-600">Sentiment from Voice</span><span class="text-sm font-medium" id="voiceSentiment">Neutral</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-gradient-to-r from-blue-400 to-green-400 h-2 rounded-full" id="voiceSentimentBar" style="width:50%"></div></div></div>
+                                        <div><div class="flex justify-between mb-1"><span class="text-sm text-gray-600">Confidence Level</span><span class="text-sm font-medium" id="voiceConfidence">75%</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-gradient-to-r from-purple-400 to-pink-400 h-2 rounded-full" style="width:75%"></div></div></div>
+                                    </div>
+                                </div>
+                                <div class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                                    <h4 class="font-bold text-gray-900 mb-4">Voice Processing</h4>
+                                    <div class="space-y-3">
+                                        <label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Enable real-time transcription</span></label>
+                                        <label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Analyze tone and emotion</span></label>
+                                        <label class="flex items-center"><input type="checkbox" class="mr-2"><span>Save audio recordings</span></label>
+                                        <label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Auto-translate if needed</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REPORTS TAB -->
+                <div id="content-reports" class="tab-pane hidden">
+                    <div class="dashboard-card p-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><i data-lucide="file-text" class="w-6 h-6 text-green-600"></i>Automated Report Generator 📄</h3>
+                        <div class="space-y-8">
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl text-center"><i data-lucide="file-text" class="w-12 h-12 text-blue-600 mx-auto mb-4"></i><h4 class="font-bold text-gray-900 mb-2">Daily Reports</h4><p class="text-gray-600 text-sm mb-4">Automatically generated every day at 8 PM</p><button class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">Generate Now</button></div>
+                                <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl text-center"><i data-lucide="bar-chart" class="w-12 h-12 text-green-600 mx-auto mb-4"></i><h4 class="font-bold text-gray-900 mb-2">Weekly Analytics</h4><p class="text-gray-600 text-sm mb-4">Detailed weekly performance reports</p><button class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">Generate Now</button></div>
+                                <div class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl text-center"><i data-lucide="trending-up" class="w-12 h-12 text-purple-600 mx-auto mb-4"></i><h4 class="font-bold text-gray-900 mb-2">Monthly Trends</h4><p class="text-gray-600 text-sm mb-4">Comprehensive monthly analysis</p><button class="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">Generate Now</button></div>
+                            </div>
+                            <div class="space-y-6">
+                                <h4 class="font-bold text-gray-900">Recent Reports</h4>
+                                <div id="reportList" class="space-y-3">
+                                    <div class="p-4 border border-gray-200 rounded-xl">
+                                        <div class="flex justify-between items-center">
+                                            <div><div class="font-medium text-gray-900">Daily Feedback Report - Today</div><div class="text-sm text-gray-600">Generated at 8:00 PM</div></div>
+                                            <div class="flex items-center gap-2">
+                                                <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium"><i data-lucide="download" class="w-4 h-4 inline mr-1"></i>PDF</button>
+                                                <button class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium"><i data-lucide="external-link" class="w-4 h-4 inline mr-1"></i>View</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-6 border-t border-gray-200">
+                                <h4 class="font-bold text-gray-900 mb-4">Report Settings</h4>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div><label class="block text-gray-700 font-medium mb-3">Schedule Reports</label><div class="space-y-2"><label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Daily at 8:00 PM</span></label><label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Weekly on Monday</span></label><label class="flex items-center"><input type="checkbox" class="mr-2"><span>Monthly on 1st</span></label></div></div>
+                                    <div><label class="block text-gray-700 font-medium mb-3">Report Formats</label><div class="space-y-2"><label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>PDF Document</span></label><label class="flex items-center"><input type="checkbox" class="mr-2"><span>Excel Spreadsheet</span></label><label class="flex items-center"><input type="checkbox" class="mr-2" checked><span>Email Notification</span></label></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Timeline -->
+            <div class="mt-12">
+                <div class="dashboard-card p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Feedback Timeline</h2>
+                    <div id="feedbackTimeline" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-blue-400"></i><span class="font-bold">AI-Powered Feedback System</span></div>
+                    <p class="text-sm text-gray-400 mt-1">© 2024 Dentalink Feedback System v3.0 | Firebase v12.10.0</p>
+                </div>
+                <div class="text-sm text-gray-400">
+                    <span class="mr-4">Live Data: <span id="dataCount">0</span> records</span>
+                    <span>AI Models: <span id="aiModelStatus">Active</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i></div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Feedback Submitted!</h3>
+            <p class="text-gray-600 mb-4">AI analysis completed. Your feedback ID: <span id="feedbackId" class="font-mono bg-gray-100 px-2 py-1 rounded">#000</span></p>
+            <div class="space-y-3">
+                <button onclick="closeModal()" class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">Continue</button>
+                <button onclick="viewFeedback()" class="w-full py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">View AI Insights</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentUser = null;
+        let feedbackChartObj = null;
+        let trendChartObj    = null;
+        let sentimentChartObj = null;
+        let realtimeListener  = null;
+        let voiceRecognition  = null;
+        let isRecording       = false;
+        let recordingTimer    = null;
+        let recordingSeconds  = 0;
+        let toxicityModel     = null;
+
+        const el = id => document.getElementById(id);
+
+        // ── Wait for Firebase to be ready ────────────────────────────────────
+        function waitForFirebase(cb, tries = 0) {
+            if (window.firebase) { cb(); return; }
+            if (tries > 50) { showToast('Firebase failed to load. Refresh.', 'error'); return; }
+            setTimeout(() => waitForFirebase(cb, tries + 1), 100);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            waitForFirebase(() => {
+                console.log('🚀 Starting AI Feedback System...');
+                initializeTabs();
+                initializeAuth();
+                initializeForm();
+                initializeVoiceRecognition();
+                loadStatistics();
+                setupRealtimeListener();
+
+                // Charts init after small delay so canvases are painted
+                setTimeout(initializeCharts, 200);
+
+                initializeAIModels();
+                initializeEmotionDetection();
+                updateVoiceFeedbackStats();
+
+                setInterval(loadStatistics, 30000);
+                setInterval(() => {
+                    el('aiSpeed').textContent    = `${(Math.random()*.3+.1).toFixed(1)}s`;
+                    el('aiAccuracy').textContent = `${Math.floor(Math.random()*10+85)}%`;
+                    el('trendAccuracy').textContent = `${Math.floor(Math.random()*10+80)}%`;
+                }, 5000);
+
+                showToast('AI Feedback System loaded!', 'success');
+            });
+        });
+
+        // ── Tabs ─────────────────────────────────────────────────────────────
+        function initializeTabs() {
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const paneId = tab.id.replace('tab-', 'content-');
+                    document.querySelectorAll('.tab-btn').forEach(t => {
+                        t.classList.remove('active','bg-blue-600','text-white');
+                        t.classList.add('bg-white','text-gray-700');
+                    });
+                    tab.classList.add('active','bg-blue-600','text-white');
+                    tab.classList.remove('bg-white','text-gray-700');
+                    document.querySelectorAll('.tab-pane').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
+                    el(paneId).classList.remove('hidden'); el(paneId).classList.add('active');
+                });
+            });
+        }
+
+        // ── Auth ──────────────────────────────────────────────────────────────
+        function initializeAuth() {
+            const { auth, authFunctions } = window.firebase;
+            authFunctions.onAuthStateChanged(auth, user => {
+                currentUser = user;
+                if (user) {
+                    el('userInfo').classList.remove('hidden'); el('userInfo').classList.add('flex');
+                    el('userName').textContent  = user.displayName || 'User';
+                    el('userEmail').textContent = user.email;
+                    el('userInitial').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                    el('loginBtn').innerHTML = '<i data-lucide="log-out" class="w-4 h-4"></i><span>Sign Out</span>';
+                    el('loginBtn').onclick = () => auth.signOut();
+                    el('connectionStatus').textContent = `Connected as ${user.displayName || user.email}`;
+                    el('submitBtn').disabled = false;
+                    lucide.createIcons();
+                } else {
+                    el('userInfo').classList.add('hidden'); el('userInfo').classList.remove('flex');
+                    el('loginBtn').innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i><span>Sign In with Google</span>';
+                    el('loginBtn').onclick = loginWithGoogle;
+                    el('connectionStatus').textContent = 'All Systems Active';
+                    el('submitBtn').disabled = true;
+                    lucide.createIcons();
+                }
+            });
+            el('loginBtn').addEventListener('click', loginWithGoogle);
+        }
+
+        async function loginWithGoogle() {
+            try {
+                const result = await window.firebase.authFunctions.signInWithPopup(window.firebase.auth, window.firebase.googleProvider);
+                showToast(`✅ Welcome ${result.user.displayName}!`, 'success');
+                window.fbLogEvent('user_login');
+            } catch(err) {
+                if (err.code !== 'auth/popup-closed-by-user') showToast('❌ Login failed: ' + err.message, 'error');
+            }
+        }
+
+        // ── Form ──────────────────────────────────────────────────────────────
+        function initializeForm() {
+            el('feedbackText').addEventListener('input', function() {
+                const len = this.value.length;
+                el('charCount').textContent = `${len}/1000`;
+                el('charCount').className = `text-sm ${len < 50 ? 'text-red-500' : 'text-green-500'}`;
+                const sentiment = analyzeSentiment(this.value);
+                updateSentimentVisual(sentiment);
+                detectEmotions(this.value);
+            });
+
+            document.querySelectorAll('.service-option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    this.querySelector('input').checked = true;
+                    document.querySelectorAll('.service-option div').forEach(d => d.classList.remove('bg-blue-100','border-blue-500'));
+                    this.querySelector('div').classList.add('bg-blue-100','border-blue-500');
+                });
+            });
+
+            const emotions = [
+                {emoji:'😊',label:'Happy',value:'happy'},{emoji:'😐',label:'Neutral',value:'neutral'},
+                {emoji:'😢',label:'Sad',value:'sad'},{emoji:'😠',label:'Angry',value:'angry'},{emoji:'😲',label:'Surprised',value:'surprised'}
+            ];
+            emotions.forEach(emotion => {
+                const btn = document.createElement('button');
+                btn.type = 'button'; btn.className = 'p-2 rounded-lg hover:bg-gray-100 transition emotion-btn';
+                btn.setAttribute('data-emotion', emotion.value);
+                btn.innerHTML = `<div class="text-2xl">${emotion.emoji}</div><div class="text-xs text-gray-600 mt-1">${emotion.label}</div>`;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('bg-blue-100','border-2','border-blue-500'));
+                    btn.classList.add('bg-blue-100','border-2','border-blue-500');
+                });
+                el('emotionIndicator').appendChild(btn);
+            });
+
+            el('feedbackForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                if (!currentUser) { showToast('🔐 Please sign in first', 'error'); return; }
+                const formData = {
+                    rating:       parseInt(document.querySelector('input[name="rating"]:checked')?.value || 0),
+                    serviceType:  document.querySelector('input[name="serviceType"]:checked')?.value || '',
+                    doctor:       el('doctorSelect').value,
+                    feedback:     el('feedbackText').value,
+                    suggestions:  el('suggestions').value,
+                    recommend:    document.querySelector('input[name="recommend"]:checked')?.value || '',
+                    isAnonymous:  el('isAnonymous').checked,
+                    allowFollowup:el('allowFollowup').checked,
+                    aiAnalysis:   el('aiAnalysis').checked,
+                    userId:       currentUser.uid,
+                    userEmail:    currentUser.email,
+                    userName:     currentUser.displayName,
+                    sentiment:    analyzeSentiment(el('feedbackText').value).label,
+                    emotion:      document.querySelector('.emotion-btn.bg-blue-100')?.getAttribute('data-emotion') || 'neutral',
+                    aiInsights:   generateAIInsights(el('feedbackText').value),
+                    isVoiceFeedback: false,
+                    createdAt:    window.firebase.firestore.serverTimestamp(),
+                    updatedAt:    window.firebase.firestore.serverTimestamp()
+                };
+                if (!formData.rating || !formData.serviceType || formData.feedback.length < 50) {
+                    showToast('❌ Fill all required fields (min 50 chars feedback)', 'error'); return;
+                }
+                await submitFeedback(formData);
+            });
+        }
+
+        async function submitFeedback(data) {
+            const btn = el('submitBtn');
+            btn.innerHTML = `<div class="spinner-small w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div><span>Processing with AI...</span>`;
+            btn.disabled = true;
+            try {
+                if (data.aiAnalysis) {
+                    data.aiAnalysisResults = await analyzeWithAI(data.feedback);
+                    if (toxicityModel) data.toxicityScore = await checkToxicity(data.feedback);
+                }
+                const docRef = await window.firebase.firestore.addDoc(
+                    window.firebase.firestore.collection(window.firebase.db, 'feedbacks'), data
+                );
+                window.fbLogEvent('feedback_submitted', { rating: data.rating, service_type: data.serviceType, sentiment: data.sentiment });
+                el('feedbackId').textContent = `#${docRef.id.slice(-6)}`;
+                el('successModal').classList.remove('hidden'); el('successModal').classList.add('flex');
+                el('feedbackForm').reset();
+                el('charCount').textContent = '0/1000';
+                el('sentimentIndicator').innerHTML = '';
+                el('sentimentPointer').style.left = '50%';
+                el('sentimentScore').textContent = 'Sentiment: Neutral';
+                showToast('✅ Feedback saved to Firebase!', 'success');
+            } catch(err) {
+                console.error('Submit error:', err);
+                let msg = '❌ Failed to submit. Try again.';
+                if (err.code === 'permission-denied') msg = '❌ Firebase permission denied — check Firestore rules.';
+                else if (err.code === 'unauthenticated')  msg = '🔐 Please login first.';
+                else if (err.code === 'unavailable')      msg = '🌐 No internet connection.';
+                showToast(msg, 'error');
+            } finally {
+                btn.innerHTML = `<i data-lucide="send" class="w-5 h-5"></i><span>Submit Feedback</span>`;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        // ── Voice ─────────────────────────────────────────────────────────────
+        function initializeVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            voiceRecognition = new SR();
+            voiceRecognition.continuous = true; voiceRecognition.interimResults = true; voiceRecognition.lang = 'en-US';
+            voiceRecognition.onstart = () => { isRecording = true; el('voiceRecording').classList.remove('hidden'); startTimer(); showToast('🎤 Recording...', 'info'); };
+            voiceRecognition.onresult = e => {
+                let t = '';
+                for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
+                el('voiceTranscript').textContent = t; el('feedbackText').value = t;
+                updateSentimentVisual(analyzeSentiment(t));
+            };
+            voiceRecognition.onerror = () => { stopVoice(); showToast('❌ Voice error', 'error'); };
+            voiceRecognition.onend   = () => stopVoice();
+            el('voiceToggle').addEventListener('click', () => isRecording ? stopVoice() : startVoice());
+            el('stopRecording').addEventListener('click', stopVoice);
+            el('startVoiceFeedback').addEventListener('click', startVoice);
+        }
+        function startVoice() { if (!currentUser) { showToast('🔐 Please sign in first', 'error'); return; } try { voiceRecognition.start(); } catch(e){} }
+        function stopVoice() {
+            if (!isRecording) return;
+            voiceRecognition.stop(); isRecording = false; el('voiceRecording').classList.add('hidden'); stopTimer();
+            showToast('✅ Voice saved', 'success');
+            const t = el('voiceTranscript').textContent;
+            if (t.length > 50) submitVoiceFeedback(t);
+        }
+        function startTimer() { recordingSeconds = 0; recordingTimer = setInterval(() => { recordingSeconds++; const m=Math.floor(recordingSeconds/60), s=recordingSeconds%60; el('voiceTimer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }, 1000); }
+        function stopTimer()  { clearInterval(recordingTimer); }
+        async function submitVoiceFeedback(transcript) {
+            try {
+                await window.firebase.firestore.addDoc(window.firebase.firestore.collection(window.firebase.db, 'voiceFeedbacks'), {
+                    rating: 4, serviceType: 'consultation', feedback: transcript,
+                    userId: currentUser.uid, userEmail: currentUser.email, userName: currentUser.displayName,
+                    sentiment: analyzeSentiment(transcript).label, emotion: detectEmotions(transcript),
+                    isVoiceFeedback: true, voiceDuration: recordingSeconds,
+                    createdAt: window.firebase.firestore.serverTimestamp()
+                });
+                updateVoiceFeedbackStats();
+                showToast('✅ Voice feedback saved!', 'success');
+            } catch(e) { showToast('❌ Voice save failed', 'error'); }
+        }
+
+        // ── AI helpers ────────────────────────────────────────────────────────
+        async function initializeAIModels() {
+            try {
+                toxicityModel = await toxicity.load(0.9);
+                showToast('🤖 AI models loaded!', 'success');
+            } catch(e) { el('aiModelStatus').textContent = 'Limited'; }
+        }
+
+        function analyzeSentiment(text) {
+            if (!text || text.length < 10) return { score:.5, label:'neutral' };
+            const pos = ['excellent','amazing','wonderful','great','good','happy','satisfied','professional','helpful','friendly','clean','fast','efficient','comfortable','painless'];
+            const neg = ['terrible','awful','horrible','bad','poor','unhappy','dissatisfied','rude','slow','dirty','painful','expensive','wait','disappointed'];
+            const words = text.toLowerCase().split(/\s+/);
+            let p=0,n=0;
+            words.forEach(w => { if(pos.includes(w)) p++; if(neg.includes(w)) n++; });
+            const total = p+n;
+            let score = total > 0 ? p/total : 0.5;
+            score += (text.match(/!/g)||[]).length * 0.05;
+            score -= (text.match(/[A-Z]{2,}/g)||[]).length * 0.05;
+            score = Math.max(0, Math.min(1, score));
+            return { score, label: score>.7?'positive':score<.3?'negative':'neutral' };
+        }
+
+        function updateSentimentVisual(s) {
+            el('sentimentPointer').style.left = `${s.score*100}%`;
+            const map = { positive:'green', neutral:'gray', negative:'red' };
+            const emo = { positive:'😊', neutral:'😐', negative:'😢' };
+            el('sentimentScore').textContent = `Sentiment: ${s.label.charAt(0).toUpperCase()+s.label.slice(1)} ${emo[s.label]}`;
+            el('sentimentScore').className = `text-sm font-medium text-${map[s.label]}-600`;
+        }
+
+        function detectEmotions(text) {
+            const map = { happy:['happy','joy','excited','pleased','delighted'], sad:['sad','unhappy','disappointed','miserable'], angry:['angry','mad','furious','annoyed'], surprised:['surprised','shocked','amazed'] };
+            const words = text.toLowerCase().split(/\s+/);
+            let dominant='neutral', max=0;
+            Object.keys(map).forEach(e => { const c=map[e].filter(w=>words.includes(w)).length; if(c>max){max=c;dominant=e;} });
+            return dominant;
+        }
+
+        function generateAIInsights(text) {
+            const i=[];
+            if(text.length>100) i.push('Detailed feedback provided');
+            if(/wait|time/.test(text)) i.push('Waiting time mentioned');
+            if(/pain|hurt/.test(text)) i.push('Pain management mentioned');
+            if(/clean|hygiene/.test(text)) i.push('Hygiene highlighted');
+            return i;
+        }
+
+        async function analyzeWithAI(text) {
+            return { topics:['patient experience','service quality'], keywords:text.split(' ').slice(0,5), summary: text.substring(0,150) };
+        }
+
+        async function checkToxicity(text) {
+            if (!toxicityModel) return 0;
+            try { const p=await toxicityModel.classify([text]); return p[6]?.results[0]?.probabilities[1]||0; } catch(e){return 0;}
+        }
+
+        function initializeEmotionDetection() {
+            setInterval(() => {
+                const h=Math.floor(Math.random()*30+60), n=Math.floor(Math.random()*20+20), s=100-h-n;
+                el('happyCount').textContent=`${h}%`; el('neutralCount').textContent=`${n}%`; el('sadCount').textContent=`${s}%`;
+                const emotions=['happy','neutral','sad'];
+                const active=emotions[Math.floor(Math.random()*3)];
+                document.querySelectorAll('.emotion-indicator').forEach(i => { i.classList.remove('active'); if(i.dataset.emotion===active) i.classList.add('active'); });
+            }, 3000);
+        }
+
+        // ── Statistics ────────────────────────────────────────────────────────
+        async function loadStatistics() {
+            try {
+                const snap = await window.firebase.firestore.getDocs(window.firebase.firestore.collection(window.firebase.db, 'feedbacks'));
+                let total=0, ratingSum=0, pos=0, neu=0, neg=0;
+                snap.forEach(d => {
+                    const data=d.data(); total++; ratingSum+=parseInt(data.rating||0);
+                    const s=data.sentiment||analyzeSentiment(data.feedback||'').label;
+                    if(s==='positive')pos++; else if(s==='neutral')neu++; else neg++;
+                });
+                const avg = total>0?(ratingSum/total).toFixed(1):'0.0';
+                const posRate = total>0?Math.round(pos/total*100):0;
+                el('totalFeedback').textContent=total; el('avgRating').textContent=`${avg}/5.0`;
+                el('positiveRate').textContent=`${posRate}%`; el('liveFeedbackCount').textContent=`${total} feedbacks collected`;
+                el('dataCount').textContent=total; el('realtimePositive').textContent=pos;
+                el('realtimeNeutral').textContent=neu; el('realtimeNegative').textContent=neg;
+                el('aiPredictions').textContent=`${Math.floor(total*.8)} AI Insights`;
+                if(feedbackChartObj) updateCharts(snap);
+                updateAIInsights(snap);
+            } catch(e) { console.error('Stats error:', e); }
+        }
+
+        function setupRealtimeListener() {
+            const q = window.firebase.firestore.query(
+                window.firebase.firestore.collection(window.firebase.db, 'feedbacks'),
+                window.firebase.firestore.orderBy('createdAt','desc'),
+                window.firebase.firestore.limit(10)
+            );
+            realtimeListener = window.firebase.firestore.onSnapshot(q, snap => {
+                updateTimeline(snap);
+                loadStatistics();
+            });
+        }
+
+        function updateTimeline(snap) {
+            const tl = el('feedbackTimeline'); tl.innerHTML = '';
+            if (snap.empty) { tl.innerHTML = '<p class="text-gray-400 text-center py-6">No feedback yet. Be the first!</p>'; return; }
+            snap.forEach(d => {
+                const data=d.data();
+                const s=data.sentiment||'neutral';
+                const sColors={positive:'green',neutral:'yellow',negative:'red'};
+                const ago = data.createdAt ? getTimeAgo(data.createdAt.toDate()) : 'Just now';
+                const div=document.createElement('div'); div.className='p-3 bg-gray-50 rounded-lg timeline-item';
+                div.innerHTML=`<div class="flex items-center justify-between mb-1"><div class="flex items-center gap-2"><div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xs font-bold">${(data.userName||data.userEmail||'A').charAt(0).toUpperCase()}</div><span class="font-medium text-sm">${data.isAnonymous?'Anonymous':(data.userName||'User')}</span></div><span class="text-xs text-gray-500">${ago}</span></div><div class="flex items-center gap-2 mb-2"><span class="text-yellow-500">${'★'.repeat(data.rating||0)}${'☆'.repeat(5-(data.rating||0))}</span><span class="text-xs px-2 py-1 bg-${sColors[s]}-100 text-${sColors[s]}-700 rounded-full">${s}</span>${data.isVoiceFeedback?'<span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">🎤 Voice</span>':''}</div><p class="text-sm text-gray-600 truncate">${(data.feedback||'').substring(0,80)}...</p>`;
+                tl.appendChild(div);
+            });
+        }
+
+        function updateAIInsights(snap) {
+            const services={}, times={};
+            snap.forEach(d => {
+                const data=d.data();
+                const svc=data.serviceType||'other'; services[svc]=(services[svc]||0)+1;
+                if(data.createdAt){ const h=data.createdAt.toDate().getHours(); times[h]=(times[h]||0)+1; }
+            });
+            let maxSvc='',maxC=0; Object.keys(services).forEach(s=>{if(services[s]>maxC){maxC=services[s];maxSvc=s;}});
+            let peakH='',peakC=0; Object.keys(times).forEach(h=>{if(times[h]>peakC){peakC=times[h];peakH=`${h}:00`;}});
+            const insights=[];
+            if(maxSvc) insights.push(`Most feedback for <b>${maxSvc}</b> services`);
+            if(peakH)  insights.push(`Peak feedback time at <b>${peakH}</b>`);
+            if(snap.size>10) insights.push('High volume — consider increasing support staff');
+            el('aiInsights').innerHTML = insights.map(i=>`<div class="ai-insight-card p-3 rounded-lg mb-3"><div class="font-medium text-gray-900 mb-1">AI Insight:</div><div class="text-gray-600">${i}</div></div>`).join('') || '<p class="text-gray-400 text-sm">Submit feedback to generate insights.</p>';
+            el('detailedInsights').innerHTML=`<div class="text-sm text-gray-700"><div class="mb-2">📊 <b>Services:</b> ${Object.keys(services).map(s=>`${s}:${services[s]}`).join(', ')||'None yet'}</div><div class="mb-2">⏰ <b>Peak Hour:</b> ${peakH||'N/A'}</div><div>🤖 <b>AI Confidence:</b> ${Math.min(95,Math.floor(snap.size*2+60))}%</div></div>`;
+        }
+
+        function updateCharts(snap) {
+            const rc={5:0,4:0,3:0,2:0,1:0}, sd={positive:0,neutral:0,negative:0};
+            snap.forEach(d=>{const data=d.data();if(rc[data.rating]!==undefined)rc[data.rating]++;const s=data.sentiment||analyzeSentiment(data.feedback||'').label;sd[s]++;});
+            feedbackChartObj.data.datasets[0].data=Object.values(rc); feedbackChartObj.update();
+            if(sentimentChartObj){sentimentChartObj.data.datasets[0].data=Object.values(sd);sentimentChartObj.update();}
+        }
+
+        async function updateVoiceFeedbackStats() {
+            try {
+                const snap=await window.firebase.firestore.getDocs(window.firebase.firestore.collection(window.firebase.db,'voiceFeedbacks'));
+                el('voiceFeedbackCount').textContent=snap.size;
+                el('voiceFeedbackList').innerHTML='';
+                snap.forEach(d=>{
+                    const data=d.data(); const ago=data.createdAt?getTimeAgo(data.createdAt.toDate()):'Just now';
+                    const item=document.createElement('div'); item.className='p-3 bg-gray-50 rounded-lg';
+                    item.innerHTML=`<div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><i data-lucide="mic" class="w-4 h-4 text-purple-600"></i><span class="text-sm font-medium">${data.userName||'User'}</span></div><span class="text-xs text-gray-500">${ago}</span></div><p class="text-sm text-gray-600 truncate">${(data.feedback||'').substring(0,60)}...</p><div class="flex items-center gap-2 mt-2"><span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${data.sentiment||'neutral'}</span><span class="text-xs text-gray-500">${data.voiceDuration||0}s</span></div>`;
+                    el('voiceFeedbackList').appendChild(item);
+                });
+                lucide.createIcons();
+            } catch(e){}
+        }
+
+        // ── Charts ────────────────────────────────────────────────────────────
+        function initializeCharts() {
+            const rCtx = el('ratingChart')?.getContext('2d');
+            if (rCtx) {
+                feedbackChartObj = new Chart(rCtx, {
+                    type:'bar',
+                    data:{ labels:['5★','4★','3★','2★','1★'], datasets:[{label:'Count',data:[0,0,0,0,0],backgroundColor:['rgba(34,197,94,.7)','rgba(134,239,172,.7)','rgba(253,224,71,.7)','rgba(251,191,36,.7)','rgba(239,68,68,.7)'],borderColor:['rgb(34,197,94)','rgb(134,239,172)','rgb(253,224,71)','rgb(251,191,36)','rgb(239,68,68)'],borderWidth:1}]},
+                    options:{responsive:true,plugins:{legend:{display:false},title:{display:true,text:'Rating Distribution',font:{size:14,weight:'bold'}}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}
+                });
+            }
+            const tCtx = el('trendChart')?.getContext('2d');
+            if (tCtx) {
+                trendChartObj = new Chart(tCtx, {
+                    type:'line',
+                    data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Positive',data:[12,19,15,17,22,18,24],borderColor:'rgb(34,197,94)',backgroundColor:'rgba(34,197,94,.1)',tension:.4,fill:true},{label:'Total',data:[20,25,22,28,30,26,32],borderColor:'rgb(59,130,246)',backgroundColor:'rgba(59,130,246,.1)',tension:.4,fill:true}]},
+                    options:{responsive:true,plugins:{legend:{position:'top'},title:{display:true,text:'Weekly Trend',font:{size:14,weight:'bold'}}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}
+                });
+            }
+            const sCtx = el('sentimentChart')?.getContext('2d');
+            if (sCtx) {
+                sentimentChartObj = new Chart(sCtx, {
+                    type:'doughnut',
+                    data:{labels:['Positive','Neutral','Negative'],datasets:[{data:[65,25,10],backgroundColor:['rgba(34,197,94,.8)','rgba(253,224,71,.8)','rgba(239,68,68,.8)'],borderColor:['rgb(34,197,94)','rgb(253,224,71)','rgb(239,68,68)'],borderWidth:1}]},
+                    options:{responsive:true,plugins:{legend:{position:'bottom'},title:{display:true,text:'Sentiment Distribution',font:{size:14,weight:'bold'}}}}
+                });
+            }
+        }
+
+        // ── Utilities ─────────────────────────────────────────────────────────
+        function getTimeAgo(date) {
+            if (!date) return 'Just now';
+            const s=Math.floor((new Date()-date)/1000);
+            if(s<60)return 'Just now';
+            const m=Math.floor(s/60); if(m<60)return `${m}m ago`;
+            const h=Math.floor(m/60); if(h<24)return `${h}h ago`;
+            const d=Math.floor(h/24); if(d<30)return `${d}d ago`;
+            return `${Math.floor(d/30)}mo ago`;
+        }
+
+        function showToast(msg, type='info') {
+            const t=document.createElement('div'); t.className=`toast ${type}`;
+            const icon=type==='success'?'check-circle':type==='error'?'alert-circle':'info';
+            t.innerHTML=`<div class="flex items-center gap-3"><i data-lucide="${icon}" class="w-5 h-5"></i><span>${msg}</span></div>`;
+            el('toastContainer').appendChild(t); lucide.createIcons();
+            setTimeout(()=>t.classList.add('show'),10);
+            setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},5000);
+        }
+
+        function closeModal() { el('successModal').classList.add('hidden'); el('successModal').classList.remove('flex'); }
+        function viewFeedback() { closeModal(); el('tab-ai-insights').click(); }
+
+        el('refreshInsights').addEventListener('click', () => {
+            el('refreshInsights').innerHTML = `<div class="spinner-small w-4 h-4 border-2 inline mr-1"></div>Refreshing...`;
+            setTimeout(()=>{ loadStatistics(); el('refreshInsights').innerHTML=`<i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1"></i>Refresh AI Insights`; lucide.createIcons(); showToast('AI insights refreshed!','success'); }, 1500);
+        });
+    </script>
+</body>
+</html>

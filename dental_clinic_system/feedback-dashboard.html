@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dentalink Pro · Animated Feedback Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="15" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
+            animation: move 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes move {
+            from { transform: translate(0, 0); }
+            to { transform: translate(50px, 50px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.6); }
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            animation: slideInLeft 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .header-left h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header-left p {
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .date-badge {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 28px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(249,115,22,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            background: inherit;
+            filter: blur(15px);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .stat-icon.orange { background: linear-gradient(135deg, #f97316, #f59e0b); }
+        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .stat-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .stat-icon.purple { background: linear-gradient(135deg, #a855f7, #9333ea); }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            animation: countUp 1s ease-out;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .stat-trend {
+            font-size: 14px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trend-up { color: #22c55e; animation: pulse 2s infinite; }
+        .trend-down { color: #ef4444; }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 24px;
+            animation: scaleIn 0.6s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(249,115,22,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            color: #e2e8f0;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        /* Rating Distribution Bars */
+        .rating-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rating-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .rating-bar-label {
+            width: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #f59e0b;
+        }
+
+        .rating-bar-container {
+            flex: 1;
+            height: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .rating-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #f59e0b);
+            border-radius: 20px;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            animation: glow 2s infinite;
+        }
+
+        .rating-bar-count {
+            width: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 100px;
+            padding: 16px 24px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            animation: slideInUp 0.8s ease-out;
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.5);
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 60px;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #64748b;
+        }
+
+        .search-wrapper input:focus {
+            border-color: #f97316;
+            background: rgba(255,255,255,0.05);
+            box-shadow: 0 0 0 4px rgba(249,115,22,0.1);
+        }
+
+        .search-wrapper input:focus + i {
+            color: #f97316;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 16px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 60px;
+            font-family: inherit;
+            font-size: 14px;
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            outline: none;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: #f97316;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .filter-select option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .reset-btn {
+            padding: 16px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 60px;
+            background: rgba(255,255,255,0.02);
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:hover {
+            background: #f97316;
+            border-color: #f97316;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(249,115,22,0.5);
+        }
+
+        .reset-btn i {
+            transition: transform 0.5s ease;
+        }
+
+        .reset-btn:hover i {
+            transform: rotate(360deg);
+        }
+
+        /* Feedback Grid */
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
+            perspective: 1000px;
+        }
+
+        .feedback-card {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            animation: scaleIn 0.6s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        .feedback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(249,115,22,0.03), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .feedback-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-15px) rotateX(2deg) scale(1.02);
+            border-color: rgba(249,115,22,0.3);
+            box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8);
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .patient-info {
+            display: flex;
+            gap: 16px;
+        }
+
+        .patient-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 20px -5px rgba(249,115,22,0.5);
+        }
+
+        .feedback-card:hover .patient-avatar {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .patient-details h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .doctor-name {
+            font-size: 14px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .doctor-name i {
+            color: #3b82f6;
+        }
+
+        .rating {
+            background: rgba(249,115,22,0.1);
+            border: 1px solid rgba(249,115,22,0.3);
+            color: #f59e0b;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        .rating i {
+            animation: starTwinkle 1.5s infinite;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .feedback-message {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 20px;
+            border-left: 4px solid #f97316;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-card:hover .feedback-message {
+            background: rgba(255,255,255,0.03);
+            border-left-width: 6px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .date {
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stars {
+            color: #f59e0b;
+            letter-spacing: 3px;
+            font-size: 16px;
+            animation: starTwinkle 2s infinite;
+        }
+
+        .ai-badge {
+            background: rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #60a5fa;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        .ai-badge i {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1/-1;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 40px;
+            padding: 80px;
+            text-align: center;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #f59e0b;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Loading Animation */
+        .loading-skeleton {
+            grid-column: 1/-1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
+        }
+
+        .skeleton-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 30px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 12px;
+            height: 200px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .charts-section { grid-template-columns: 1fr; }
+            .filters-bar { flex-direction: column; border-radius: 30px; }
+            .filter-group { flex-direction: column; width: 100%; }
+            .filter-select { width: 100%; }
+            .reset-btn { width: 100%; justify-content: center; }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-star" style="color: #f97316; margin-right: 12px;"></i>Feedback Center</h1>
+                <p>Real-time patient feedback & satisfaction analytics</p>
+            </div>
+            <div class="date-badge" id="current-date"></div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="stat-label">Total Reviews</span>
+                </div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up trend-up"></i>
+                    +23% this month
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span class="stat-label">Average Rating</span>
+                </div>
+                <div class="stat-value" id="stat-avg">0.0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-star" style="color: #f59e0b;"></i>
+                    out of 5.0
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <span class="stat-label">5-Star Reviews</span>
+                </div>
+                <div class="stat-value" id="stat-5star">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-check-circle trend-up"></i>
+                    excellent feedback
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <span class="stat-label">This Month</span>
+                </div>
+                <div class="stat-value" id="stat-month">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-clock"></i>
+                    new reviews
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <!-- Rating Distribution Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie" style="color: #f97316;"></i> Rating Distribution</h3>
+                    <span style="color: #94a3b8; font-size: 14px;">last 30 days</span>
+                </div>
+                <div class="rating-bars" id="ratingBars">
+                    <!-- Dynamic bars will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Monthly Trend Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line" style="color: #f97316;"></i> Monthly Trend</h3>
+                    <span style="color: #94a3b8; font-size: 14px;">last 6 months</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by patient, doctor, or feedback...">
+            </div>
+            <div class="filter-group">
+                <select id="ratingFilter" class="filter-select">
+                    <option value="all">All Ratings</option>
+                    <option value="5">5 Stars ⭐⭐⭐⭐⭐</option>
+                    <option value="4">4 Stars ⭐⭐⭐⭐</option>
+                    <option value="3">3 Stars ⭐⭐⭐</option>
+                    <option value="2">2 Stars ⭐⭐</option>
+                    <option value="1">1 Star ⭐</option>
+                </select>
+                <button class="reset-btn" onclick="resetFilters()">
+                    <i class="fas fa-redo-alt"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Grid -->
+        <div class="feedback-grid" id="feedbackGrid">
+            <div class="loading-skeleton" id="loadingSkeleton">
+                <div class="skeleton-card"><div class="skeleton"></div></div>
+                <div class="skeleton-card"><div class="skeleton"></div></div>
+                <div class="skeleton-card"><div class="skeleton"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Firebase Config -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+            authDomain: "dentalink-e3d20.firebaseapp.com",
+            databaseURL: "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+            projectId: "dentalink-e3d20",
+            storageBucket: "dentalink-e3d20.firebasestorage.app",
+            messagingSenderId: "22170715728",
+            appId: "1:22170715728:web:d175aa5e780bc3c926f355",
+            measurementId: "G-X3Z8RYKWBM"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State
+        let allFeedback = [];
+        let trendChart;
+
+        // Set current date
+        document.getElementById('current-date').innerHTML = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249,115,22,0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#f97316',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Animated counter
+        function animateValue(element, start, end, duration = 1500) {
+            if (!element) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = element.id === 'stat-avg' ? (value / 10).toFixed(1) : value;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Listen to feedbacks collection
+        onSnapshot(query(collection(db, "feedbacks"), orderBy("createdAt", "desc")), (snapshot) => {
+            allFeedback = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allFeedback.push({
+                    id: doc.id,
+                    patientName: data.patientName || data.name || 'Anonymous Patient',
+                    doctorName: data.doctor || data.doctorName || 'Dr. General',
+                    rating: parseInt(data.rating) || 0,
+                    feedback: data.feedback || data.review || data.comment || data.summary || 'No feedback text available',
+                    date: data.createdAt || data.date || new Date(),
+                    aiAnalysis: data.aiAnalysis || false,
+                    topics: data.topics || []
+                });
+            });
+            document.getElementById('loadingSkeleton').style.display = 'none';
+            renderFeedback();
+            updateCharts();
+        }, (error) => {
+            console.error("Firebase error:", error);
+            document.getElementById('feedbackGrid').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    <h3>Error Loading Data</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        });
+
+        // Update charts
+        function updateCharts() {
+            // Update rating bars
+            const ratingCounts = [0, 0, 0, 0, 0];
+            allFeedback.forEach(f => {
+                if (f.rating >= 1 && f.rating <= 5) {
+                    ratingCounts[5 - f.rating]++;
+                }
+            });
+
+            const barsHtml = [5,4,3,2,1].map((stars, i) => {
+                const count = ratingCounts[5 - stars];
+                const total = allFeedback.length;
+                const percentage = total > 0 ? (count / total * 100) : 0;
+                return `
+                    <div class="rating-bar-item">
+                        <span class="rating-bar-label">${stars}★</span>
+                        <div class="rating-bar-container">
+                            <div class="rating-bar-fill" style="width: ${percentage}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('ratingBars').innerHTML = barsHtml;
+
+            // Update trend chart
+            if (trendChart) {
+                const monthlyData = [0, 0, 0, 0, 0, 0];
+                const now = new Date();
+                
+                allFeedback.forEach(f => {
+                    try {
+                        const date = f.date?.toDate ? f.date.toDate() : new Date(f.date);
+                        const monthDiff = (now.getMonth() - date.getMonth() + 12) % 12;
+                        if (monthDiff < 6) {
+                            monthlyData[5 - monthDiff]++;
+                        }
+                    } catch (e) {}
+                });
+                
+                trendChart.data.datasets[0].data = monthlyData;
+                trendChart.update();
+            }
+        }
+
+        // Render feedback
+        function renderFeedback() {
+            let filtered = [...allFeedback];
+
+            // Apply search
+            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            if (searchTerm) {
+                filtered = filtered.filter(f => 
+                    f.patientName.toLowerCase().includes(searchTerm) ||
+                    f.doctorName.toLowerCase().includes(searchTerm) ||
+                    f.feedback.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply rating filter
+            const ratingFilter = document.getElementById('ratingFilter')?.value || 'all';
+            if (ratingFilter !== 'all') {
+                filtered = filtered.filter(f => f.rating === parseInt(ratingFilter));
+            }
+
+            // Calculate stats
+            const total = allFeedback.length;
+            const avgRating = total > 0 
+                ? (allFeedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
+                : 0;
+            const fiveStar = allFeedback.filter(f => f.rating === 5).length;
+            
+            // This month
+            const now = new Date();
+            const thisMonth = allFeedback.filter(f => {
+                try {
+                    const date = f.date?.toDate ? f.date.toDate() : new Date(f.date);
+                    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                } catch {
+                    return false;
+                }
+            }).length;
+
+            // Animate stats
+            animateValue(document.getElementById('stat-total'), 0, total);
+            document.getElementById('stat-avg').textContent = avgRating;
+            animateValue(document.getElementById('stat-5star'), 0, fiveStar);
+            animateValue(document.getElementById('stat-month'), 0, thisMonth);
+
+            // Render cards
+            const grid = document.getElementById('feedbackGrid');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-star"></i>
+                        <h3>No feedback found</h3>
+                        <p>${searchTerm ? 'Try adjusting your search or filter' : 'Be the first to leave a review'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((f, index) => {
+                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                let dateStr = 'Recently';
+                
+                try {
+                    const date = f.date?.toDate ? f.date.toDate() : new Date(f.date);
+                    if (!isNaN(date.getTime())) {
+                        dateStr = date.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                    }
+                } catch (e) {}
+
+                return `
+                    <div class="feedback-card" style="animation: scaleIn 0.5s ease-out ${index * 0.1}s both;">
+                        <div class="card-header">
+                            <div class="patient-info">
+                                <div class="patient-avatar">
+                                    ${f.patientName.charAt(0).toUpperCase()}
+                                </div>
+                                <div class="patient-details">
+                                    <h4>${escapeHtml(f.patientName)}</h4>
+                                    <div class="doctor-name">
+                                        <i class="fas fa-user-md"></i>
+                                        ${escapeHtml(f.doctorName)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                ${f.rating}.0
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="feedback-message">
+                                "${escapeHtml(f.feedback)}"
+                            </div>
+                            <div class="meta-info">
+                                <span class="date">
+                                    <i class="far fa-calendar"></i>
+                                    ${dateStr}
+                                </span>
+                                <span class="stars">${stars}</span>
+                            </div>
+                            ${f.aiAnalysis ? `
+                                <div class="ai-badge">
+                                    <i class="fas fa-robot"></i>
+                                    AI Analysis Available
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper functions
+        function escapeHtml(s) {
+            if (!s) return '';
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        // Reset filters
+        window.resetFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('ratingFilter').value = 'all';
+            renderFeedback();
+        };
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderFeedback);
+        document.getElementById('ratingFilter').addEventListener('change', renderFeedback);
+
+        // Initialize chart
+        window.addEventListener('load', initChart);
+    </script>
+</body>
+</html>

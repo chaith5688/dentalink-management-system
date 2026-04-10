@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DentalCare Pro | Smart Medical Reports Portal</title>
+    
+    <!-- Core Libraries (Tailwind, Fonts, Icons, Charts, PDF, Excel) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK Modular (v12.11.0) -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js",
+                "firebase/analytics": "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js",
+                "firebase/storage": "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js"
+            }
+        }
+    </script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(145deg, #f6f9fc 0%, #f1f5f9 100%); min-height: 100vh; }
+        .med-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            transition: all 0.25s ease;
+            border: 1px solid rgba(226,232,240,0.8);
+        }
+        .med-card:hover { transform: translateY(-3px); box-shadow: 0 20px 35px -12px rgba(26,86,219,0.2); border-color: #a0c4ff; }
+        .status-badge {
+            display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        .status-completed { background: #d1fae5; color: #065f46; border-left: 3px solid #10b981; }
+        .status-pending { background: #fff3cd; color: #856404; border-left: 3px solid #ffc107; }
+        .status-inprogress { background: #dbeafe; color: #1e40af; border-left: 3px solid #3b82f6; }
+        .gradient-primary { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        @media print { .no-print { display: none !important; } .med-card { break-inside: avoid; box-shadow: none; } }
+        .animate-slide-in { animation: slideUp 0.25s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mb-4"></div>
+            <p class="font-medium text-gray-700">Loading Dental Portal...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="gradient-primary w-10 h-10 rounded-2xl flex items-center justify-center shadow-md">
+                    <i class="fas fa-tooth text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-gray-800 text-xl">DentalCare Pro</h1>
+                    <p class="text-xs text-gray-500">Medical Reports Portal v2.0</p>
+                </div>
+            </div>
+            <div class="hidden md:flex gap-8 items-center">
+                <a href="#" class="text-gray-600 hover:text-blue-700 font-medium"><i class="fas fa-chart-line mr-2"></i>Dashboard</a>
+                <a href="#" class="text-blue-700 font-semibold border-b-2 border-blue-600 pb-1"><i class="fas fa-file-medical mr-2"></i>Reports</a>
+                <a href="#" class="text-gray-600 hover:text-blue-700"><i class="fas fa-calendar-check mr-2"></i>Appointments</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-bold" id="userInitials">RP</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                    </button>
+                    <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border z-50">
+                        <div class="p-2"><a href="#" class="block px-4 py-2 hover:bg-gray-50 rounded-lg"><i class="fas fa-user mr-2"></i>Profile</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-50 rounded-lg"><i class="fas fa-cog mr-2"></i>Settings</a>
+                        <hr class="my-1"><button onclick="logout()" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-5 py-8 sm:px-8">
+        <!-- Header & Patient Card -->
+        <div class="mb-8 flex flex-wrap justify-between items-start gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-gray-800 tracking-tight">Medical Reports</h1>
+                <p class="text-gray-500 mt-1">Comprehensive dental records & insights</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-emerald-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button onclick="generateFullPDF()" class="bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-blue-800 flex items-center gap-2"><i class="fas fa-file-pdf"></i> PDF Report</button>
+                <button onclick="refreshData()" class="border border-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-50"><i class="fas fa-sync-alt"></i> Sync</button>
+            </div>
+        </div>
+
+        <!-- Patient info card -->
+        <div class="med-card p-5 mb-8">
+            <div class="flex flex-wrap justify-between items-center">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center shadow"><span class="text-white text-2xl font-bold" id="patientInitialsCard">RP</span></div>
+                    <div><h2 class="text-2xl font-bold" id="patientNameCard">Rajesh Patil</h2>
+                    <div class="flex gap-2 mt-1"><span class="text-xs bg-blue-100 px-3 py-1 rounded-full">ID: DCP-2412</span><span class="text-xs bg-gray-100 px-3 py-1 rounded-full">35 yrs • O+</span></div></div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 text-center">
+                    <div><div class="text-xs text-gray-500">Total Visits</div><div class="font-bold text-xl" id="totalVisitsStat">24</div></div>
+                    <div><div class="text-xs text-gray-500">Last Visit</div><div class="font-bold" id="lastVisitStat">15 Dec 2024</div></div>
+                    <div><div class="text-xs text-gray-500">Success Rate</div><div class="font-bold text-green-600" id="successRateStat">98%</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="totalReportsCount">0</div><div class="text-gray-500">Total Reports</div></div><i class="fas fa-folder-open text-3xl text-blue-400"></i></div><div class="mt-2 text-xs">Completed: <span id="completedCount">0</span> / Pending: <span id="pendingCount">0</span></div></div>
+            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="recentMonthCount">0</div><div class="text-gray-500">This Month</div></div><i class="fas fa-calendar-week text-3xl text-emerald-400"></i></div><div class="mt-2 text-xs">X-Ray: <span id="xrayCountStat">0</span> | Lab: <span id="labCountStat">0</span></div></div>
+            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="healthScore">92</div><div class="text-gray-500">Oral Health Index</div></div><i class="fas fa-heartbeat text-3xl text-rose-400"></i></div><div class="w-full bg-gray-100 rounded-full h-1.5 mt-2"><div class="bg-blue-600 h-1.5 rounded-full" id="healthBar" style="width:92%"></div></div></div>
+            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-xl font-bold" id="nextAppt">20 Dec 2024</div><div class="text-gray-500">Next Checkup</div></div><i class="fas fa-tooth text-3xl text-indigo-400"></i></div><button class="mt-2 w-full text-sm bg-blue-50 py-2 rounded-lg text-blue-700" onclick="showNotification('Appointment details: Dr. Vijay Wagh, 10:30 AM')">View Details</button></div>
+        </div>
+
+        <!-- Reports & Analytics Grid -->
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Reports list (left 2 cols) -->
+            <div class="lg:col-span-2">
+                <div class="med-card p-5 mb-6 flex flex-wrap gap-3 justify-between items-center">
+                    <div class="relative flex-1 min-w-[200px]"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchReports" placeholder="Search reports by title, doctor..." class="w-full pl-10 pr-4 py-2.5 border rounded-xl" onkeyup="filterReportsDebounced()"></div>
+                    <select id="filterType" class="border rounded-xl px-4 py-2.5 bg-white" onchange="filterReports()"><option value="all">All Types</option><option value="radiology">X-Ray</option><option value="pathology">Lab</option><option value="treatment">Treatment</option></select>
+                    <select id="filterStatus" class="border rounded-xl px-4 py-2.5" onchange="filterReports()"><option value="all">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option></select>
+                </div>
+                <div id="reportsListContainer" class="space-y-4">
+                    <div class="text-center py-12"><div class="animate-spin w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full mx-auto"></div><p class="mt-3 text-gray-500">Loading reports...</p></div>
+                </div>
+                <div id="reportDetailsView" class="hidden"></div>
+            </div>
+
+            <!-- Right Sidebar: Charts & Actions -->
+            <div class="space-y-6">
+                <div class="med-card p-5">
+                    <h3 class="font-bold text-gray-800">Health Metrics</h3>
+                    <canvas id="gaugeChart" height="180" class="mt-2"></canvas>
+                    <div class="mt-3 space-y-2 text-sm"><div class="flex justify-between"><span>Gum Health</span><span class="font-bold" id="gumHealthVal">85%</span></div><div class="bg-gray-100 rounded-full h-1.5"><div class="bg-blue-500 h-1.5 rounded-full" id="gumBar" style="width:85%"></div></div></div>
+                </div>
+                <div class="med-card p-5">
+                    <h3 class="font-bold mb-3">Quick Actions</h3>
+                    <button onclick="requestNewReport()" class="w-full mb-2 py-3 bg-blue-600 text-white rounded-xl flex items-center justify-center gap-2"><i class="fas fa-plus-circle"></i> Request New Report</button>
+                    <button onclick="shareMedicalSummary()" class="w-full py-3 bg-emerald-100 text-emerald-800 rounded-xl flex items-center justify-center gap-2"><i class="fas fa-share-alt"></i> Share Summary</button>
+                </div>
+                <div class="med-card p-5">
+                    <h3 class="font-bold">Upcoming Tests</h3>
+                    <div class="mt-3 space-y-3"><div class="flex justify-between"><span><i class="fas fa-x-ray text-blue-500 mr-2"></i>Dental X-Ray</span><span class="text-sm font-medium">Dec 20</span></div><div class="flex justify-between"><span><i class="fas fa-microscope text-purple-500 mr-2"></i>Oral Screening</span><span class="text-sm">Jan 15</span></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trend Chart Section -->
+        <div class="mt-10 med-card p-6"><h3 class="font-bold text-lg mb-3">Health Trend (Last 6 months)</h3><canvas id="trendChart" height="100"></canvas></div>
+    </main>
+
+    <!-- Modal Structure -->
+    <div id="reportModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-auto"><div class="p-6" id="modalContent"></div><div class="p-4 border-t flex justify-end"><button onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Close</button></div></div>
+    </div>
+
+    <footer class="text-center text-gray-500 text-xs py-8 mt-12 border-t no-print">© 2025 DentalCare Pro — Secure & HIPAA Aligned</footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+            authDomain: "dentalink-e3d20.firebaseapp.com",
+            databaseURL: "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+            projectId: "dentalink-e3d20",
+            storageBucket: "dentalink-e3d20.firebasestorage.app",
+            messagingSenderId: "22170715728",
+            appId: "1:22170715728:web:d175aa5e780bc3c926f355",
+            measurementId: "G-X3Z8RYKWBM"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let globalReports = [];
+        let filteredReports = [];
+        let trendChart, gaugeChart;
+
+        // Demo dataset fallback
+        const demoReports = [
+            { id: "RPT-001", title: "Panoramic X-Ray Analysis", type: "radiology", date: "2024-12-15", doctor: { name: "Dr. Vijay Wagh" }, status: "completed", priority: "routine", description: "Full mouth X-ray, no caries.", findings: "Healthy bone levels", recommendations: "Recall in 12 months", attachments: [] },
+            { id: "RPT-002", title: "CBC & HbA1c", type: "pathology", date: "2024-12-10", doctor: { name: "Dr. Meera Pawar" }, status: "completed", description: "Blood work within normal limits", findings: "Hb 14.2", recommendations: "Maintain diet", attachments: [] },
+            { id: "RPT-003", title: "Root Canal Follow-up", type: "treatment", date: "2024-12-18", doctor: { name: "Dr. Vijay Wagh" }, status: "completed", description: "Post-op evaluation: excellent healing", findings: "No pain", recommendations: "Crown placement", attachments: [] },
+            { id: "RPT-004", title: "Oral Cancer Screening", type: "radiology", date: "2025-01-15", doctor: { name: "Dr. Rahul" }, status: "pending", description: "VELscope scheduled", findings: "Awaiting", recommendations: "N/A", attachments: [] }
+        ];
+
+        async function loadData() {
+            const user = auth.currentUser;
+            if (!user) { window.location.href = 'login.html'; return; }
+            document.getElementById('userInitials').innerText = (user.displayName?.charAt(0) || 'U') + (user.displayName?.split(' ')[1]?.charAt(0) || '');
+            document.getElementById('patientInitialsCard').innerText = (user.displayName?.charAt(0) || 'R') + (user.displayName?.split(' ')[1]?.charAt(0) || 'P');
+            document.getElementById('patientNameCard').innerText = user.displayName || "Rajesh Patil";
+            try {
+                const q = query(collection(db, "reports"), where("userId", "==", user.uid), orderBy("date", "desc"));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    globalReports = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    globalReports = [...demoReports];
+                }
+            } catch(e) { console.warn("Firestore fallback", e); globalReports = [...demoReports]; }
+            filteredReports = [...globalReports];
+            renderReports();
+            updateStats();
+            initCharts();
+            document.getElementById('loadingOverlay')?.remove();
+        }
+
+        function renderReports() {
+            const container = document.getElementById('reportsListContainer');
+            if(filteredReports.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No reports found</div>`; return; }
+            container.innerHTML = filteredReports.map(r => `
+                <div class="med-card p-5 hover:shadow-md transition cursor-pointer" onclick="viewReportDetail('${r.id}')">
+                    <div class="flex flex-wrap justify-between items-start gap-2"><div><div class="font-bold text-lg">${r.title}</div><div class="flex gap-3 text-sm text-gray-500 mt-1"><span><i class="fas fa-user-md"></i> ${r.doctor?.name || 'Dr. Unknown'}</span><span><i class="far fa-calendar-alt"></i> ${r.date}</span></div></div>
+                    <span class="status-badge status-${r.status}">${r.status === 'completed' ? 'Completed' : r.status === 'pending' ? 'Pending' : 'Active'}</span></div>
+                    <p class="text-gray-600 text-sm mt-2 line-clamp-2">${r.description || 'No description'}</p>
+                    <div class="mt-3 flex gap-2 text-xs"><button onclick="event.stopPropagation(); downloadReportJson('${r.id}')" class="text-blue-600"><i class="fas fa-download"></i> JSON</button>
+                    <button onclick="event.stopPropagation(); shareSingleReport('${r.id}')" class="text-green-600"><i class="fas fa-share"></i> Share</button></div>
+                </div>`).join('');
+        }
+
+        function updateStats() {
+            const total = globalReports.length;
+            const completed = globalReports.filter(r=>r.status==='completed').length;
+            const pending = total-completed;
+            document.getElementById('totalReportsCount').innerText = total;
+            document.getElementById('completedCount').innerText = completed;
+            document.getElementById('pendingCount').innerText = pending;
+            const thisMonth = globalReports.filter(r=> new Date(r.date).getMonth() === new Date().getMonth()).length;
+            document.getElementById('recentMonthCount').innerText = thisMonth;
+            const xray = globalReports.filter(r=>r.type==='radiology').length;
+            const lab = globalReports.filter(r=>r.type==='pathology').length;
+            document.getElementById('xrayCountStat').innerText = xray;
+            document.getElementById('labCountStat').innerText = lab;
+            const successRate = total ? Math.round((completed/total)*100) : 98;
+            document.getElementById('successRateStat').innerText = successRate+"%";
+            document.getElementById('totalVisitsStat').innerText = total+12;
+            document.getElementById('healthScore').innerText = "92";
+            document.getElementById('healthBar').style.width = "92%";
+            document.getElementById('gumHealthVal').innerText = "85%";
+            document.getElementById('gumBar').style.width = "85%";
+        }
+
+        function initCharts() {
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            if(trendChart) trendChart.destroy();
+            trendChart = new Chart(ctxTrend, { type: 'line', data: { labels: ['Jul','Aug','Sep','Oct','Nov','Dec'], datasets: [{ label: 'Oral Health Score', data: [84,86,88,90,91,92], borderColor: '#2563eb', tension: 0.3, fill: false }] }, options: { responsive: true, maintainAspectRatio: true } });
+            const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+            if(gaugeChart) gaugeChart.destroy();
+            gaugeChart = new Chart(gaugeCtx, { type: 'doughnut', data: { labels: ['Oral Health', 'Remaining'], datasets: [{ data: [92, 8], backgroundColor: ['#3b82f6', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '70%', plugins: { legend: { display: false } } } });
+        }
+
+        window.viewReportDetail = (id) => {
+            const report = globalReports.find(r=> r.id === id);
+            if(!report) return;
+            document.getElementById('reportsListContainer').classList.add('hidden');
+            const detailDiv = document.getElementById('reportDetailsView');
+            detailDiv.classList.remove('hidden');
+            detailDiv.innerHTML = `<div class="med-card p-6"><button onclick="backToList()" class="text-blue-600 mb-4"><i class="fas fa-arrow-left"></i> Back</button><h2 class="text-2xl font-bold">${report.title}</h2><div class="mt-3 grid grid-cols-2 gap-3"><div><span class="font-semibold">Doctor:</span> ${report.doctor?.name}</div><div><span class="font-semibold">Date:</span> ${report.date}</div><div><span class="font-semibold">Status:</span> ${report.status}</div><div><span class="font-semibold">Type:</span> ${report.type}</div></div><div class="mt-4"><p class="font-semibold">Findings:</p><p>${report.findings || 'N/A'}</p><p class="font-semibold mt-2">Recommendations:</p><p>${report.recommendations || 'Regular follow-up'}</p></div><div class="mt-6 flex gap-3"><button onclick="downloadReportJson('${report.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Download JSON</button><button onclick="printSpecificReport('${report.id}')" class="bg-gray-700 text-white px-4 py-2 rounded-lg">Print</button></div></div>`;
+        };
+        window.backToList = () => { document.getElementById('reportsListContainer').classList.remove('hidden'); document.getElementById('reportDetailsView').classList.add('hidden'); };
+        window.downloadReportJson = (id) => { const rep = globalReports.find(r=>r.id===id); const dataStr = JSON.stringify(rep,null,2); const blob = new Blob([dataStr], {type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`report_${id}.json`; a.click(); URL.revokeObjectURL(url); showNotification("Report downloaded","success"); };
+        window.shareSingleReport = (id) => { const rep = globalReports.find(r=>r.id===id); if(navigator.share) navigator.share({title:rep.title, text:rep.description}); else { navigator.clipboard.writeText(`${rep.title} - ${rep.description}`); showNotification("Copied to clipboard"); } };
+        window.filterReports = () => { const type = document.getElementById('filterType').value; const status = document.getElementById('filterStatus').value; filteredReports = globalReports.filter(r=> (type==='all' || r.type===type) && (status==='all' || r.status===status)); renderReports(); };
+        window.filterReportsDebounced = () => { const term = document.getElementById('searchReports').value.toLowerCase(); filteredReports = globalReports.filter(r=> r.title.toLowerCase().includes(term) || r.doctor?.name?.toLowerCase().includes(term)); renderReports(); };
+        window.exportToExcel = () => { const wsData = globalReports.map(r=>({ ID:r.id, Title:r.title, Type:r.type, Date:r.date, Doctor:r.doctor?.name, Status:r.status })); const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Reports"); XLSX.writeFile(wb, `DentalReports_${new Date().toISOString().slice(0,10)}.xlsx`); showNotification("Excel exported","success"); };
+        window.generateFullPDF = async () => { showNotification("Generating PDF summary..."); const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text("DentalCare Pro Medical Summary", 20, 20); doc.setFontSize(12); doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30); doc.text(`Total Reports: ${globalReports.length}`, 20, 40); doc.save(`Full_Report_${Date.now()}.pdf`); };
+        window.refreshData = () => { loadData(); showNotification("Data synced","success"); };
+        window.requestNewReport = () => { document.getElementById('modalContent').innerHTML = `<h3 class="text-xl font-bold mb-4">Request Medical Report</h3><form id="reqForm"><input type="text" placeholder="Report title" class="w-full border p-2 rounded mb-3" id="reqTitle"><select id="reqType" class="w-full border p-2 rounded mb-3"><option>radiology</option><option>pathology</option></select><textarea placeholder="Reason" class="w-full border p-2 rounded mb-3" rows="2"></textarea><button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Submit Request</button></form>`; document.getElementById('reqForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const newReport = { id: "RPT-"+Date.now(), title: document.getElementById('reqTitle').value, type: document.getElementById('reqType').value, date: new Date().toISOString().slice(0,10), doctor:{name:"Assigned Doctor"}, status:"pending", description:"Request submitted", findings:"Awaiting analysis", recommendations:"Pending", attachments:[], userId: auth.currentUser?.uid }; globalReports.unshift(newReport); filteredReports = [...globalReports]; renderReports(); updateStats(); closeModal(); showNotification("Request submitted","success"); if(auth.currentUser) try{ await addDoc(collection(db,"reports"), {...newReport, createdAt: serverTimestamp()}); }catch(e){console.warn(e);} }); openModal(); };
+        window.shareMedicalSummary = () => { const summary = `Dental Health Summary: ${globalReports.length} total reports, ${globalReports.filter(r=>r.status==='completed').length} completed. Last report: ${globalReports[0]?.date}`; navigator.clipboard.writeText(summary); showNotification("Summary copied to clipboard"); };
+        window.printSpecificReport = (id) => { const rep = globalReports.find(r=>r.id===id); const printWin = window.open('','_blank'); printWin.document.write(`<html><head><title>${rep.title}</title></head><body><h1>${rep.title}</h1><p>Doctor: ${rep.doctor?.name}</p><p>Date: ${rep.date}</p><p>Findings: ${rep.findings}</p></body></html>`); printWin.print(); };
+        function openModal() { document.getElementById('reportModal').classList.remove('hidden'); document.getElementById('reportModal').classList.add('flex'); }
+        window.closeModal = () => { document.getElementById('reportModal').classList.add('hidden'); document.getElementById('reportModal').classList.remove('flex'); };
+        function showNotification(msg, type="info") { Swal.fire({ toast:true, icon:type, title:msg, timer:2500, showConfirmButton:false }); }
+        window.toggleUserMenu = () => { document.getElementById('userMenu').classList.toggle('hidden'); };
+        window.logout = () => { signOut(auth).then(()=>{ window.location.href='login.html'; }); };
+        onAuthStateChanged(auth, (user) => { if(user) loadData(); else window.location.href='login.html'; });
+        window.showNotification = showNotification;
+    </script>
+</body>
+</html>

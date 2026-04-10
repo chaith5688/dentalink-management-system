@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Dentalink System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --bg:#080b12; --surface:#0e1118; --surface2:#141820;
+            --border:#1a1f2e; --border-light:#242c42;
+            --accent:#00d4ff; --accent2:#0057ff;
+            --text-primary:#e2e8f5; --text-secondary:#6b7a99; --text-muted:#333d57;
+            --danger:#ff4757; --success:#00e676; --warning:#ffab40; --info:#7ca3ff;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;}
+        body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+        body::after{content:'';position:fixed;top:-300px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(0,87,255,.07) 0%,transparent 65%);pointer-events:none;z-index:0;animation:bgDrift 10s ease-in-out infinite alternate;}
+        @keyframes bgDrift{to{transform:translate(-80px,60px);}}
+
+        .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+
+        /* TOP BAR */
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;animation:fadeD .5s ease forwards;}
+        .nav-back{display:flex;align-items:center;gap:.5rem;color:var(--text-secondary);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;transition:color .2s,gap .2s;}
+        .nav-back:hover{color:var(--accent);gap:.8rem;}
+        .topbar-right{display:flex;align-items:center;gap:.75rem;}
+        .sys-badge{display:flex;align-items:center;gap:.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.35rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-muted);letter-spacing:.1em;}
+        .live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blink 2s infinite;}
+        .auth-badge{display:flex;align-items:center;gap:.4rem;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:.35rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+        .conn-wrap{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-muted);}
+        .conn-dot{width:5px;height:5px;border-radius:50%;}
+        @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+        /* HEADER */
+        .page-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:1.5rem;margin-bottom:2.5rem;border-bottom:1px solid var(--border);animation:fadeD .5s .1s ease both;}
+        .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:.3rem;}
+        .page-title{font-family:'Bebas Neue',cursive;font-size:3.8rem;letter-spacing:.04em;line-height:1;background:linear-gradient(135deg,#e2e8f5 40%,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .page-sub{margin-top:.4rem;font-size:.85rem;color:var(--text-secondary);}
+        .header-gear{width:66px;height:66px;border:1px solid var(--border-light);border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--accent);position:relative;overflow:hidden;}
+        .header-gear::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,255,.1),transparent);}
+        .header-gear::after{content:'';position:absolute;left:0;right:0;height:35%;background:linear-gradient(transparent,rgba(0,212,255,.12),transparent);animation:scan 3s linear infinite;}
+        @keyframes scan{0%{top:-40%}100%{top:130%}}
+        .header-gear i{position:relative;z-index:1;animation:spin 12s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* SECTION */
+        .section{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.25rem;opacity:0;transform:translateY(18px);transition:border-color .3s,box-shadow .3s;}
+        .section:hover{border-color:var(--border-light);box-shadow:0 0 0 1px rgba(0,212,255,.04);}
+        .section.visible{animation:riseUp .5s cubic-bezier(.16,1,.3,1) forwards;}
+        @keyframes riseUp{to{opacity:1;transform:translateY(0);}}
+        .sec-head{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.4rem;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .2s;}
+        .sec-head:hover{background:rgba(255,255,255,.02);}
+        .sec-ico{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.95rem;}
+        .ico-clinic{background:rgba(0,212,255,.1);}
+        .ico-appt{background:rgba(0,87,255,.1);}
+        .ico-notif{background:rgba(255,171,64,.1);}
+        .ico-user{background:rgba(0,230,118,.1);}
+        .sec-title{font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:.1em;flex:1;}
+        .sec-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-muted);letter-spacing:.08em;}
+        .sec-chev{color:var(--text-muted);transition:transform .3s;}
+        .section.collapsed .sec-chev{transform:rotate(-90deg);}
+        .sec-body{max-height:1400px;transition:max-height .4s cubic-bezier(.16,1,.3,1);overflow:hidden;}
+        .section.collapsed .sec-body{max-height:0;}
+
+        /* ROW */
+        .row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:1.5rem;padding:.95rem 1.4rem;border-bottom:1px solid var(--border);position:relative;transition:background .2s;}
+        .row:last-child{border-bottom:none;}
+        .row:hover{background:rgba(255,255,255,.015);}
+        .row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transition:transform .2s;}
+        .row:hover::before{transform:scaleY(1);}
+        .row-label{font-weight:500;font-size:.88rem;}
+        .row-desc{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-muted);margin-top:.15rem;}
+
+        /* INPUTS */
+        .field{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.48rem .75rem;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:.875rem;outline:none;transition:border-color .2s,box-shadow .2s;min-width:200px;}
+        .field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.1);}
+        .field-sm{min-width:80px;}
+        .field-time{min-width:115px;}
+        select.field{cursor:pointer;}
+        select.field option{background:var(--surface2);}
+        .time-row{display:flex;align-items:center;gap:.5rem;}
+        .time-sep{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-muted);}
+
+        /* TOGGLE */
+        .tog{position:relative;width:50px;height:26px;cursor:pointer;flex-shrink:0;}
+        .tog input{display:none;}
+        .tog-track{position:absolute;inset:0;background:var(--border-light);border-radius:13px;border:1px solid var(--border-light);transition:background .3s,border-color .3s;}
+        .tog input:checked~.tog-track{background:linear-gradient(90deg,var(--accent2),var(--accent));border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,.3);}
+        .tog-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,.5);}
+        .tog input:checked~.tog-thumb{transform:translateX(24px);}
+
+        /* BUTTONS */
+        .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.48rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
+        .btn-ghost{background:transparent;border:1px solid var(--border-light);color:var(--text-secondary);}
+        .btn-ghost:hover{border-color:var(--text-secondary);color:var(--text-primary);}
+        .btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#000;font-weight:700;position:relative;overflow:hidden;}
+        .btn-primary::before{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,.3);transform:skewX(-20deg);transition:left .4s;}
+        .btn-primary:hover::before{left:120%;}
+        .btn-primary:hover{box-shadow:0 0 22px rgba(0,212,255,.4);transform:translateY(-1px);}
+        .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+        .btn-danger{background:transparent;border:1px solid rgba(255,71,87,.3);color:var(--danger);}
+        .btn-danger:hover{background:rgba(255,71,87,.1);border-color:var(--danger);box-shadow:0 0 12px rgba(255,71,87,.2);}
+        .btn-sm{padding:.35rem .7rem;font-size:.75rem;}
+        .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:sp .6s linear infinite;}
+        @keyframes sp{to{transform:rotate(360deg)}}
+
+        /* ACTIONS BAR */
+        .actions-bar{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding:1.2rem 1.4rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;opacity:0;animation:fadeD .5s 1.2s ease both;}
+        .save-status{display:flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-muted);}
+        .save-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);transition:background .3s;}
+        .save-dot.dirty{background:var(--warning);animation:blink 1.5s infinite;}
+        .save-dot.saved{background:var(--success);}
+        .save-dot.saving{background:var(--accent);animation:blink .8s infinite;}
+        .actions-right{display:flex;gap:.75rem;}
+
+        /* MODAL */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+        .modal-overlay.open{opacity:1;pointer-events:all;}
+        .modal{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:2rem;width:420px;max-width:95vw;transform:translateY(20px) scale(.97);transition:transform .3s;position:relative;}
+        .modal-overlay.open .modal{transform:translateY(0) scale(1);}
+        .modal-title{font-family:'Bebas Neue',cursive;font-size:1.7rem;letter-spacing:.06em;margin-bottom:1.5rem;}
+        .modal label{display:block;font-size:.72rem;color:var(--text-secondary);margin-bottom:.3rem;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;}
+        .modal .field{width:100%;margin-bottom:1rem;}
+        .modal-actions{display:flex;justify-content:flex-end;gap:.75rem;margin-top:.5rem;}
+        .modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--text-muted);cursor:pointer;transition:color .2s;}
+        .modal-close:hover{color:var(--text-primary);}
+        .modal-err{font-size:.75rem;color:var(--danger);margin-bottom:.75rem;min-height:1.1rem;font-family:'JetBrains Mono',monospace;}
+
+        /* TOAST */
+        .toast-stack{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;display:flex;flex-direction:column-reverse;gap:.6rem;}
+        .toast{background:var(--surface2);border:1px solid var(--border-light);border-radius:6px;padding:.7rem 1rem;font-size:.82rem;color:var(--text-primary);display:flex;align-items:center;gap:.6rem;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateX(150%);transition:transform .4s cubic-bezier(.16,1,.3,1);min-width:260px;max-width:340px;position:relative;}
+        .toast.show{transform:translateX(0);}
+        .toast-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:6px 0 0 6px;}
+
+        @keyframes fadeD{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+        ::-webkit-scrollbar{width:4px;}
+        ::-webkit-scrollbar-track{background:var(--bg);}
+        ::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:2px;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <a href="index.html" class="nav-back">
+            <i data-lucide="arrow-left" style="width:13px;height:13px;"></i>
+            Back to Dashboard
+        </a>
+        <div class="topbar-right">
+            <div class="conn-wrap">
+                <div class="conn-dot" id="connDot" style="background:var(--text-muted)"></div>
+                <span id="connText">CONNECTING…</span>
+            </div>
+            <div class="auth-badge">
+                <i data-lucide="user" style="width:10px;height:10px;"></i>
+                <span id="authUser">NOT LOGGED IN</span>
+            </div>
+            <div class="sys-badge">
+                <div class="live-dot"></div>
+                DENTALINK v2.4.1
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">// configuration_panel · firebase_backed</div>
+            <h1 class="page-title">System Settings</h1>
+            <p class="page-sub">Live sync · Email · SMS · Auth — all in one place</p>
+        </div>
+        <div class="header-gear">
+            <i data-lucide="settings" style="width:28px;height:28px;"></i>
+        </div>
+    </div>
+
+    <!-- SECTION: CLINIC -->
+    <div class="section" id="s1">
+        <div class="sec-head" onclick="toggle('s1')">
+            <div class="sec-ico ico-clinic">🏥</div>
+            <span class="sec-title">Clinic Settings</span>
+            <span class="sec-meta">3 PARAMS · FIRESTORE</span>
+            <i data-lucide="chevron-down" class="sec-chev" style="width:15px;height:15px;"></i>
+        </div>
+        <div class="sec-body">
+            <div class="row">
+                <div><div class="row-label">Clinic Name</div><div class="row-desc">// clinics/swami-dental → clinicName</div></div>
+                <input id="clinicName" type="text" class="field" value="Swami Dental Care Centre" oninput="dirty()">
+            </div>
+            <div class="row">
+                <div><div class="row-label">Clinic Hours</div><div class="row-desc">// openTime → closeTime</div></div>
+                <div class="time-row">
+                    <input id="openTime" type="time" class="field field-time" value="09:00" onchange="dirty()">
+                    <span class="time-sep">→</span>
+                    <input id="closeTime" type="time" class="field field-time" value="18:00" onchange="dirty()">
+                </div>
+            </div>
+            <div class="row">
+                <div><div class="row-label">Lunch Break</div><div class="row-desc">// lunchBreak window</div></div>
+                <select id="lunchBreak" class="field" onchange="dirty()">
+                    <option value="12:30-13:30">12:30 PM – 1:30 PM</option>
+                    <option value="13:00-14:00">1:00 PM – 2:00 PM</option>
+                    <option value="none">No Lunch Break</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: APPOINTMENT -->
+    <div class="section" id="s2">
+        <div class="sec-head" onclick="toggle('s2')">
+            <div class="sec-ico ico-appt">📅</div>
+            <span class="sec-title">Appointment Settings</span>
+            <span class="sec-meta">3 PARAMS · FIRESTORE</span>
+            <i data-lucide="chevron-down" class="sec-chev" style="width:15px;height:15px;"></i>
+        </div>
+        <div class="sec-body">
+            <div class="row">
+                <div><div class="row-label">Slot Duration</div><div class="row-desc">// minutes_per_slot</div></div>
+                <select id="slotDuration" class="field" onchange="dirty()">
+                    <option value="15">15 minutes</option>
+                    <option value="30" selected>30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">60 minutes</option>
+                </select>
+            </div>
+            <div class="row">
+                <div><div class="row-label">Max Daily Appointments</div><div class="row-desc">// max_slots_per_day</div></div>
+                <input id="maxAppt" type="number" class="field field-sm" value="20" min="5" max="50" oninput="dirty()">
+            </div>
+            <div class="row">
+                <div><div class="row-label">Advance Booking</div><div class="row-desc">// booking_window_days</div></div>
+                <select id="advanceBook" class="field" onchange="dirty()">
+                    <option value="7">7 days</option>
+                    <option value="15" selected>15 days</option>
+                    <option value="30">30 days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: NOTIFICATIONS -->
+    <div class="section" id="s3">
+        <div class="sec-head" onclick="toggle('s3')">
+            <div class="sec-ico ico-notif">🔔</div>
+            <span class="sec-title">Notification Settings</span>
+            <span class="sec-meta">5 PARAMS · EMAILJS + TWILIO</span>
+            <i data-lucide="chevron-down" class="sec-chev" style="width:15px;height:15px;"></i>
+        </div>
+        <div class="sec-body">
+            <div class="row">
+                <div><div class="row-label">Email Notifications</div><div class="row-desc">// emailjs → appointment alerts</div></div>
+                <label class="tog"><input id="emailNotif" type="checkbox" checked onchange="dirty()"><div class="tog-track"></div><div class="tog-thumb"></div></label>
+            </div>
+            <div class="row">
+                <div><div class="row-label">SMS Notifications</div><div class="row-desc">// twilio → patient reminders</div></div>
+                <label class="tog"><input id="smsNotif" type="checkbox" checked onchange="dirty()"><div class="tog-track"></div><div class="tog-thumb"></div></label>
+            </div>
+            <div class="row">
+                <div><div class="row-label">Reminder Timing</div><div class="row-desc">// send_before_appointment</div></div>
+                <select id="reminderTime" class="field" onchange="dirty()">
+                    <option value="1">1 hour before</option>
+                    <option value="24" selected>24 hours before</option>
+                    <option value="48">48 hours before</option>
+                </select>
+            </div>
+            <div class="row">
+                <div><div class="row-label">Test Email</div><div class="row-desc">// fire_test → doctorEmail via EmailJS</div></div>
+                <button class="btn btn-ghost btn-sm" onclick="sendTestEmail()">
+                    <i data-lucide="send" style="width:12px;height:12px;"></i> Send Test Email
+                </button>
+            </div>
+            <div class="row">
+                <div><div class="row-label">Test SMS</div><div class="row-desc">// fire_test → registered number via Twilio</div></div>
+                <button class="btn btn-ghost btn-sm" onclick="sendTestSMS()">
+                    <i data-lucide="message-square" style="width:12px;height:12px;"></i> Send Test SMS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: USER -->
+    <div class="section" id="s4">
+        <div class="sec-head" onclick="toggle('s4')">
+            <div class="sec-ico ico-user">👤</div>
+            <span class="sec-title">User Settings</span>
+            <span class="sec-meta">3 PARAMS · FIREBASE AUTH</span>
+            <i data-lucide="chevron-down" class="sec-chev" style="width:15px;height:15px;"></i>
+        </div>
+        <div class="sec-body">
+            <div class="row">
+                <div><div class="row-label">Doctor Name</div><div class="row-desc">// display_name · profile</div></div>
+                <input id="doctorName" type="text" class="field" value="Dr. Vijay Wagh" oninput="dirty()">
+            </div>
+            <div class="row">
+                <div><div class="row-label">Email Address</div><div class="row-desc">// notification_email · auth email</div></div>
+                <input id="doctorEmail" type="email" class="field" value="drvijay@swamidental.com" oninput="dirty()">
+            </div>
+            <div class="row">
+                <div><div class="row-label">Change Password</div><div class="row-desc">// firebase_auth → reauthenticate → update</div></div>
+                <button class="btn btn-danger btn-sm" onclick="openPwdModal()">
+                    <i data-lucide="key" style="width:12px;height:12px;"></i> Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS BAR -->
+    <div class="actions-bar">
+        <div class="save-status">
+            <div class="save-dot" id="saveDot"></div>
+            <span id="saveText">ALL CHANGES SAVED</span>
+        </div>
+        <div class="actions-right">
+            <button class="btn btn-ghost" onclick="loadSettings()">
+                <i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i> Reset
+            </button>
+            <button class="btn btn-primary" id="saveBtn" onclick="saveSettings()">
+                <i data-lucide="save" style="width:13px;height:13px;"></i> Save Changes
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pwdModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closePwdModal()"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+        <div class="modal-title">Change Password</div>
+        <label>Current Password</label>
+        <input id="curPwd" type="password" class="field" placeholder="Enter current password">
+        <label>New Password</label>
+        <input id="newPwd" type="password" class="field" placeholder="Min. 6 characters">
+        <label>Confirm New Password</label>
+        <input id="conPwd" type="password" class="field" placeholder="Re-enter new password">
+        <div class="modal-err" id="pwdErr"></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closePwdModal()">Cancel</button>
+            <button class="btn btn-primary" id="pwdBtn" onclick="changePassword()">
+                <i data-lucide="check" style="width:13px;height:13px;"></i> Update Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ══════════════════════════════════════════════
+     🔑 FILL IN YOUR KEYS HERE
+══════════════════════════════════════════════════ -->
+<script>
+/* ─── FIREBASE ─────────────────────────────────────────
+   firebase.google.com → Your Project → Project Settings
+   → Your Apps → Web App → Config                        */
+const FIREBASE_CONFIG = {
+    apiKey:            "YOUR_FIREBASE_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+};
+
+/* ─── EMAILJS ───────────────────────────────────────────
+   emailjs.com → Account → API Keys
+   Template variables needed: {{to_email}} {{clinic_name}}
+   {{doctor_name}} {{message}}                            */
+const EMAILJS_CFG = {
+    publicKey:  "YOUR_EMAILJS_PUBLIC_KEY",
+    serviceId:  "YOUR_EMAILJS_SERVICE_ID",
+    templateId: "YOUR_EMAILJS_TEMPLATE_ID"
+};
+
+/* ─── TWILIO (via Firebase Cloud Function) ─────────────
+   Deploy a Cloud Function that accepts POST {to, message}
+   and calls Twilio. Paste its URL here.                  */
+const TWILIO_URL = "https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/sendSMS";
+
+/* ─── FIRESTORE PATH ───────────────────────────────────
+   Document where settings are saved                      */
+const SETTINGS_PATH = "clinics/swami-dental";
+</script>
+
+<!-- ══════════════════════════════════════════════
+     APP LOGIC — no need to edit below this line
+══════════════════════════════════════════════════ -->
+<script>
+let db, auth, currentUser, isDirty = false;
+
+/* ── INIT ── */
+function init() {
+    try {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db   = firebase.firestore();
+        auth = firebase.auth();
+        auth.onAuthStateChanged(u => {
+            currentUser = u;
+            setEl('authUser', u ? (u.email || 'ADMIN') : 'NOT LOGGED IN');
+            setConn(u ? 'ok' : 'warn', u ? 'FIRESTORE LIVE' : 'NOT AUTHENTICATED');
+        });
+        setConn('ok', 'FIRESTORE LIVE');
+        loadSettings();
+    } catch(e) {
+        setConn('warn','DEMO MODE');
+        toast('Firebase keys not set — running demo mode.','warning');
+    }
+    try { emailjs.init(EMAILJS_CFG.publicKey); } catch(e){}
+}
+
+function setConn(state, label) {
+    const c = {ok:'var(--success)',warn:'var(--warning)',err:'var(--danger)'};
+    const dot = document.getElementById('connDot');
+    const txt = document.getElementById('connText');
+    if(dot) dot.style.background = c[state]||'var(--text-muted)';
+    if(txt) txt.textContent = label.toUpperCase();
+}
+
+/* ── LOAD ── */
+async function loadSettings() {
+    if(!db){ markSaved(); return; }
+    try {
+        const doc = await db.doc(SETTINGS_PATH).get();
+        if(doc.exists){
+            const d = doc.data();
+            setV('clinicName',   d.clinicName    || 'Swami Dental Care Centre');
+            setV('openTime',     d.openTime      || '09:00');
+            setV('closeTime',    d.closeTime     || '18:00');
+            setV('lunchBreak',   d.lunchBreak    || '12:30-13:30');
+            setV('slotDuration', d.slotDuration  || '30');
+            setV('maxAppt',      d.maxAppt       || '20');
+            setV('advanceBook',  d.advanceBook   || '15');
+            setC('emailNotif',   d.emailNotif    !== false);
+            setC('smsNotif',     d.smsNotif      !== false);
+            setV('reminderTime', d.reminderTime  || '24');
+            setV('doctorName',   d.doctorName    || 'Dr. Vijay Wagh');
+            setV('doctorEmail',  d.doctorEmail   || 'drvijay@swamidental.com');
+            markSaved();
+            toast('Settings loaded from Firestore ✓','success');
+        } else {
+            markSaved();
+            toast('No saved settings found — using defaults.','info');
+        }
+    } catch(e){ toast('Load error: '+e.message,'error'); }
+}
+
+/* ── SAVE ── */
+async function saveSettings() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Saving…';
+    markSaving();
+
+    const data = {
+        clinicName:   getV('clinicName'),
+        openTime:     getV('openTime'),
+        closeTime:    getV('closeTime'),
+        lunchBreak:   getV('lunchBreak'),
+        slotDuration: getV('slotDuration'),
+        maxAppt:      parseInt(getV('maxAppt')),
+        advanceBook:  getV('advanceBook'),
+        emailNotif:   getC('emailNotif'),
+        smsNotif:     getC('smsNotif'),
+        reminderTime: getV('reminderTime'),
+        doctorName:   getV('doctorName'),
+        doctorEmail:  getV('doctorEmail'),
+        updatedAt:    new Date().toISOString()
+    };
+
+    if(db){
+        try {
+            await db.doc(SETTINGS_PATH).set(data, {merge:true});
+            markSaved();
+            toast('Settings saved to Firestore ✓','success');
+        } catch(e){
+            toast('Save failed: '+e.message,'error');
+            markDirty();
+        }
+    } else {
+        localStorage.setItem('dentalink_settings', JSON.stringify(data));
+        markSaved();
+        toast('Saved locally (demo mode) ✓','warning');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save" style="width:13px;height:13px;"></i> Save Changes';
+    lucide.createIcons();
+}
+
+/* ── TEST EMAIL ── */
+async function sendTestEmail() {
+    if(EMAILJS_CFG.publicKey.startsWith('YOUR')){
+        toast('Set your EmailJS keys in the config block.','warning'); return;
+    }
+    const email = getV('doctorEmail');
+    toast('Sending test email to '+email+'…','info');
+    try {
+        await emailjs.send(EMAILJS_CFG.serviceId, EMAILJS_CFG.templateId, {
+            to_email:    email,
+            clinic_name: getV('clinicName'),
+            doctor_name: getV('doctorName'),
+            message:     'This is a test notification from Dentalink System. Your email alerts are working correctly.'
+        });
+        toast('Test email sent to '+email+' ✓','success');
+    } catch(e){ toast('EmailJS error: '+e.text||e.message,'error'); }
+}
+
+/* ── TEST SMS ── */
+async function sendTestSMS() {
+    if(TWILIO_URL.includes('YOUR_')){
+        toast('Set your Twilio Cloud Function URL in the config block.','warning'); return;
+    }
+    toast('Sending test SMS…','info');
+    try {
+        const res = await fetch(TWILIO_URL, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                message: 'Dentalink test SMS: Your SMS notifications are working correctly.'
+            })
+        });
+        const json = await res.json();
+        if(json.success) toast('Test SMS sent ✓','success');
+        else toast('SMS error: '+(json.error||'unknown'),'error');
+    } catch(e){ toast('SMS function error: '+e.message,'error'); }
+}
+
+/* ── PASSWORD CHANGE ── */
+async function changePassword() {
+    const cur = document.getElementById('curPwd').value;
+    const np  = document.getElementById('newPwd').value;
+    const cp  = document.getElementById('conPwd').value;
+    const err = document.getElementById('pwdErr');
+    err.textContent = '';
+
+    if(!cur||!np||!cp){ err.textContent='// all_fields_required'; return; }
+    if(np!==cp)        { err.textContent='// passwords_do_not_match'; return; }
+    if(np.length<6)    { err.textContent='// password_too_short (min 6)'; return; }
+
+    const btn = document.getElementById('pwdBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Updating…';
+
+    if(auth && currentUser){
+        try {
+            const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
+            await currentUser.reauthenticateWithCredential(cred);
+            await currentUser.updatePassword(np);
+            closePwdModal();
+            toast('Password updated successfully ✓','success');
+        } catch(e){
+            const msgs = {
+                'auth/wrong-password':'// current_password_incorrect',
+                'auth/too-many-requests':'// too_many_attempts — try_later',
+                'auth/weak-password':'// password_too_weak'
+            };
+            err.textContent = msgs[e.code]||'// '+e.message;
+        }
+    } else {
+        closePwdModal();
+        toast('Firebase Auth not configured — demo only.','warning');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i> Update Password';
+    lucide.createIcons();
+}
+
+/* ── MODAL ── */
+function openPwdModal(){
+    document.getElementById('pwdModal').classList.add('open');
+    ['curPwd','newPwd','conPwd'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('pwdErr').textContent='';
+}
+function closePwdModal(){ document.getElementById('pwdModal').classList.remove('open'); }
+document.getElementById('pwdModal').addEventListener('click', e=>{ if(e.target.id==='pwdModal') closePwdModal(); });
+
+/* ── STATE ── */
+function dirty(){ isDirty=true; markDirty(); }
+function markDirty(){ setDot('dirty'); setEl('saveText','UNSAVED CHANGES'); }
+function markSaving(){ setDot('saving'); setEl('saveText','SAVING TO FIRESTORE…'); }
+function markSaved(){ isDirty=false; setDot('saved'); setEl('saveText','ALL CHANGES SAVED'); }
+function setDot(cls){ document.getElementById('saveDot').className='save-dot '+cls; }
+window.addEventListener('beforeunload', e=>{ if(isDirty){e.preventDefault();e.returnValue='';} });
+
+/* ── SECTION TOGGLE ── */
+function toggle(id){ document.getElementById(id).classList.toggle('collapsed'); }
+
+/* ── TOAST ── */
+function toast(msg, type='success'){
+    const c={success:'var(--success)',error:'var(--danger)',warning:'var(--warning)',info:'var(--info)'};
+    const ic={success:'check-circle',error:'alert-circle',warning:'alert-triangle',info:'info'};
+    const stack = document.getElementById('toastStack');
+    const t = document.createElement('div');
+    t.className='toast';
+    t.innerHTML=`<div class="toast-bar" style="background:${c[type]||c.success}"></div>
+        <i data-lucide="${ic[type]||'check-circle'}" style="width:15px;height:15px;color:${c[type]||c.success};flex-shrink:0;"></i>
+        <span style="padding-left:.2rem;">${msg}</span>`;
+    stack.appendChild(t);
+    lucide.createIcons();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+    setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),500); },4200);
+}
+
+/* ── HELPERS ── */
+function getV(id){ return document.getElementById(id)?.value||''; }
+function setV(id,v){ const e=document.getElementById(id); if(e) e.value=v; }
+function getC(id){ return document.getElementById(id)?.checked||false; }
+function setC(id,v){ const e=document.getElementById(id); if(e) e.checked=v; }
+function setEl(id,t){ const e=document.getElementById(id); if(e) e.textContent=t; }
+
+/* ── STAGGER SECTIONS ── */
+document.querySelectorAll('.section').forEach((el,i)=>{
+    setTimeout(()=>el.classList.add('visible'), 300+i*140);
+});
+
+lucide.createIcons();
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

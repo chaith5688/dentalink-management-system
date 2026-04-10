@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DentaFlow · Database History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg:        #070d1a;
+      --surface:   #0d1830;
+      --surface2:  #111f3a;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --blue:      #2d7dd2;
+      --cyan:      #38c9e8;
+      --green:     #22c55e;
+      --amber:     #f59e0b;
+      --red:       #ef4444;
+      --purple:    #a855f7;
+      --pink:      #ec4899;
+      --text:      #e2e8f0;
+      --text-dim:  rgba(226,232,240,0.45);
+      --text-mid:  rgba(226,232,240,0.7);
+      --glow-blue: rgba(45,125,210,0.18);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background-image: linear-gradient(rgba(45,125,210,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(45,125,210,0.04) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 60% 50% at 20% 20%, rgba(45,125,210,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(56,201,232,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,13,26,0.92); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      animation: slideDown 0.5s ease both;
+    }
+    @keyframes slideDown { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(56,201,232,0.25);
+    }
+    .brand-icon i { font-size: 16px; color: white; }
+    .brand-name { font-size: 1.1rem; font-weight: 700; color: white; letter-spacing: -0.01em; }
+    .brand-name span { display: block; font-size: 0.62rem; font-weight: 500; color: var(--cyan); letter-spacing: 0.15em; text-transform: uppercase; margin-top: -2px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+      color: var(--green); font-size: 0.72rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px; letter-spacing: 0.06em;
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: livePulse 1.5s infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .icon-btn {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+      border-radius: 10px; color: var(--text-dim); font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .icon-btn:hover { background: var(--glow-blue); border-color: var(--blue); color: var(--cyan); }
+    .icon-btn.spinning i { animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* DEBUG BANNER */
+    #debugBanner {
+      position: relative; z-index: 50;
+      padding: 10px 2rem; font-size: 0.8rem; font-weight: 600;
+      align-items: center; gap: 8px; display: none;
+    }
+    #debugBanner.info  { display:flex; background: rgba(45,125,210,0.12); color: #93c5fd; border-bottom: 1px solid rgba(45,125,210,0.2); }
+    #debugBanner.warn  { display:flex; background: rgba(245,158,11,0.12); color: var(--amber); border-bottom: 1px solid rgba(245,158,11,0.2); }
+    #debugBanner.error { display:flex; background: rgba(239,68,68,0.12);  color: #fca5a5;     border-bottom: 1px solid rgba(239,68,68,0.2); }
+    #debugBanner.ok    { display:flex; background: rgba(34,197,94,0.1);   color: var(--green); border-bottom: 1px solid rgba(34,197,94,0.15); }
+
+    /* LAYOUT */
+    .layout { position: relative; z-index: 1; display: flex; min-height: calc(100vh - 64px); }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px; flex-shrink: 0;
+      background: rgba(13,24,48,0.8); border-right: 1px solid var(--border);
+      backdrop-filter: blur(10px); padding: 1.5rem 0;
+      position: sticky; top: 64px; height: calc(100vh - 64px);
+      overflow-y: auto; animation: fadeInLeft 0.5s 0.1s ease both;
+    }
+    @keyframes fadeInLeft { from{transform:translateX(-20px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .sidebar-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); padding: 0 1.2rem; margin-bottom: 0.6rem; }
+    .col-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.6rem 1.2rem; cursor: pointer; transition: all 0.2s;
+      border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; color: var(--text-dim);
+    }
+    .col-item:hover { background: rgba(45,125,210,0.06); color: var(--text); }
+    .col-item.active { background: rgba(45,125,210,0.1); border-left-color: var(--cyan); color: white; }
+    .col-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .col-count { margin-left: auto; background: rgba(255,255,255,0.06); font-size: 0.68rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; padding: 2px 7px; border-radius: 20px; color: var(--text-dim); }
+    .col-item.active .col-count { background: rgba(56,201,232,0.15); color: var(--cyan); }
+    .ic-appointments  { background: rgba(45,125,210,0.15);  color: var(--blue); }
+    .ic-callbacks     { background: rgba(245,158,11,0.15);  color: var(--amber); }
+    .ic-chatHistory   { background: rgba(168,85,247,0.15);  color: var(--purple); }
+    .ic-chats         { background: rgba(236,72,153,0.15);  color: var(--pink); }
+    .ic-feedback      { background: rgba(34,197,94,0.15);   color: var(--green); }
+    .ic-feedbacks     { background: rgba(34,197,94,0.15);   color: var(--green); }
+    .ic-login         { background: rgba(56,201,232,0.15);  color: var(--cyan); }
+    .ic-messages      { background: rgba(168,85,247,0.15);  color: var(--purple); }
+    .ic-patients      { background: rgba(45,125,210,0.15);  color: var(--blue); }
+    .ic-prescriptions { background: rgba(245,158,11,0.15);  color: var(--amber); }
+    .ic-replies       { background: rgba(236,72,153,0.15);  color: var(--pink); }
+    .ic-store         { background: rgba(34,197,94,0.15);   color: var(--green); }
+    .ic-users         { background: rgba(56,201,232,0.15);  color: var(--cyan); }
+
+    /* MAIN */
+    .main { flex: 1; padding: 2rem; overflow: hidden; }
+    .page-header { margin-bottom: 1.8rem; animation: fadeUp 0.5s 0.15s ease both; }
+    @keyframes fadeUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .page-header h1 {
+      font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, white 30%, var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .page-header p { font-size: 0.875rem; color: var(--text-dim); margin-top: 4px; }
+    .collection-name {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--cyan);
+      background: rgba(56,201,232,0.1); border: 1px solid rgba(56,201,232,0.2);
+      padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+    }
+
+    /* STATS */
+    .stats-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.2s ease both; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.1rem 1.3rem; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .stat-card.blue::before   { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .stat-card.green::before  { background: var(--green); }
+    .stat-card.amber::before  { background: var(--amber); }
+    .stat-card.purple::before { background: var(--purple); }
+    .stat-label { font-size: 0.72rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+    .stat-val { font-size: 2rem; font-weight: 800; color: white; letter-spacing: -0.04em; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+    .stat-sub { font-size: 0.73rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* FILTER BAR */
+    .filter-bar { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; animation: fadeUp 0.5s 0.25s ease both; }
+    .filter-group { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 9px; border: none;
+      font-family: 'Sora', sans-serif; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; color: var(--text-dim); background: transparent;
+    }
+    .filter-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .filter-btn.active { background: linear-gradient(135deg, var(--blue), var(--cyan)); color: white; box-shadow: 0 2px 12px rgba(45,125,210,0.35); }
+    .search-wrap { flex: 1; min-width: 200px; max-width: 320px; position: relative; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 13px; pointer-events: none; }
+    .search-input {
+      width: 100%; padding: 8px 12px 8px 34px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 0.82rem;
+      font-family: 'Sora', sans-serif; outline: none; transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: var(--text-dim); }
+    .search-input:focus { border-color: rgba(56,201,232,0.4); box-shadow: 0 0 0 3px rgba(56,201,232,0.08); }
+    .sort-sel {
+      padding: 8px 12px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text-dim); font-size: 0.8rem;
+      font-family: 'Sora', sans-serif; outline: none; cursor: pointer;
+    }
+    .sort-sel option { background: #0d1830; }
+
+    /* TABLE */
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; animation: fadeUp 0.5s 0.3s ease both; }
+    .table-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .table-title { font-size: 0.88rem; font-weight: 700; color: white; }
+    .record-count { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim); }
+    #recordsList { min-height: 300px; }
+
+    .record-row { border-bottom: 1px solid var(--border); transition: background 0.18s; cursor: pointer; animation: rowIn 0.35s ease both; }
+    .record-row:last-child { border-bottom: none; }
+    .record-row:hover { background: rgba(45,125,210,0.04); }
+    @keyframes rowIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+
+    .record-summary { display: flex; align-items: center; gap: 1rem; padding: 0.95rem 1.5rem; }
+    .rec-index { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--text-dim); width: 28px; flex-shrink: 0; }
+    .rec-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .rec-main { flex: 1; min-width: 0; }
+    .rec-id { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-preview { font-size: 0.82rem; color: var(--text-mid); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-date { font-size: 0.73rem; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+    .rec-badge { padding: 3px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; flex-shrink: 0; }
+    .rec-expand-btn {
+      width: 28px; height: 28px; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-dim); font-size: 11px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s;
+    }
+    .rec-expand-btn:hover { background: var(--glow-blue); border-color: var(--blue); color: var(--cyan); }
+
+    .record-detail { display: none; padding: 0 1.5rem 1rem 5.5rem; }
+    .record-detail.open { display: block; animation: expandIn 0.25s ease; }
+    @keyframes expandIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+    .fields-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.6rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .field-key { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--cyan); font-weight: 500; margin-bottom: 2px; }
+    .field-val { font-size: 0.82rem; color: var(--text); word-break: break-word; }
+
+    /* STATES */
+    .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 1.2rem; }
+    .loader-ring { width: 48px; height: 48px; border: 3px solid rgba(56,201,232,0.15); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loading-text { color: var(--text-dim); font-size: 0.88rem; }
+    .loading-col  { color: var(--cyan); font-weight: 600; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 0.8rem; }
+    .empty-state i { font-size: 2.5rem; color: var(--text-dim); }
+    .empty-state p { color: var(--text-dim); font-size: 0.9rem; text-align: center; max-width: 440px; line-height: 1.7; }
+    .err-code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--red); background: rgba(239,68,68,0.08); padding: 2px 7px; border-radius: 4px; }
+
+    /* BADGES */
+    .badge-confirmed { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+    .badge-pending   { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+    .badge-cancelled { background: rgba(239,68,68,0.12);  color: var(--red);   border: 1px solid rgba(239,68,68,0.2); }
+    .badge-default   { background: rgba(255,255,255,0.06); color: var(--text-dim); border: 1px solid var(--border); }
+
+    /* TIMELINE */
+    .timeline-date-header {
+      padding: 0.5rem 1.5rem; font-size: 0.72rem; font-weight: 700; color: var(--text-dim);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: rgba(255,255,255,0.015); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .timeline-date-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* PAGINATION */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 1.2rem; border-top: 1px solid var(--border); }
+    .page-btn {
+      width: 34px; height: 34px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.8rem; transition: all 0.18s;
+    }
+    .page-btn:hover { border-color: var(--blue); color: var(--cyan); }
+    .page-btn.active { background: linear-gradient(135deg,var(--blue),var(--cyan)); border-color: transparent; color: white; }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.84rem; font-weight: 500;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.ok   i { color: var(--green); }
+    .toast.err  i { color: var(--red); }
+    .toast.warn i { color: var(--amber); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    @media (max-width: 900px) { .sidebar { width: 200px; } .stats-strip { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 700px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: relative; top: 0; display: flex; flex-wrap: wrap; gap: 4px; padding: 0.5rem; }
+      .col-item { border-left: none; border-radius: 8px; padding: 6px 10px; }
+      .stats-strip { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-tooth"></i></div>
+      <div class="brand-name">DentaFlow <span>Database History</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><span class="live-dot"></span> LIVE</div>
+      <button class="icon-btn" id="refreshBtn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+      <a href="profile.html" style="text-decoration:none">
+        <button class="icon-btn" title="Back"><i class="fas fa-arrow-left"></i></button>
+      </a>
+    </div>
+  </div>
+
+  <!-- Status banner shown during init and on errors -->
+  <div id="debugBanner"></div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-title">Collections</div>
+    </div>
+
+    <div class="main">
+      <div class="page-header">
+        <h1>Database History</h1>
+        <p>Browse, filter and inspect all Firestore collections in real time</p>
+        <div class="collection-name">
+          <i class="fas fa-database" style="font-size:10px"></i>
+          <span id="activeColName">Select a collection</span>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Records</div>
+          <div class="stat-val" id="statTotal">—</div>
+          <div class="stat-sub">in current collection</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Today</div>
+          <div class="stat-val" id="statToday">—</div>
+          <div class="stat-sub">added today</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Yesterday</div>
+          <div class="stat-val" id="statYesterday">—</div>
+          <div class="stat-sub">added yesterday</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">This Year</div>
+          <div class="stat-val" id="statYear">—</div>
+          <div class="stat-sub">records this year</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="today">Today</button>
+          <button class="filter-btn" data-filter="yesterday">Yesterday</button>
+          <button class="filter-btn" data-filter="week">This Week</button>
+          <button class="filter-btn" data-filter="year">This Year</button>
+        </div>
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input class="search-input" type="text" id="searchInput" placeholder="Search records…">
+        </div>
+        <select class="sort-sel" id="sortSel">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="az">A → Z (by ID)</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-head">
+          <div class="table-title" id="tableTitle">Select a collection to view records</div>
+          <div class="record-count" id="recordCount"></div>
+        </div>
+        <div id="recordsList">
+          <div class="empty-state">
+            <i class="fas fa-layer-group"></i>
+            <p>Choose a collection from the sidebar</p>
+          </div>
+        </div>
+        <div class="pagination" id="pagination" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMsg">Done</span>
+  </div>
+
+  <script type="module">
+    /* ═══════════════════════════════════════════════════
+       HELPERS — available before Firebase loads
+    ═══════════════════════════════════════════════════ */
+    const banner = document.getElementById('debugBanner');
+
+    function showBanner(msg, type = 'info') {
+      banner.textContent = msg;
+      banner.className   = type;   // CSS class controls display:flex
+      if (type === 'ok') setTimeout(() => { banner.className = ''; }, 4000);
+    }
+
+    function showToast(msg, type = 'ok') {
+      const t  = document.getElementById('toast');
+      const ic = t.querySelector('i');
+      t.className = `toast ${type}`;
+      ic.className = type === 'ok'   ? 'fas fa-check-circle'
+                   : type === 'warn' ? 'fas fa-exclamation-triangle'
+                   :                   'fas fa-times-circle';
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FIREBASE INIT
+       — analytics imported separately so it never
+         blocks Firestore if it throws
+    ═══════════════════════════════════════════════════ */
+    showBanner('⏳ Connecting to Firebase…', 'info');
+
+    let db, firestoreCollection, firestoreGetDocs;
+
+    try {
+      // ── Use the same SDK version as your project's CDN snippet ──
+      const SDK = 'https://www.gstatic.com/firebasejs/11.8.1';
+
+      const { initializeApp } = await import(`${SDK}/firebase-app.js`);
+
+      const firestoreMod = await import(`${SDK}/firebase-firestore.js`);
+      firestoreCollection = firestoreMod.collection;
+      firestoreGetDocs    = firestoreMod.getDocs;
+      const getFirestore  = firestoreMod.getFirestore;
+
+      const firebaseConfig = {
+        apiKey:            "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+        authDomain:        "dentalink-e3d20.firebaseapp.com",
+        databaseURL:       "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+        projectId:         "dentalink-e3d20",
+        storageBucket:     "dentalink-e3d20.firebasestorage.app",
+        messagingSenderId: "22170715728",
+        appId:             "1:22170715728:web:d175aa5e780bc3c926f355",
+        measurementId:     "G-X3Z8RYKWBM"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+
+      // Analytics — optional, don't crash if it fails
+      try {
+        const { getAnalytics } = await import(`${SDK}/firebase-analytics.js`);
+        getAnalytics(app);
+      } catch (_) { /* analytics not critical */ }
+
+      showBanner('✅ Firebase connected', 'ok');
+
+    } catch (initErr) {
+      console.error('[DentaFlow] Firebase init failed:', initErr);
+      showBanner(`❌ Firebase init failed: ${initErr.message}`, 'error');
+      document.getElementById('recordsList').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-plug" style="color:var(--red)"></i>
+          <p>
+            <strong style="color:var(--red)">Could not connect to Firebase</strong><br><br>
+            ${initErr.message}<br><br>
+            Open the browser console (F12 → Console) for full details.
+          </p>
+        </div>`;
+      // Stop script — nothing else can work without db
+      throw initErr;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       APP CONFIG
+    ═══════════════════════════════════════════════════ */
+    const COLLECTIONS = [
+      { id: 'appointments',     icon: 'fa-calendar-check', cls: 'ic-appointments' },
+      { id: 'callbacks',        icon: 'fa-phone',          cls: 'ic-callbacks' },
+      { id: 'chatHistory',      icon: 'fa-comments',       cls: 'ic-chatHistory' },
+      { id: 'chats',            icon: 'fa-comment-dots',   cls: 'ic-chats' },
+      { id: 'feedback',         icon: 'fa-star',           cls: 'ic-feedback' },
+      { id: 'feedbacks',        icon: 'fa-star-half-alt',  cls: 'ic-feedbacks' },
+      { id: 'login_activities', icon: 'fa-shield-alt',     cls: 'ic-login' },
+      { id: 'messages',         icon: 'fa-envelope',       cls: 'ic-messages' },
+      { id: 'patients',         icon: 'fa-user-injured',   cls: 'ic-patients' },
+      { id: 'prescriptions',    icon: 'fa-prescription',   cls: 'ic-prescriptions' },
+      { id: 'replies',          icon: 'fa-reply',          cls: 'ic-replies' },
+      { id: 'store_orders',     icon: 'fa-shopping-bag',   cls: 'ic-store' },
+      { id: 'users',            icon: 'fa-users',          cls: 'ic-users' },
+    ];
+
+    /* ── State ── */
+    let allDocs      = [];
+    let filteredDocs = [];
+    let currentCol   = null;
+    let dateFilter   = 'all';
+    let searchTerm   = '';
+    let sortMode     = 'newest';
+    let currentPage  = 1;
+    const PAGE_SIZE  = 15;
+    const colCounts  = {};
+
+    /* ── DOM refs ── */
+    const sidebar       = document.getElementById('sidebar');
+    const recordsList   = document.getElementById('recordsList');
+    const paginationEl  = document.getElementById('pagination');
+    const tableTitle    = document.getElementById('tableTitle');
+    const recordCount   = document.getElementById('recordCount');
+    const searchInput   = document.getElementById('searchInput');
+    const sortSel       = document.getElementById('sortSel');
+    const refreshBtn    = document.getElementById('refreshBtn');
+    const activeColName = document.getElementById('activeColName');
+
+    /* ═══════════════════════════════════════════════════
+       DATE HELPERS
+    ═══════════════════════════════════════════════════ */
+    function toDate(val) {
+      if (!val) return null;
+      if (typeof val.toDate === 'function') return val.toDate();   // Firestore Timestamp
+      if (val.seconds != null) return new Date(val.seconds * 1000); // plain {seconds, nanoseconds}
+      if (val instanceof Date) return val;
+      if (typeof val === 'number') return new Date(val);
+      if (typeof val === 'string') {
+        const d = new Date(val);
+        return isNaN(d) ? null : d;
+      }
+      return null;
+    }
+
+    function dateLabel(d) {
+      if (!d) return '—';
+      const now   = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yest  = new Date(today); yest.setDate(today.getDate() - 1);
+      const dt    = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const time  = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (dt.getTime() === today.getTime()) return `Today ${time}`;
+      if (dt.getTime() === yest.getTime())  return `Yesterday ${time}`;
+      return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) + ' ' + time;
+    }
+
+    function groupLabel(d) {
+      if (!d) return 'Unknown Date';
+      const now   = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yest  = new Date(today); yest.setDate(today.getDate() - 1);
+      const dt    = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      if (dt.getTime() === today.getTime()) return '📅 Today';
+      if (dt.getTime() === yest.getTime())  return '📆 Yesterday';
+      return d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+
+    function inDateFilter(d) {
+      if (dateFilter === 'all' || !d) return true;
+      const now      = new Date();
+      const today    = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yest     = new Date(today); yest.setDate(today.getDate() - 1);
+      const weekAgo  = new Date(today); weekAgo.setDate(today.getDate() - 7);
+      const yearStart = new Date(now.getFullYear(), 0, 1);
+      const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      if (dateFilter === 'today')     return dt.getTime() === today.getTime();
+      if (dateFilter === 'yesterday') return dt.getTime() === yest.getTime();
+      if (dateFilter === 'week')      return d >= weekAgo;
+      if (dateFilter === 'year')      return d >= yearStart;
+      return true;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DOC FIELD HELPERS
+    ═══════════════════════════════════════════════════ */
+    const DATE_FIELDS = [
+      'createdAt','timestamp','date','updatedAt','loginDate',
+      'created_at','appointmentDate','dateTime','time','bookingDate','scheduled_at'
+    ];
+
+    function getDocDate(data) {
+      for (const f of DATE_FIELDS) {
+        if (data[f] !== undefined) {
+          const d = toDate(data[f]);
+          if (d) return d;
+        }
+      }
+      // Fallback: scan all string values for ISO date patterns
+      for (const v of Object.values(data)) {
+        if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) {
+          const d = new Date(v);
+          if (!isNaN(d)) return d;
+        }
+      }
+      return null;
+    }
+
+    function getPreview(data) {
+      const priority = ['patientName','name','email','doctor','title','subject','message','problem','description','text','content','body','phone','mobile'];
+      for (const k of priority) {
+        if (data[k] && typeof data[k] === 'string' && data[k].trim()) return data[k];
+      }
+      for (const v of Object.values(data)) {
+        if (typeof v === 'string' && v.length > 2) return v;
+      }
+      return '';
+    }
+
+    function getBadge(data) {
+      const raw = data.status || data.state || data.type || data.method || '';
+      if (!raw) return null;
+      const lc = String(raw).toLowerCase();
+      let cls = 'badge-default';
+      if (['confirmed','success','active','completed','done','approved'].includes(lc)) cls = 'badge-confirmed';
+      else if (['pending','waiting','processing','scheduled'].includes(lc))           cls = 'badge-pending';
+      else if (['cancelled','canceled','failed','rejected','error'].includes(lc))     cls = 'badge-cancelled';
+      return { text: raw, cls };
+    }
+
+    /* safe HTML escaping — prevents XSS from Firestore data */
+    function esc(s) {
+      return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderValue(v) {
+      if (v === null || v === undefined) return '<em style="opacity:0.35">null</em>';
+      if (typeof v.toDate === 'function') return esc(v.toDate().toLocaleString());
+      if (v != null && v.seconds != null) return esc(new Date(v.seconds * 1000).toLocaleString());
+      if (typeof v === 'boolean') return v ? '✅ true' : '❌ false';
+      if (typeof v === 'object')  return `<pre style="font-size:0.72rem;color:var(--text-mid);white-space:pre-wrap;margin:0;max-height:120px;overflow:auto">${esc(JSON.stringify(v, null, 2))}</pre>`;
+      return esc(String(v).substring(0, 300));
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════════ */
+    function buildSidebar(counts) {
+      sidebar.innerHTML = '<div class="sidebar-title">Collections</div>';
+      COLLECTIONS.forEach(col => {
+        const cnt  = counts[col.id] ?? '…';
+        const item = document.createElement('div');
+        item.className   = 'col-item';
+        item.dataset.col = col.id;
+        item.innerHTML   = `
+          <div class="col-icon ${col.cls}"><i class="fas ${col.icon}"></i></div>
+          <span>${col.id}</span>
+          <span class="col-count">${cnt}</span>`;
+        item.addEventListener('click', () => loadCollection(col.id));
+        sidebar.appendChild(item);
+      });
+    }
+
+    async function loadCounts() {
+      showBanner('⏳ Loading collection sizes…', 'info');
+      await Promise.all(COLLECTIONS.map(async col => {
+        try {
+          const snap = await firestoreGetDocs(firestoreCollection(db, col.id));
+          colCounts[col.id] = snap.size;
+        } catch (e) {
+          console.warn(`[count] ${col.id}:`, e.code || e.message);
+          colCounts[col.id] = e.code === 'permission-denied' ? '🔒' : '?';
+        }
+      }));
+      buildSidebar(colCounts);
+      showBanner('✅ All collections loaded', 'ok');
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LOAD COLLECTION  ← main fix lives here
+    ═══════════════════════════════════════════════════ */
+    async function loadCollection(colId) {
+      currentCol  = colId;
+      currentPage = 1;
+
+      document.querySelectorAll('.col-item').forEach(el =>
+        el.classList.toggle('active', el.dataset.col === colId));
+
+      activeColName.textContent  = colId;
+      tableTitle.textContent     = colId;
+      recordCount.textContent    = '';
+      paginationEl.style.display = 'none';
+
+      recordsList.innerHTML = `
+        <div class="loading-state">
+          <div class="loader-ring"></div>
+          <div class="loading-text">Loading <span class="loading-col">${colId}</span>…</div>
+        </div>`;
+
+      try {
+        /*
+          FIX: call firestoreCollection & firestoreGetDocs — the named imports
+          extracted from the Firestore module above.  The original code called
+          the bare identifiers which weren't in scope when the module errored.
+        */
+        const colRef = firestoreCollection(db, colId);
+        const snap   = await firestoreGetDocs(colRef);
+
+        console.log(`[${colId}] docs fetched: ${snap.size}`);
+
+        if (snap.empty) {
+          allDocs = [];
+          updateStats();
+          recordsList.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>
+                Collection <span class="err-code">${colId}</span> returned 0 documents.<br><br>
+                Either the collection is empty, it doesn't exist yet, or your Firestore
+                security rules are blocking read access for unauthenticated users.
+              </p>
+            </div>`;
+          recordCount.textContent = '0 records';
+          showToast(`${colId}: 0 documents returned`, 'warn');
+          return;
+        }
+
+        allDocs = [];
+        snap.forEach(doc => allDocs.push({ id: doc.id, data: doc.data() }));
+
+        // Update sidebar count badge
+        colCounts[colId] = allDocs.length;
+        const badge = document.querySelector(`.col-item[data-col="${colId}"] .col-count`);
+        if (badge) badge.textContent = allDocs.length;
+
+        updateStats();
+        applyFilters();
+        showToast(`Loaded ${allDocs.length} records from "${colId}"`, 'ok');
+
+      } catch (e) {
+        console.error(`[${colId}] Firestore error:`, e);
+
+        let hint = esc(e.message || 'Unknown error');
+        if (e.code === 'permission-denied')
+          hint = 'Permission denied — your Firestore security rules block this read.<br>Set <code>allow read: if true;</code> temporarily to test, or add proper auth.';
+        else if (e.code === 'unavailable')
+          hint = 'Firestore is unavailable — check your internet connection.';
+        else if (e.code === 'not-found')
+          hint = `Collection "${colId}" was not found in your Firestore project.`;
+
+        recordsList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle" style="color:var(--red)"></i>
+            <p>
+              <strong style="color:var(--red)">Failed to load "${colId}"</strong><br><br>
+              ${hint}<br><br>
+              <span style="font-size:0.75rem;opacity:0.6">Error code: <span class="err-code">${e.code || 'unknown'}</span></span>
+            </p>
+          </div>`;
+        showToast(`Error: ${e.code || e.message}`, 'err');
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       STATS
+    ═══════════════════════════════════════════════════ */
+    function updateStats() {
+      const now        = new Date();
+      const today      = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yest       = new Date(today); yest.setDate(today.getDate() - 1);
+      const yearStart  = new Date(now.getFullYear(), 0, 1);
+      let todayCnt = 0, yesterdayCnt = 0, yearCnt = 0;
+
+      allDocs.forEach(({ data }) => {
+        const d = getDocDate(data);
+        if (!d) return;
+        const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        if (dt.getTime() === today.getTime()) todayCnt++;
+        if (dt.getTime() === yest.getTime())  yesterdayCnt++;
+        if (d >= yearStart)                    yearCnt++;
+      });
+
+      animateCount('statTotal',     allDocs.length);
+      animateCount('statToday',     todayCnt);
+      animateCount('statYesterday', yesterdayCnt);
+      animateCount('statYear',      yearCnt);
+    }
+
+    function animateCount(id, target) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target / 30));
+      const timer = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        el.textContent = cur.toLocaleString();
+        if (cur >= target) clearInterval(timer);
+      }, 25);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FILTER / SEARCH / SORT
+    ═══════════════════════════════════════════════════ */
+    function applyFilters() {
+      const term = searchTerm.toLowerCase();
+      filteredDocs = allDocs.filter(({ id, data }) => {
+        if (!inDateFilter(getDocDate(data))) return false;
+        if (!term) return true;
+        return [id, ...Object.values(data).map(v => String(v))].join(' ').toLowerCase().includes(term);
+      });
+
+      filteredDocs.sort((a, b) => {
+        const da  = getDocDate(a.data);
+        const db_ = getDocDate(b.data);
+        if (sortMode === 'newest') return (db_ || 0) - (da || 0);
+        if (sortMode === 'oldest') return (da || 0) - (db_ || 0);
+        if (sortMode === 'az')     return a.id.localeCompare(b.id);
+        return 0;
+      });
+
+      currentPage = 1;
+      renderPage();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════════════════ */
+    function renderPage() {
+      const total = filteredDocs.length;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const page  = filteredDocs.slice(start, Math.min(start + PAGE_SIZE, total));
+      recordCount.textContent = `${total.toLocaleString()} record${total !== 1 ? 's' : ''}`;
+
+      if (total === 0) {
+        recordsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No records match your filters</p></div>`;
+        paginationEl.style.display = 'none';
+        return;
+      }
+
+      // Group by date heading
+      const groups = {};
+      page.forEach(doc => {
+        const lbl = groupLabel(getDocDate(doc.data));
+        (groups[lbl] = groups[lbl] || []).push(doc);
+      });
+
+      const colMeta = COLLECTIONS.find(c => c.id === currentCol) || {};
+      let html = '';
+      let idx  = start;
+
+      for (const [grpLabel, docs] of Object.entries(groups)) {
+        html += `<div class="timeline-date-header">${grpLabel}</div>`;
+        for (const { id, data } of docs) {
+          idx++;
+          const d       = getDocDate(data);
+          const preview = getPreview(data);
+          const badge   = getBadge(data);
+
+          const fieldsHtml = Object.entries(data).map(([k, v]) => `
+            <div>
+              <div class="field-key">${esc(k)}</div>
+              <div class="field-val">${renderValue(v)}</div>
+            </div>`).join('');
+
+          html += `
+            <div class="record-row" data-docid="${esc(id)}">
+              <div class="record-summary">
+                <span class="rec-index">${idx}</span>
+                <div class="rec-icon ${colMeta.cls || ''}">
+                  <i class="fas ${colMeta.icon || 'fa-file'}"></i>
+                </div>
+                <div class="rec-main">
+                  <div class="rec-id">${esc(id)}</div>
+                  <div class="rec-preview">${preview ? esc(preview.substring(0,100)) : '<em style="opacity:0.4">no preview</em>'}</div>
+                </div>
+                ${badge ? `<span class="rec-badge ${badge.cls}">${esc(badge.text)}</span>` : ''}
+                <div class="rec-date">${d ? dateLabel(d) : '—'}</div>
+                <button class="rec-expand-btn" data-docid="${esc(id)}" title="Expand">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+              </div>
+              <div class="record-detail" id="detail-${esc(id)}">
+                <div class="fields-grid">${fieldsHtml}</div>
+              </div>
+            </div>`;
+        }
+      }
+
+      recordsList.innerHTML = html;
+
+      // Stagger entrance animation
+      recordsList.querySelectorAll('.record-row').forEach((el, i) => {
+        el.style.animationDelay = `${i * 0.025}s`;
+      });
+
+      // Toggle expand
+      function toggle(docId) {
+        const detail = document.getElementById(`detail-${docId}`);
+        const btn    = recordsList.querySelector(`.rec-expand-btn[data-docid="${docId}"]`);
+        if (!detail || !btn) return;
+        const open = detail.classList.toggle('open');
+        btn.querySelector('i').className = open ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        btn.style.color = open ? 'var(--cyan)' : '';
+      }
+
+      recordsList.querySelectorAll('.rec-expand-btn').forEach(btn =>
+        btn.addEventListener('click', e => { e.stopPropagation(); toggle(btn.dataset.docid); }));
+
+      recordsList.querySelectorAll('.record-row').forEach(row =>
+        row.addEventListener('click', e => {
+          if (!e.target.closest('.rec-expand-btn')) toggle(row.dataset.docid);
+        }));
+
+      renderPagination(total);
+    }
+
+    function renderPagination(total) {
+      const pages = Math.ceil(total / PAGE_SIZE);
+      if (pages <= 1) { paginationEl.style.display = 'none'; return; }
+      paginationEl.style.display = 'flex';
+
+      const range = [];
+      if (pages <= 7) { for (let i=1;i<=pages;i++) range.push(i); }
+      else {
+        range.push(1);
+        if (currentPage > 3) range.push('…');
+        for (let i=Math.max(2,currentPage-1); i<=Math.min(pages-1,currentPage+1); i++) range.push(i);
+        if (currentPage < pages-2) range.push('…');
+        range.push(pages);
+      }
+
+      let html = `<button class="page-btn" id="pp" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+      range.forEach(p => {
+        if (p==='…') { html += `<span style="color:var(--text-dim);padding:0 4px">…</span>`; return; }
+        html += `<button class="page-btn${p===currentPage?' active':''}" data-page="${p}">${p}</button>`;
+      });
+      html += `<button class="page-btn" id="np" ${currentPage===pages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+      paginationEl.innerHTML = html;
+
+      paginationEl.querySelectorAll('[data-page]').forEach(b =>
+        b.addEventListener('click', () => { currentPage = +b.dataset.page; renderPage(); scrollTo({top:0,behavior:'smooth'}); }));
+      paginationEl.querySelector('#pp')?.addEventListener('click', () => { if(currentPage>1){currentPage--;renderPage();} });
+      paginationEl.querySelector('#np')?.addEventListener('click', () => { if(currentPage<pages){currentPage++;renderPage();} });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       EVENT LISTENERS
+    ═══════════════════════════════════════════════════ */
+    document.querySelectorAll('.filter-btn').forEach(btn =>
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        dateFilter = btn.dataset.filter;
+        if (currentCol) applyFilters();
+      }));
+
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchTerm = searchInput.value.trim();
+        if (currentCol) applyFilters();
+      }, 300);
+    });
+
+    sortSel.addEventListener('change', () => {
+      sortMode = sortSel.value;
+      if (currentCol) applyFilters();
+    });
+
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.classList.add('spinning');
+      try {
+        if (currentCol) await loadCollection(currentCol);
+        else            await loadCounts();
+      } finally {
+        refreshBtn.classList.remove('spinning');
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════════════════ */
+    buildSidebar({});
+    await loadCounts();
+    await loadCollection('appointments');
+
+  </script>
+</body>
+</html>

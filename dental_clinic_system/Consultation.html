@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DentaConnect — Online Dental Consultation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://meet.jit.si/external_api.js"></script>
+
+<!-- ═══ FIREBASE v12.10.0 ═══ -->
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics }    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+  import {
+    getFirestore, collection, addDoc, getDocs,
+    query, orderBy, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+    authDomain:        "dentalink-e3d20.firebaseapp.com",
+    databaseURL:       "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+    projectId:         "dentalink-e3d20",
+    storageBucket:     "dentalink-e3d20.firebasestorage.app",
+    messagingSenderId: "22170715728",
+    appId:             "1:22170715728:web:d175aa5e780bc3c926f355",
+    measurementId:     "G-X3Z8RYKWBM"
+  };
+
+  const app       = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db        = getFirestore(app);
+
+  // ── Expose to global scope ──
+  window._db              = db;
+  window._col             = collection;
+  window._addDoc          = addDoc;
+  window._getDocs         = getDocs;
+  window._query           = query;
+  window._orderBy         = orderBy;
+  window._serverTimestamp = serverTimestamp;
+
+  console.log('✅ Firebase v12.10.0 + Analytics initialized');
+
+  // ── Load existing feedback from Firestore on page ready ──
+  window.addEventListener('load', async () => {
+    try {
+      const snap = await getDocs(query(collection(db, 'feedback'), orderBy('createdAt', 'desc')));
+      snap.forEach(doc => {
+        const d = doc.data();
+        appendReviewCard(d.patientName || 'Anonymous', d.doctor, d.rating, d.review, d.createdAt?.toDate());
+      });
+    } catch(e) { console.warn('Could not load reviews:', e); }
+  });
+</script>
+
+<style>
+  :root {
+    --teal: #0a9e8c;
+    --teal-light: #e0f7f4;
+    --teal-dark: #076f62;
+    --blue: #1a6fba;
+    --blue-light: #e8f3fb;
+    --white: #ffffff;
+    --off-white: #f5f9fc;
+    --gray-1: #f0f4f8;
+    --gray-2: #d0dde8;
+    --gray-3: #8fa3b1;
+    --dark: #0d2233;
+    --card-shadow: 0 4px 24px rgba(10,40,70,0.08);
+    --card-shadow-hover: 0 8px 40px rgba(10,40,70,0.14);
+    --radius: 18px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    background: var(--white);
+    border-bottom: 1.5px solid var(--gray-1);
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 12px rgba(10,40,70,0.05);
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--teal-dark);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1.1rem;
+  }
+
+  .nav-links {
+    display: flex; gap: 8px; list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none; color: var(--gray-3);
+    font-size: 0.88rem; font-weight: 500;
+    padding: 6px 14px; border-radius: 8px;
+    transition: all .2s;
+    cursor: pointer;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--teal-dark); background: var(--teal-light); }
+
+  /* ─── PAGES ─── */
+  .page { display: none; animation: fadeIn .35s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(135deg, #e8f6f4 0%, #eaf3fb 60%, #f5f9fc 100%);
+    padding: 80px 5% 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .hero-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    line-height: 1.15;
+    color: var(--dark);
+    margin-bottom: 18px;
+  }
+
+  .hero-text h1 span { color: var(--teal); }
+
+  .hero-text p {
+    font-size: 1.05rem; color: var(--gray-3); line-height: 1.7;
+    max-width: 420px; margin-bottom: 32px;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; border: none; transition: all .22s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(10,158,140,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(10,158,140,0.4); }
+
+  .btn-outline {
+    background: transparent;
+    border: 2px solid var(--teal);
+    color: var(--teal);
+  }
+  .btn-outline:hover { background: var(--teal-light); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #e05050, #c0392b);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(192,57,43,0.3);
+  }
+
+  .hero-stats {
+    display: flex; gap: 28px; margin-top: 36px;
+  }
+
+  .stat { text-align: center; }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--teal-dark); }
+  .stat-label { font-size: 0.78rem; color: var(--gray-3); font-weight: 500; }
+
+  .hero-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--teal), var(--blue));
+  }
+
+  .hero-card h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 20px; font-weight: 600; }
+
+  /* ─── SECTIONS ─── */
+  .section { padding: 60px 5%; }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem; color: var(--dark); margin-bottom: 8px;
+  }
+  .section-sub { color: var(--gray-3); font-size: 0.95rem; margin-bottom: 40px; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow .22s, transform .22s;
+  }
+  .card:hover { box-shadow: var(--card-shadow-hover); transform: translateY(-2px); }
+
+  /* ─── FORM ─── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.82rem; font-weight: 600; color: var(--dark); letter-spacing: .4px; }
+  input, select, textarea {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-2);
+    font-family: 'DM Sans', sans-serif; font-size: 0.93rem;
+    color: var(--dark); background: var(--off-white);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--teal); box-shadow: 0 0 0 3px rgba(10,158,140,0.1);
+    background: var(--white);
+  }
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* ─── DOCTOR CARD ─── */
+  .doctor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+
+  .doctor-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 28px; box-shadow: var(--card-shadow);
+    text-align: center; transition: all .22s; cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .doctor-card:hover { box-shadow: var(--card-shadow-hover); transform: translateY(-3px); }
+  .doctor-card.selected { border-color: var(--teal); }
+
+  .doctor-avatar {
+    width: 88px; height: 88px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal-light), var(--blue-light));
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; position: relative; overflow: hidden;
+  }
+
+  .doc-badge {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #2ecc71; border: 2.5px solid #fff;
+  }
+
+  .doctor-name { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--dark); margin-bottom: 4px; }
+  .doctor-spec { font-size: 0.82rem; color: var(--teal); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+  .doctor-exp { font-size: 0.88rem; color: var(--gray-3); margin-bottom: 16px; }
+
+  .stars { color: #f4b942; font-size: 0.9rem; margin-bottom: 10px; }
+
+  /* ─── APPOINTMENT ─── */
+  .appt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .time-slot {
+    padding: 10px 6px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-2); text-align: center;
+    font-size: 0.84rem; cursor: pointer; transition: all .18s;
+    background: var(--off-white);
+  }
+  .time-slot:hover { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); }
+  .time-slot.selected { border-color: var(--teal); background: var(--teal); color: #fff; font-weight: 600; }
+
+  /* ─── VIDEO CALL ─── */
+  #video-page { background: #0d2233; min-height: calc(100vh - 68px); }
+
+  .video-layout {
+    display: grid; grid-template-columns: 1fr 360px;
+    gap: 0; height: calc(100vh - 68px);
+  }
+
+  .video-main { position: relative; background: #0a1a2a; }
+
+  #jitsi-container {
+    width: 100%; height: 100%; min-height: 500px;
+  }
+
+  .video-placeholder {
+    width: 100%; height: 100%; min-height: 480px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #8fa3b1; gap: 16px;
+  }
+  .video-placeholder .big-icon { font-size: 5rem; opacity: .4; }
+  .video-placeholder p { font-size: 1rem; opacity: .6; }
+
+  .video-controls {
+    position: absolute; bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 14px; align-items: center;
+    background: rgba(13,34,51,0.85);
+    padding: 12px 22px; border-radius: 50px;
+    backdrop-filter: blur(10px);
+  }
+
+  .ctrl-btn {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: none; cursor: pointer;
+    font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; background: rgba(255,255,255,0.1); color: #fff;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.08); }
+  .ctrl-btn.off { background: rgba(220,50,50,0.35); }
+  .ctrl-btn.end { background: linear-gradient(135deg, #e05050, #c0392b); width: 60px; height: 60px; font-size: 1.4rem; }
+
+  .video-sidebar {
+    background: var(--white);
+    display: flex; flex-direction: column;
+    border-left: 1.5px solid var(--gray-1);
+    overflow: hidden;
+  }
+
+  .sidebar-tabs {
+    display: flex; border-bottom: 1.5px solid var(--gray-1);
+  }
+
+  .s-tab {
+    flex: 1; padding: 14px; text-align: center;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    color: var(--gray-3); transition: all .18s;
+    border-bottom: 3px solid transparent;
+  }
+  .s-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+  .sidebar-content { flex: 1; overflow-y: auto; padding: 18px; display: none; }
+  .sidebar-content.active { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ─── CHAT ─── */
+  .chat-messages { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+
+  .msg {
+    max-width: 80%; padding: 10px 14px; border-radius: 16px;
+    font-size: 0.88rem; line-height: 1.5;
+  }
+  .msg.patient { background: var(--teal-light); color: var(--teal-dark); align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.doctor  { background: var(--gray-1); color: var(--dark); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 0.7rem; color: var(--gray-3); margin-top: 3px; }
+
+  .chat-input-area {
+    display: flex; gap: 8px; padding: 14px 18px;
+    border-top: 1.5px solid var(--gray-1);
+  }
+
+  .chat-input-area input {
+    flex: 1; padding: 10px 14px; border-radius: 50px;
+    font-size: 0.88rem;
+  }
+
+  .send-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    border: none; cursor: pointer; color: #fff; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s;
+  }
+  .send-btn:hover { transform: scale(1.1); }
+
+  /* ─── PRESCRIPTION ─── */
+  .rx-header {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 16px; border-bottom: 1.5px solid var(--gray-1); margin-bottom: 16px;
+  }
+  .rx-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--teal-light), var(--blue-light));
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+  }
+
+  .rx-content { display: flex; flex-direction: column; gap: 10px; }
+  .rx-content textarea {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white); font-size: 0.88rem;
+    min-height: 140px;
+  }
+
+  .download-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 50px;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    color: #fff; border: none; cursor: pointer;
+    font-size: 0.88rem; font-weight: 600;
+    transition: all .2s; width: fit-content;
+  }
+  .download-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(10,158,140,0.3); }
+
+  /* ─── FEEDBACK ─── */
+  .feedback-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+
+  .star-select { display: flex; gap: 6px; font-size: 1.8rem; margin: 12px 0; }
+  .star-select span { cursor: pointer; color: var(--gray-2); transition: color .15s; }
+  .star-select span.lit { color: #f4b942; }
+
+  .review-list { display: flex; flex-direction: column; gap: 16px; margin-top: 30px; }
+
+  .review-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--card-shadow);
+  }
+  .reviewer { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .r-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal-light), var(--blue-light));
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .r-name { font-weight: 600; font-size: 0.92rem; }
+  .r-date { font-size: 0.78rem; color: var(--gray-3); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--dark); color: #fff;
+    padding: 14px 22px; border-radius: var(--radius-sm);
+    font-size: 0.9rem; font-weight: 500;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transform: translateY(80px); opacity: 0;
+    transition: all .3s cubic-bezier(.34,1.56,.64,1);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { transform: none; opacity: 1; }
+  .toast.success::before { content: '✅'; }
+  .toast.info::before    { content: 'ℹ️'; }
+
+  /* ─── CHIP / BADGE ─── */
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 50px;
+    font-size: 0.78rem; font-weight: 600;
+    background: var(--teal-light); color: var(--teal-dark);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; padding: 50px 5% 40px; gap: 32px; }
+    .hero-card { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .appt-grid { grid-template-columns: 1fr; }
+    .video-layout { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    .video-sidebar { height: 380px; }
+    .nav-links { display: none; }
+  }
+
+  /* ─── UTILS ─── */
+  .mt-4 { margin-top: 16px; }
+  .flex-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .divider { border: none; border-top: 1.5px solid var(--gray-1); margin: 24px 0; }
+  .text-muted { color: var(--gray-3); font-size: 0.88rem; }
+  .text-teal { color: var(--teal); }
+  .fw-600 { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🦷</div>
+    DentaConnect
+  </div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')"        class="active" id="nav-home">Home</a></li>
+    <li><a onclick="showPage('patient')"     id="nav-patient">Patient Info</a></li>
+    <li><a onclick="showPage('doctors')"     id="nav-doctors">Doctors</a></li>
+    <li><a onclick="showPage('appointment')" id="nav-appointment">Book</a></li>
+    <li><a onclick="showPage('video')"       id="nav-video">Consultation</a></li>
+    <li><a onclick="showPage('feedback')"    id="nav-feedback">Feedback</a></li>
+    <li><a onclick="showPage('Medicinesstore')"    id="nav-medicinesstore">Medicines Store</a></li><a href="onlinemedicale.html" target="_blank">🛒 Medicines Store</a>
+  </ul>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="chip" style="margin-bottom:18px;">🟢 Doctors Available Now</div>
+      <h1>Expert <span>Dental Care</span><br>From Your Home</h1>
+      <p>Connect with certified dentists instantly. Get consultations, prescriptions, and dental advice — all without leaving your couch.</p>
+      <div class="flex-row">
+        <button class="btn btn-primary" onclick="showPage('patient')">📋 Get Started</button>
+        <button class="btn btn-outline" onclick="showPage('doctors')">👨‍⚕️ Meet Our Doctors</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">2,400+</div><div class="stat-label">Patients Served</div></div>
+        <div class="stat"><div class="stat-num">18</div><div class="stat-label">Expert Dentists</div></div>
+        <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">Average Rating</div></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>🚀 How It Works</h3>
+      <div style="display:flex;flex-direction:column;gap:18px;margin-top:12px;">
+        <div class="flex-row">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">1️⃣</div>
+          <div><div class="fw-600" style="font-size:.92rem;">Enter Patient Info</div><div class="text-muted">Name, age, and your concern</div></div>
+        </div>
+        <div class="flex-row">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">2️⃣</div>
+          <div><div class="fw-600" style="font-size:.92rem;">Choose a Dentist</div><div class="text-muted">Browse specialists & ratings</div></div>
+        </div>
+        <div class="flex-row">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">3️⃣</div>
+          <div><div class="fw-600" style="font-size:.92rem;">Book a Slot</div><div class="text-muted">Pick a convenient time</div></div>
+        </div>
+        <div class="flex-row">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">4️⃣</div>
+          <div><div class="fw-600" style="font-size:.92rem;">Video Consultation</div><div class="text-muted">Chat, consult, get prescription</div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary mt-4" style="width:100%;justify-content:center;" onclick="showPage('patient')">Start Consultation →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PATIENT INFO ═══ -->
+<div class="page" id="page-patient">
+  <div class="section">
+    <div class="section-title">Patient Information</div>
+    <div class="section-sub">Please fill in your details before proceeding to consultation.</div>
+    <div class="card" style="max-width:680px;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>PATIENT NAME</label>
+          <input type="text" id="p-name" placeholder="e.g. Riya Sharma" />
+        </div>
+        <div class="form-group">
+          <label>AGE</label>
+          <input type="number" id="p-age" placeholder="e.g. 28" min="1" max="120" />
+        </div>
+        <div class="form-group">
+          <label>GENDER</label>
+          <select id="p-gender">
+            <option value="">Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>CONTACT NUMBER</label>
+          <input type="tel" id="p-phone" placeholder="+91 XXXXX XXXXX" />
+        </div>
+        <div class="form-group full">
+          <label>DESCRIBE YOUR DENTAL PROBLEM</label>
+          <textarea id="p-problem" placeholder="Describe your symptoms, pain level, and how long you've had the issue..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>ANY ALLERGIES OR CURRENT MEDICATIONS?</label>
+          <input type="text" id="p-meds" placeholder="e.g. Penicillin allergy, taking Ibuprofen..." />
+        </div>
+      </div>
+      <div class="flex-row mt-4">
+        <button class="btn btn-primary" onclick="savePatientInfo()">Save & Continue →</button>
+        <button class="btn btn-outline" onclick="showPage('home')">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DOCTORS ═══ -->
+<div class="page" id="page-doctors">
+  <div class="section">
+    <div class="section-title">Meet Our Dentists</div>
+    <div class="section-sub">All doctors are verified & licensed professionals.</div>
+    <div class="doctor-grid">
+      <div class="doctor-card" onclick="selectDoctor(this, 'Dr. S. Pawar')" id="doc-1">
+        <div class="doctor-avatar">👨‍⚕️<div class="doc-badge"></div></div>
+        <div class="doctor-name">Dr. S. Pawar</div>
+        <div class="doctor-spec">Orthodontist</div>
+        <div class="doctor-exp">12 years experience · BDS, MDS</div>
+        <div class="stars">★★★★★</div>
+        <div class="text-muted" style="font-size:.82rem;">Specializes in braces, aligners & bite correction</div>
+        <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="event.stopPropagation();selectAndBook('Dr. S. Pawar')">Book Now</button>
+      </div>
+      <div class="doctor-card" onclick="selectDoctor(this, 'Dr. A. Kulkarni')" id="doc-2">
+        <div class="doctor-avatar">👩‍⚕️<div class="doc-badge"></div></div>
+        <div class="doctor-name">Dr. A. Kulkarni</div>
+        <div class="doctor-spec">Endodontist</div>
+        <div class="doctor-exp">9 years experience · BDS, MDS</div>
+        <div class="stars">★★★★☆</div>
+        <div class="text-muted" style="font-size:.82rem;">Expert in root canals, dental pain & infections</div>
+        <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="event.stopPropagation();selectAndBook('Dr. A. Kulkarni')">Book Now</button>
+      </div>
+      <div class="doctor-card" onclick="selectDoctor(this, 'Dr. M. Raut')" id="doc-3">
+        <div class="doctor-avatar" style="background:linear-gradient(135deg,#fde8e8,#fde8ff);">👨‍⚕️<div class="doc-badge"></div></div>
+        <div class="doctor-name">Dr. M. Raut</div>
+        <div class="doctor-spec">Cosmetic Dentist</div>
+        <div class="doctor-exp">15 years experience · BDS</div>
+        <div class="stars">★★★★★</div>
+        <div class="text-muted" style="font-size:.82rem;">Teeth whitening, veneers & smile makeovers</div>
+        <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="event.stopPropagation();selectAndBook('Dr. M. Raut')">Book Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APPOINTMENT ═══ -->
+<div class="page" id="page-appointment">
+  <div class="section">
+    <div class="section-title">Book Appointment</div>
+    <div class="section-sub">Select your preferred date and time slot.</div>
+    <div class="appt-grid" style="max-width:780px;">
+      <div class="card">
+        <h3 class="fw-600" style="margin-bottom:18px;">📅 Select Date</h3>
+        <div class="form-group">
+          <label>PREFERRED DATE</label>
+          <input type="date" id="appt-date" />
+        </div>
+        <div class="form-group mt-4">
+          <label>SELECT DOCTOR</label>
+          <select id="appt-doctor">
+            <option value="">-- Choose a Doctor --</option>
+            <option>Dr. S. Pawar</option>
+            <option>Dr. A. Kulkarni</option>
+            <option>Dr. M. Raut</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="fw-600" style="margin-bottom:14px;">⏰ Available Slots</h3>
+        <div class="time-slots" id="time-slots">
+          <div class="time-slot" onclick="pickSlot(this)">9:00 AM</div>
+          <div class="time-slot" onclick="pickSlot(this)">10:00 AM</div>
+          <div class="time-slot" onclick="pickSlot(this)">11:30 AM</div>
+          <div class="time-slot" onclick="pickSlot(this)">1:00 PM</div>
+          <div class="time-slot" onclick="pickSlot(this)">2:30 PM</div>
+          <div class="time-slot" onclick="pickSlot(this)">4:00 PM</div>
+          <div class="time-slot" onclick="pickSlot(this)">5:30 PM</div>
+          <div class="time-slot" onclick="pickSlot(this)">6:00 PM</div>
+          <div class="time-slot" style="opacity:.4;cursor:not-allowed;">7:30 PM</div>
+        </div>
+      </div>
+    </div>
+    <div class="flex-row mt-4">
+      <button class="btn btn-primary" onclick="bookAppointment()" style="font-size:1rem;padding:15px 36px;">✅ Confirm Appointment</button>
+      <button class="btn btn-outline" onclick="showPage('doctors')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIDEO CALL ═══ -->
+<div class="page" id="page-video">
+  <div class="video-layout">
+    <div class="video-main">
+      <div id="jitsi-container"></div>
+      <div class="video-placeholder" id="video-placeholder">
+        <div class="big-icon">🎥</div>
+        <p>Click "Join Consultation" to start your video call</p>
+        <button class="btn btn-primary" onclick="joinConsultation()">Join Consultation</button>
+      </div>
+      <div class="video-controls" id="video-controls" style="display:none;">
+        <button class="ctrl-btn" id="btn-mic" onclick="toggleMic()" title="Mute/Unmute">🎙️</button>
+        <button class="ctrl-btn" id="btn-cam" onclick="toggleCam()" title="Camera">📷</button>
+        <button class="ctrl-btn end" onclick="endCall()" title="End Call">📵</button>
+      </div>
+    </div>
+    <div class="video-sidebar">
+      <div class="sidebar-tabs">
+        <div class="s-tab active" onclick="switchTab('chat', event)">💬 Chat</div>
+        <div class="s-tab" onclick="switchTab('rx', event)">📝 Prescription</div>
+      </div>
+      <div class="sidebar-content active" id="tab-chat">
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg doctor">
+            Hello! I'm reviewing your symptoms. Could you describe the pain more?
+            <div class="msg-time">Doctor · 10:01 AM</div>
+          </div>
+          <div class="msg patient">
+            It started 3 days ago, sharp pain when I bite down.
+            <div class="msg-time">You · 10:02 AM</div>
+          </div>
+          <div class="msg doctor">
+            Understood. Is the tooth sensitive to hot or cold drinks?
+            <div class="msg-time">Doctor · 10:02 AM</div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-content" id="tab-rx">
+        <div class="rx-header">
+          <div class="rx-icon">💊</div>
+          <div>
+            <div class="fw-600">Write Prescription</div>
+            <div class="text-muted" style="font-size:.78rem;">Doctor completes below</div>
+          </div>
+        </div>
+        <div class="rx-content">
+          <div class="form-group">
+            <label>DIAGNOSIS</label>
+            <input type="text" id="rx-diagnosis" placeholder="e.g. Dental caries (tooth decay)" />
+          </div>
+          <div class="form-group">
+            <label>MEDICATIONS & DOSAGE</label>
+            <textarea id="rx-meds" placeholder="1. Amoxicillin 500mg — 3x/day for 5 days&#10;2. Ibuprofen 400mg — as needed for pain&#10;3. Chlorhexidine mouthwash — twice daily"></textarea>
+          </div>
+          <div class="form-group">
+            <label>FOLLOW-UP INSTRUCTIONS</label>
+            <textarea id="rx-notes" placeholder="Visit a dental clinic for X-ray within 7 days..." style="min-height:70px;"></textarea>
+          </div>
+          <button class="download-btn" onclick="downloadPrescription()">⬇️ Download Prescription PDF</button>
+        </div>
+      </div>
+      <div class="chat-input-area" id="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a message or symptom..." onkeypress="if(event.key==='Enter')sendMessage()" />
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FEEDBACK ═══ -->
+<div class="page" id="page-feedback">
+  <div class="section">
+    <div class="section-title">Your Feedback</div>
+    <div class="section-sub">Help us improve — your experience matters!</div>
+    <div class="feedback-grid">
+      <div class="card">
+        <h3 class="fw-600" style="margin-bottom:16px;">⭐ Rate Your Consultation</h3>
+        <div class="form-group">
+          <label>DOCTOR SEEN</label>
+          <select id="fb-doctor">
+            <option>Dr. S. Pawar</option>
+            <option>Dr. A. Kulkarni</option>
+            <option>Dr. M. Raut</option>
+          </select>
+        </div>
+        <div style="margin:14px 0 6px;font-size:.82rem;font-weight:600;color:var(--dark);">YOUR RATING</div>
+        <div class="star-select" id="star-select">
+          <span onclick="rateStar(1)">★</span>
+          <span onclick="rateStar(2)">★</span>
+          <span onclick="rateStar(3)">★</span>
+          <span onclick="rateStar(4)">★</span>
+          <span onclick="rateStar(5)">★</span>
+        </div>
+        <div class="form-group mt-4">
+          <label>YOUR NAME (optional)</label>
+          <input type="text" id="fb-name" placeholder="e.g. Riya S." />
+        </div>
+        <div class="form-group mt-4">
+          <label>WRITE A REVIEW</label>
+          <textarea id="fb-review" placeholder="Share your experience with the consultation..."></textarea>
+        </div>
+        <button class="btn btn-primary mt-4" onclick="submitFeedback()">Submit Feedback ✓</button>
+        <div id="fb-status" style="margin-top:10px;font-size:.82rem;color:var(--teal);display:none;">✅ Saved to Firebase!</div>
+      </div>
+      <div>
+        <h3 class="fw-600" style="margin-bottom:16px;">💬 Recent Reviews</h3>
+        <div class="review-list" id="review-list">
+          <div class="review-card">
+            <div class="reviewer">
+              <div class="r-avatar">👩</div>
+              <div><div class="r-name">Meera K.</div><div class="r-date">Feb 28, 2026 · Dr. S. Pawar</div></div>
+              <div class="stars" style="margin-left:auto;font-size:.85rem;">★★★★★</div>
+            </div>
+            <p class="text-muted" style="font-size:.88rem;">Dr. Pawar explained everything so clearly. Highly recommended!</p>
+          </div>
+          <div class="review-card">
+            <div class="reviewer">
+              <div class="r-avatar">👨</div>
+              <div><div class="r-name">Arjun P.</div><div class="r-date">Feb 20, 2026 · Dr. A. Kulkarni</div></div>
+              <div class="stars" style="margin-left:auto;font-size:.85rem;">★★★★☆</div>
+            </div>
+            <p class="text-muted" style="font-size:.88rem;">Got root canal advice without going to clinic. Dr. Kulkarni was very thorough.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── NAVIGATION ───
+  let currentPage = 'home';
+
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    const navEl = document.getElementById('nav-' + page);
+    if (navEl) navEl.classList.add('active');
+    currentPage = page;
+    window.scrollTo(0, 0);
+  }
+
+  // ─── TOAST ───
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // ─── FIREBASE SAVE HELPER ───
+  // Waits for module script to expose window._db before saving
+  async function fbSave(collectionName, data) {
+    try {
+      if (!window._db) { console.warn('Firebase not ready yet'); return null; }
+      const ref = await window._addDoc(
+        window._col(window._db, collectionName),
+        { ...data, createdAt: window._serverTimestamp() }
+      );
+      return ref.id;
+    } catch(e) {
+      console.error('Firebase save error:', e.code, e.message);
+      return null;
+    }
+  }
+
+  // ─── PATIENT INFO ───
+  let patientData = {};
+
+  async function savePatientInfo() {
+    const name    = document.getElementById('p-name').value.trim();
+    const age     = document.getElementById('p-age').value.trim();
+    const gender  = document.getElementById('p-gender').value;
+    const phone   = document.getElementById('p-phone').value.trim();
+    const problem = document.getElementById('p-problem').value.trim();
+    const meds    = document.getElementById('p-meds').value.trim();
+
+    if (!name || !age || !problem) {
+      showToast('Please fill Name, Age, and Problem.', 'info'); return;
+    }
+
+    patientData = { name, age, gender, phone, problem, meds };
+
+    const id = await fbSave('patients', patientData);
+    if (id) {
+      patientData.firestoreId = id;
+      showToast('Patient info saved to Firebase! 🔥');
+    } else {
+      showToast('Patient info saved locally (Firebase offline).', 'info');
+    }
+    showPage('doctors');
+  }
+
+  // ─── DOCTOR SELECTION ───
+  let selectedDoctor = '';
+
+  function selectDoctor(el, name) {
+    document.querySelectorAll('.doctor-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedDoctor = name;
+    showToast(name + ' selected!');
+  }
+
+  function selectAndBook(name) {
+    selectedDoctor = name;
+    document.getElementById('appt-doctor').value = name;
+    showPage('appointment');
+    showToast(name + ' selected. Pick a time slot!', 'info');
+  }
+
+  // ─── APPOINTMENT ───
+  let selectedSlot   = '';
+  let appointmentData = {};
+
+  function pickSlot(el) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSlot = el.textContent;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('appt-date').min   = today;
+  document.getElementById('appt-date').value = today;
+
+  async function bookAppointment() {
+    const date   = document.getElementById('appt-date').value;
+    const doctor = document.getElementById('appt-doctor').value;
+    if (!date || !doctor || !selectedSlot) {
+      showToast('Please select date, doctor and a time slot.', 'info'); return;
+    }
+
+    appointmentData = {
+      patientName: patientData.name  || 'Unknown',
+      patientAge:  patientData.age   || '',
+      phone:       patientData.phone || '',
+      problem:     patientData.problem || '',
+      doctor, date, timeSlot: selectedSlot, status: 'confirmed'
+    };
+
+    const id = await fbSave('appointments', appointmentData);
+    if (id) {
+      appointmentData.firestoreId = id;
+      showToast(`Appointment booked with ${doctor} on ${date} at ${selectedSlot} ✅ — Saved to Firebase!`);
+    } else {
+      showToast(`Appointment booked with ${doctor} at ${selectedSlot} ✅`);
+    }
+    setTimeout(() => showPage('video'), 2000);
+  }
+
+  // ─── VIDEO CALL ───
+  let micOn = true, camOn = true, jitsiApi = null;
+
+  function joinConsultation() {
+    document.getElementById('video-placeholder').style.display = 'none';
+    document.getElementById('video-controls').style.display = 'flex';
+
+    if (typeof JitsiMeetExternalAPI === 'undefined') {
+      document.getElementById('jitsi-container').innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8fa3b1;font-size:1rem;flex-direction:column;gap:12px;"><span style="font-size:3rem;">📹</span><p>Video call requires internet connection.</p><p style="font-size:.82rem;opacity:.6;">Jitsi Meet integration active when online.</p></div>';
+      showToast('Live video requires internet. UI ready!', 'info');
+      return;
+    }
+
+    const options = {
+      roomName: 'DentaLink_' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      width: '100%', height: '100%',
+      parentNode: document.querySelector('#jitsi-container'),
+      userInfo: { displayName: patientData.name || 'Patient' },
+      interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, TOOLBAR_BUTTONS: [] }
+    };
+    jitsiApi = new JitsiMeetExternalAPI('meet.jit.si', options);
+    showToast('Joined consultation room!');
+  }
+
+  function toggleMic() {
+    micOn = !micOn;
+    const btn = document.getElementById('btn-mic');
+    btn.textContent = micOn ? '🎙️' : '🔇';
+    btn.classList.toggle('off', !micOn);
+    if (jitsiApi) jitsiApi.executeCommand('toggleAudio');
+    showToast(micOn ? 'Microphone on' : 'Microphone muted', 'info');
+  }
+
+  function toggleCam() {
+    camOn = !camOn;
+    const btn = document.getElementById('btn-cam');
+    btn.textContent = camOn ? '📷' : '🚫';
+    btn.classList.toggle('off', !camOn);
+    if (jitsiApi) jitsiApi.executeCommand('toggleVideo');
+    showToast(camOn ? 'Camera on' : 'Camera off', 'info');
+  }
+
+  function endCall() {
+    if (jitsiApi) { jitsiApi.dispose(); jitsiApi = null; }
+    document.getElementById('jitsi-container').innerHTML = '';
+    document.getElementById('video-placeholder').style.display = 'flex';
+    document.getElementById('video-controls').style.display = 'none';
+    micOn = true; camOn = true;
+    document.getElementById('btn-mic').textContent = '🎙️';
+    document.getElementById('btn-cam').textContent = '📷';
+    showToast('Call ended. How was your session?', 'info');
+    setTimeout(() => showPage('feedback'), 1800);
+  }
+
+  // ─── CHAT ───
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const msg   = input.value.trim();
+    if (!msg) return;
+    const messages = document.getElementById('chat-messages');
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const div = document.createElement('div');
+    div.className = 'msg patient';
+    div.innerHTML = `${msg}<div class="msg-time">You · ${time}</div>`;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    input.value = '';
+
+    await fbSave('chats', {
+      sender: 'patient',
+      patientName: patientData.name || 'Patient',
+      doctor: appointmentData.doctor || selectedDoctor || '',
+      message: msg
+    });
+
+    setTimeout(async () => {
+      const replies = [
+        "Thank you, I've noted that. Any other symptoms?",
+        "I understand. Let me check your records.",
+        "Please don't worry — this is very treatable!",
+        "I'll include that in the prescription."
+      ];
+      const reply = replies[Math.floor(Math.random() * replies.length)];
+      const r = document.createElement('div');
+      r.className = 'msg doctor';
+      r.innerHTML = `${reply}<div class="msg-time">Doctor · ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+      messages.appendChild(r);
+      messages.scrollTop = messages.scrollHeight;
+
+      await fbSave('chats', {
+        sender: 'doctor',
+        doctor: appointmentData.doctor || selectedDoctor || '',
+        patientName: patientData.name || 'Patient',
+        message: reply
+      });
+    }, 1400);
+  }
+
+  // ─── SIDEBAR TABS ───
+  function switchTab(tab, event) {
+    document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.sidebar-content').forEach(c => c.classList.remove('active'));
+    if (event && event.target) event.target.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('chat-input-area').style.display = tab === 'chat' ? 'flex' : 'none';
+  }
+
+  // ─── PRESCRIPTION ───
+  async function downloadPrescription() {
+    const diagnosis = document.getElementById('rx-diagnosis').value || 'Dental Consultation';
+    const meds      = document.getElementById('rx-meds').value     || 'As prescribed by doctor';
+    const notes     = document.getElementById('rx-notes').value    || 'Follow up as advised';
+    const pName     = patientData.name || document.getElementById('p-name')?.value || 'Patient';
+    const pAge      = patientData.age  || document.getElementById('p-age')?.value  || '--';
+    const date      = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+    await fbSave('prescriptions', {
+      patientName: pName, patientAge: pAge,
+      doctor: appointmentData.doctor || selectedDoctor || '',
+      diagnosis, medications: meds, followUp: notes,
+      appointmentDate: appointmentData.date || date
+    });
+
+    const content = `DentaLink — Digital Prescription
+${'='.repeat(44)}
+
+Date: ${date}
+Patient: ${pName}, Age: ${pAge}
+Doctor: ${appointmentData.doctor || selectedDoctor || 'N/A'}
+
+DIAGNOSIS
+─────────────────────────
+${diagnosis}
+
+MEDICATIONS & DOSAGE
+─────────────────────────
+${meds}
+
+FOLLOW-UP INSTRUCTIONS
+─────────────────────────
+${notes}
+
+${'─'.repeat(44)}
+This prescription is issued via DentaLink.
+Please consult a dentist for in-person follow-up.`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `DentaLink_Prescription_${pName.replace(/ /g,'_')}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Prescription downloaded & saved to Firebase! 💊');
+  }
+
+  // ─── FEEDBACK ───
+  let selectedRating = 0;
+
+  function rateStar(n) {
+    selectedRating = n;
+    document.querySelectorAll('#star-select span').forEach((s, i) => {
+      s.classList.toggle('lit', i < n);
+    });
+  }
+
+  async function submitFeedback() {
+    const review = document.getElementById('fb-review').value.trim();
+    const doctor = document.getElementById('fb-doctor').value;
+    const fbName = document.getElementById('fb-name').value.trim() || patientData.name || 'Anonymous';
+    if (!selectedRating) { showToast('Please select a star rating.', 'info'); return; }
+    if (!review)         { showToast('Please write a short review.', 'info'); return; }
+
+    const statusEl = document.getElementById('fb-status');
+    const id = await fbSave('feedback', { patientName: fbName, doctor, rating: selectedRating, review });
+
+    if (id) {
+      statusEl.style.display = 'block';
+      setTimeout(() => statusEl.style.display = 'none', 3000);
+    }
+
+    appendReviewCard(fbName, doctor, selectedRating, review, new Date());
+
+    document.getElementById('fb-review').value = '';
+    document.getElementById('fb-name').value   = '';
+    selectedRating = 0;
+    document.querySelectorAll('#star-select span').forEach(s => s.classList.remove('lit'));
+    showToast('Thank you for your feedback! Saved to Firebase 🔥');
+  }
+
+  // ─── HELPER: Render a review card ───
+  function appendReviewCard(name, doctor, rating, review, dateObj) {
+    const stars   = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const list    = document.getElementById('review-list');
+    const dateStr = dateObj
+      ? (dateObj instanceof Date ? dateObj : (dateObj.toDate?.() || new Date()))
+          .toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+      : '';
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.innerHTML = `
+      <div class="reviewer">
+        <div class="r-avatar">😊</div>
+        <div>
+          <div class="r-name">${name}</div>
+          <div class="r-date">${dateStr}${doctor ? ' · ' + doctor : ''}</div>
+        </div>
+        <div class="stars" style="margin-left:auto;font-size:.85rem;">${stars}</div>
+      </div>
+      <p class="text-muted" style="font-size:.88rem;">${review}</p>`;
+    list.prepend(card);
+  }
+</script>
+</body>
+</html>

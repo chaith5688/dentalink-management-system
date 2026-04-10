@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Our Expert Dentists - Swami Dental Care</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2a4b9a;
+            --primary-light: #3a6bff;
+            --secondary-color: #00c9b7;
+            --accent-color: #ff6b8b;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --gray-light: #eef2f7;
+            --gray-dark: #6c757d;
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Particle Background */
+        .particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0.05;
+            animation: floatParticle 20s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.05;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Header Styles */
+        .main-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 5%;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            box-shadow: var(--shadow-sm);
+            animation: pulseLogo 2s infinite;
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-tagline {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            font-weight: 500;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .appointment-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #00a8a8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .appointment-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            background: linear-gradient(135deg, #00a8a8, var(--secondary-color));
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 180px 5% 100px;
+            background: linear-gradient(135deg, rgba(42, 75, 154, 0.9), rgba(58, 107, 255, 0.8)), url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 4rem;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 4rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 200px;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, #e6f7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+            padding: 0 5%;
+        }
+
+        .filter-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .filter-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .filter-tab {
+            padding: 1rem 2rem;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--dark-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.5rem 2rem 1.5rem 4rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 50px;
+            font-size: 1.1rem;
+            background: white;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-dark);
+            font-size: 1.2rem;
+        }
+
+        /* Doctors Grid */
+        .doctors-container {
+            max-width: 1400px;
+            margin: 0 auto 6rem;
+            padding: 0 5%;
+        }
+
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        /* Doctor Card - Modern Design */
+        .doctor-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .doctor-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doctor-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+
+        .doctor-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .doctor-card:hover .doctor-image {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .doctor-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .doctor-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .doctor-specialty {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .doctor-qualification {
+            font-size: 1rem;
+            opacity: 0.8;
+            z-index: 1;
+            position: relative;
+        }
+
+        .doctor-body {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doctor-experience {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .doctor-experience i {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .doctor-bio {
+            color: var(--gray-dark);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .specializations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .specialization-tag {
+            background: var(--gray-light);
+            color: var(--dark-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .specialization-tag:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .doctor-footer {
+            padding: 1.5rem 2rem;
+            background: var(--gray-light);
+            border-top: 2px solid white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .book-consult-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #00a8a8);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .book-consult-btn:hover {
+            background: linear-gradient(135deg, #00a8a8, var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Schedule Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border-radius: 30px 30px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Schedule Grid */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .schedule-day {
+            background: var(--gray-light);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .schedule-day:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .day-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .day-time {
+            font-size: 1.1rem;
+            color: var(--gray-dark);
+        }
+
+        .schedule-day:hover .day-time {
+            color: white;
+        }
+
+        /* Team Section */
+        .team-section {
+            max-width: 1400px;
+            margin: 0 auto 6rem;
+            padding: 0 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray-dark);
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .team-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--gray-light), white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary-color);
+            font-size: 2rem;
+            border: 3px solid var(--secondary-color);
+        }
+
+        .team-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-card p {
+            color: var(--gray-dark);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            padding: 6rem 5%;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin: 4rem 0;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+
+        .cta-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .cta-subtitle {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            position: relative;
+        }
+
+        .cta-button {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .cta-button.primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .cta-button.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button.primary:hover {
+            background: var(--gray-light);
+        }
+
+        .cta-button.secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Footer */
+        .main-footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 4rem 5%;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-section p {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+
+        .social-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link-footer {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link-footer:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .doctors-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            
+            .hero-title {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .main-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero-section {
+                padding: 150px 5% 80px;
+            }
+            
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .stats-container {
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+            
+            .filter-tabs {
+                gap: 0.5rem;
+            }
+            
+            .filter-tab {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 130px 5% 60px;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .section-title, .filter-title {
+                font-size: 2.2rem;
+            }
+            
+            .stat-item {
+                min-width: 150px;
+                padding: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--gray-light);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particles-bg" id="particlesBg"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-tooth"></i>
+                </div>
+                <div>
+                    <div class="logo-text">Swami Dental Care Centre</div>
+                    <div class="logo-tagline">Excellence in Dental Healthcare</div>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="about.html" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About Us</span>
+                </a>
+                <a href="facilities.html" class="nav-link">
+                    <i class="fas fa-clinic-medical"></i>
+                    <span>Facilities</span>
+                </a>
+                <a href="doctors.html" class="nav-link active">
+                    <i class="fas fa-user-md"></i>
+                    <span>Our Doctors</span>
+                </a>
+                <a href="#appointment" class="appointment-btn">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Book Appointment</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1 class="hero-title animate__animated animate__fadeInDown">Meet Our Expert Dental Team</h1>
+        <p class="hero-subtitle animate__animated animate__fadeInUp">World-class specialists providing advanced dental care with compassion and precision</p>
+        
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number" data-count="15">0</div>
+                <div class="stat-label">Specialized Doctors</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="25">0</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="10000">0</div>
+                <div class="stat-label">Happy Patients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="50">0</div>
+                <div class="stat-label">Awards & Recognition</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section animate-on-scroll">
+        <h2 class="filter-title">Find Your Specialist</h2>
+        <p style="text-align: center; color: var(--gray-dark); margin-bottom: 3rem; font-size: 1.2rem;">
+            Filter by specialization or search for specific doctors
+        </p>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">
+                <i class="fas fa-star"></i>
+                All Specialists
+            </button>
+            <button class="filter-tab" data-filter="orthodontics">
+                <i class="fas fa-teeth"></i>
+                Orthodontics
+            </button>
+            <button class="filter-tab" data-filter="surgery">
+                <i class="fas fa-syringe"></i>
+                Oral Surgery
+            </button>
+            <button class="filter-tab" data-filter="pediatric">
+                <i class="fas fa-child"></i>
+                Pediatric
+            </button>
+            <button class="filter-tab" data-filter="cosmetic">
+                <i class="fas fa-sparkles"></i>
+                Cosmetic
+            </button>
+            <button class="filter-tab" data-filter="implant">
+                <i class="fas fa-tooth"></i>
+                Implantology
+            </button>
+            <button class="filter-tab" data-filter="periodontics">
+                <i class="fas fa-teeth-open"></i>
+                Periodontics
+            </button>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search doctors by name, specialization, or keyword...">
+        </div>
+    </section>
+
+    <!-- Doctors Grid -->
+    <section class="doctors-container">
+        <div class="doctors-grid" id="doctorsGrid">
+            <!-- Doctor cards will be dynamically loaded -->
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section animate-on-scroll">
+        <h2 class="section-title">Complete Dental Team</h2>
+        <p class="section-subtitle">Behind every great dentist is an exceptional support team dedicated to your comfort and care</p>
+        
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-icon">
+                    <i class="fas fa-user-nurse"></i>
+                </div>
+                <h3>Dental Assistants</h3>
+                <p>Certified professionals ensuring smooth procedures and patient comfort during treatments.</p>
+            </div>
+            
+            <div class="team-card">
+                <div class="team-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h3>Hygienists</h3>
+                <p>Specialists in preventive care, deep cleaning, and maintaining your oral health.</p>
+            </div>
+            
+            <div class="team-card">
+                <div class="team-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Patient Coordinators</h3>
+                <p>Your personal guides through appointments, insurance, and treatment planning.</p>
+            </div>
+            
+            <div class="team-card">
+                <div class="team-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Sterilization Staff</h3>
+                <p>Experts maintaining the highest standards of cleanliness and infection control.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section animate-on-scroll">
+        <h2 class="cta-title">Ready for Your Perfect Smile?</h2>
+        <p class="cta-subtitle">Book a consultation with our expert team and start your journey to optimal oral health today</p>
+        
+        <div class="cta-buttons">
+            <a href="#appointment" class="cta-button primary">
+                <i class="fas fa-calendar-alt"></i>
+                Book Appointment Online
+            </a>
+            <a href="tel:+919876543210" class="cta-button secondary">
+                <i class="fas fa-phone-alt"></i>
+                Call Now: +91 98765 43210
+            </a>
+        </div>
+    </section>
+
+    <!-- Schedule Modal -->
+    <div class="modal-overlay" id="scheduleModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalDoctorName">Dr. Specialist Name</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Available Schedule</h4>
+                <div class="schedule-grid" id="scheduleGrid">
+                    <!-- Schedule will be dynamically loaded -->
+                </div>
+                
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--gray-light);">
+                    <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Book Appointment</h4>
+                    <form id="appointmentForm" style="display: grid; gap: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <input type="text" placeholder="Full Name" required style="padding: 1rem; border: 2px solid var(--gray-light); border-radius: 10px; font-size: 1rem;">
+                            <input type="tel" placeholder="Phone Number" required style="padding: 1rem; border: 2px solid var(--gray-light); border-radius: 10px; font-size: 1rem;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <input type="email" placeholder="Email Address" required style="padding: 1rem; border: 2px solid var(--gray-light); border-radius: 10px; font-size: 1rem;">
+                            <input type="date" required style="padding: 1rem; border: 2px solid var(--gray-light); border-radius: 10px; font-size: 1rem;">
+                        </div>
+                        <textarea placeholder="Brief description of your dental concern..." rows="4" style="padding: 1rem; border: 2px solid var(--gray-light); border-radius: 10px; font-size: 1rem; resize: vertical;"></textarea>
+                        <button type="submit" style="background: linear-gradient(135deg, var(--secondary-color), #00a8a8); color: white; border: none; padding: 1.2rem; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: var(--transition);">
+                            <i class="fas fa-paper-plane"></i> Submit Appointment Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-tooth"></i> Swami Dental Care</h3>
+                <p>Providing world-class dental care with advanced technology and compassionate service since 2005.</p>
+                <div class="social-container">
+                    <a href="#" class="social-link-footer"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link-footer"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link-footer"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link-footer"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="facilities.html"><i class="fas fa-chevron-right"></i> Our Facilities</a></li>
+                    <li><a href="doctors.html"><i class="fas fa-chevron-right"></i> Our Doctors</a></li>
+                    <li><a href="#appointment"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Dental Street, Healthcare District, City</a></li>
+                    <li><a href="tel:+919876543210"><i class="fas fa-phone"></i> +91 98765 43210</a></li>
+                    <li><a href="mailto:info@swamidentalcare.com"><i class="fas fa-envelope"></i> info@swamidentalcare.com</a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i> Mon-Sat: 9AM-8PM</a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i> Sun: Emergency Only</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2024 Swami Dental Care Centre. All Rights Reserved. | Designed with <i class="fas fa-heart" style="color: #ff6b8b;"></i> for healthy smiles</p>
+        </div>
+    </footer>
+
+    <script>
+        // Particle Background
+        function createParticles() {
+            const particlesBg = document.getElementById('particlesBg');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random properties
+                const size = Math.random() * 100 + 50;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const duration = Math.random() * 30 + 20;
+                const delay = Math.random() * 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesBg.appendChild(particle);
+            }
+        }
+
+        // Doctor Data
+        const doctorsData = [
+            {
+                id: 1,
+                name: "Dr. S. Pawar",
+                specialty: "Orthodontics Specialist",
+                qualification: "BDS, MDS (Orthodontics), FICOI",
+                experience: "12+ Years",
+                image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "orthodontics",
+                bio: "Specialized in advanced orthodontic treatments including Invisalign, ceramic braces, and lingual orthodontics. Trained in the latest digital smile design technology.",
+                specializations: ["Invisalign", "Ceramic Braces", "Lingual Orthodontics", "Digital Smile Design"],
+                schedule: {
+                    "Monday": "10:00 AM - 6:00 PM",
+                    "Tuesday": "10:00 AM - 6:00 PM",
+                    "Wednesday": "10:00 AM - 6:00 PM",
+                    "Thursday": "10:00 AM - 6:00 PM",
+                    "Friday": "10:00 AM - 4:00 PM",
+                    "Saturday": "9:00 AM - 2:00 PM"
+                }
+            },
+            {
+                id: 2,
+                name: "Dr. A. Kulkarni",
+                specialty: "Oral & Maxillofacial Surgeon",
+                qualification: "BDS, MDS (Oral Surgery), FFDRCSI",
+                experience: "15+ Years",
+                image: "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "surgery",
+                bio: "Expert in complex dental extractions, implant surgeries, and corrective jaw surgeries. Performs minimally invasive procedures with advanced surgical techniques.",
+                specializations: ["Dental Implants", "Wisdom Teeth", "Jaw Surgery", "Trauma Surgery"],
+                schedule: {
+                    "Monday": "9:00 AM - 5:00 PM",
+                    "Tuesday": "9:00 AM - 5:00 PM",
+                    "Thursday": "9:00 AM - 5:00 PM",
+                    "Friday": "9:00 AM - 3:00 PM",
+                    "Saturday": "10:00 AM - 2:00 PM"
+                }
+            },
+            {
+                id: 3,
+                name: "Dr. M. Raut",
+                specialty: "Pediatric Dentist",
+                qualification: "BDS, MDS (Pedodontics), Certified in Laser Dentistry",
+                experience: "8+ Years",
+                image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "pediatric",
+                bio: "Dedicated to creating positive dental experiences for children. Specializes in preventive care, behavior management, and early orthodontic intervention.",
+                specializations: ["Child Psychology", "Preventive Care", "Dental Trauma", "Special Needs"],
+                schedule: {
+                    "Monday": "11:00 AM - 7:00 PM",
+                    "Tuesday": "11:00 AM - 7:00 PM",
+                    "Wednesday": "11:00 AM - 7:00 PM",
+                    "Friday": "11:00 AM - 5:00 PM",
+                    "Saturday": "9:00 AM - 4:00 PM"
+                }
+            },
+            {
+                id: 4,
+                name: "Dr. N. Sharma",
+                specialty: "Cosmetic Dentist",
+                qualification: "BDS, MDS (Prosthodontics), AAID Certified",
+                experience: "10+ Years",
+                image: "https://images.unsplash.com/photo-1594824434340-7e7dfc37cabb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "cosmetic",
+                bio: "Transforms smiles with cutting-edge cosmetic dentistry. Expert in veneers, teeth whitening, and full-mouth smile makeovers using digital technology.",
+                specializations: ["Veneers", "Teeth Whitening", "Smile Makeovers", "Digital Dentistry"],
+                schedule: {
+                    "Tuesday": "10:00 AM - 6:00 PM",
+                    "Wednesday": "10:00 AM - 6:00 PM",
+                    "Thursday": "10:00 AM - 6:00 PM",
+                    "Friday": "10:00 AM - 4:00 PM",
+                    "Saturday": "9:00 AM - 3:00 PM"
+                }
+            },
+            {
+                id: 5,
+                name: "Dr. R. Patel",
+                specialty: "Implantologist",
+                qualification: "BDS, MDS (Implantology), DICOI",
+                experience: "18+ Years",
+                image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "implant",
+                bio: "Pioneer in advanced implant dentistry with expertise in immediate loading, full-arch implants, and zygomatic implants for complex cases.",
+                specializations: ["Full-Arch Implants", "Bone Grafting", "Zygomatic Implants", "Guided Surgery"],
+                schedule: {
+                    "Monday": "9:00 AM - 5:00 PM",
+                    "Wednesday": "9:00 AM - 5:00 PM",
+                    "Thursday": "9:00 AM - 5:00 PM",
+                    "Friday": "9:00 AM - 3:00 PM",
+                    "Saturday": "10:00 AM - 2:00 PM"
+                }
+            },
+            {
+                id: 6,
+                name: "Dr. S. Deshmukh",
+                specialty: "Periodontist",
+                qualification: "BDS, MDS (Periodontics), Certified in Laser Therapy",
+                experience: "14+ Years",
+                image: "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: "periodontics",
+                bio: "Specializes in gum disease treatment, gum grafting, and aesthetic periodontal procedures. Expert in LANAP laser therapy for gum treatment.",
+                specializations: ["Gum Surgery", "LANAP Therapy", "Gum Grafting", "Crown Lengthening"],
+                schedule: {
+                    "Tuesday": "10:00 AM - 6:00 PM",
+                    "Wednesday": "10:00 AM - 6:00 PM",
+                    "Thursday": "10:00 AM - 6:00 PM",
+                    "Friday": "10:00 AM - 4:00 PM"
+                }
+            }
+        ];
+
+        // Render Doctors
+        function renderDoctors(doctors) {
+            const doctorsGrid = document.getElementById('doctorsGrid');
+            doctorsGrid.innerHTML = '';
+            
+            doctors.forEach(doctor => {
+                const doctorCard = document.createElement('div');
+                doctorCard.className = 'doctor-card animate-on-scroll';
+                doctorCard.dataset.category = doctor.category;
+                
+                doctorCard.innerHTML = `
+                    <div class="doctor-header">
+                        <div class="doctor-badge">${doctor.experience}</div>
+                        <img src="${doctor.image}" alt="${doctor.name}" class="doctor-image">
+                        <h3 class="doctor-name">${doctor.name}</h3>
+                        <p class="doctor-specialty">${doctor.specialty}</p>
+                        <p class="doctor-qualification">${doctor.qualification}</p>
+                    </div>
+                    <div class="doctor-body">
+                        <div class="doctor-experience">
+                            <i class="fas fa-award"></i>
+                            <span>${doctor.experience} Experience</span>
+                        </div>
+                        <p class="doctor-bio">${doctor.bio}</p>
+                        <div class="specializations">
+                            ${doctor.specializations.map(spec => 
+                                `<span class="specialization-tag">${spec}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div class="doctor-footer">
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        </div>
+                        <button class="book-consult-btn" data-doctor-id="${doctor.id}">
+                            <i class="fas fa-calendar-alt"></i>
+                            View Schedule
+                        </button>
+                    </div>
+                `;
+                
+                doctorsGrid.appendChild(doctorCard);
+            });
+            
+            // Add click event to schedule buttons
+            document.querySelectorAll('.book-consult-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const doctorId = this.dataset.doctorId;
+                    const doctor = doctorsData.find(d => d.id == doctorId);
+                    openScheduleModal(doctor);
+                });
+            });
+            
+            // Trigger scroll animation
+            setTimeout(() => {
+                const elements = document.querySelectorAll('.animate-on-scroll');
+                elements.forEach(el => {
+                    if (el.getBoundingClientRect().top < window.innerHeight * 0.8) {
+                        el.classList.add('animated');
+                    }
+                });
+            }, 100);
+        }
+
+        // Filter Doctors
+        function setupFilters() {
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            const searchInput = document.querySelector('.search-input');
+            let currentFilter = 'all';
+            let currentSearch = '';
+
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterDoctors();
+                });
+            });
+
+            searchInput.addEventListener('input', function() {
+                currentSearch = this.value.toLowerCase();
+                filterDoctors();
+            });
+
+            function filterDoctors() {
+                let filteredDoctors = doctorsData;
+                
+                // Apply category filter
+                if (currentFilter !== 'all') {
+                    filteredDoctors = filteredDoctors.filter(doctor => 
+                        doctor.category === currentFilter
+                    );
+                }
+                
+                // Apply search filter
+                if (currentSearch) {
+                    filteredDoctors = filteredDoctors.filter(doctor => 
+                        doctor.name.toLowerCase().includes(currentSearch) ||
+                        doctor.specialty.toLowerCase().includes(currentSearch) ||
+                        doctor.qualification.toLowerCase().includes(currentSearch) ||
+                        doctor.bio.toLowerCase().includes(currentSearch) ||
+                        doctor.specializations.some(spec => 
+                            spec.toLowerCase().includes(currentSearch)
+                        )
+                    );
+                }
+                
+                renderDoctors(filteredDoctors);
+            }
+            
+            // Initial render
+            renderDoctors(doctorsData);
+        }
+
+        // Schedule Modal
+        function openScheduleModal(doctor) {
+            const modal = document.getElementById('scheduleModal');
+            const modalName = document.getElementById('modalDoctorName');
+            const scheduleGrid = document.getElementById('scheduleGrid');
+            
+            modalName.textContent = doctor.name;
+            scheduleGrid.innerHTML = '';
+            
+            Object.entries(doctor.schedule).forEach(([day, time]) => {
+                const scheduleDay = document.createElement('div');
+                scheduleDay.className = 'schedule-day';
+                scheduleDay.innerHTML = `
+                    <div class="day-name">${day}</div>
+                    <div class="day-time">${time}</div>
+                `;
+                scheduleGrid.appendChild(scheduleDay);
+            });
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Modal
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('scheduleModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Close modal on overlay click
+        document.getElementById('scheduleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Animate Statistics
+        function animateStatistics() {
+            const stats = document.querySelectorAll('.stat-number');
+            
+            stats.forEach(stat => {
+                const target = parseInt(stat.dataset.count);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current);
+                }, 30);
+            });
+        }
+
+        // Scroll Animation
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight * 0.8;
+                
+                if (elementPosition < screenPosition) {
+                    element.classList.add('animated');
+                }
+            });
+        }
+
+        // Appointment Form
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Appointment request submitted successfully! We will contact you shortly.');
+            document.getElementById('scheduleModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setupFilters();
+            animateStatistics();
+            animateOnScroll();
+            
+            // Animate stats when in view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateStatistics();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            const statsSection = document.querySelector('.stats-container');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+            
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('.main-header');
+                if (window.scrollY > 100) {
+                    header.style.padding = '1rem 5%';
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.padding = '1.5rem 5%';
+                    header.style.boxShadow = 'var(--shadow-sm)';
+                }
+                
+                animateOnScroll();
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#') {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            window.scrollTo({
+                                top: target.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            console.log(`
+            🦷 Swami Dental Care - Doctors Page Loaded
+            =============================================
+            
+            Features:
+            - Animated particle background
+            - Interactive filtering system
+            - Search functionality
+            - Schedule viewing modal
+            - Animated statistics
+            - Responsive design
+            - Appointment booking
+            
+            Doctors: ${doctorsData.length} specialists
+            =============================================
+            `);
+        });
+    </script>
+</body>
+</html>

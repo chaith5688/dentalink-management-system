@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dentalink Pro · Messages Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #fff;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 20px 0;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .date-badge {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 24px;
+            animation: slideIn 0.5s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.blue { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .stat-icon.amber { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .stat-icon.green { background: rgba(16,185,129,0.2); color: #10b981; }
+        .stat-icon.purple { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .stat-trend {
+            font-size: 13px;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 100px;
+            padding: 16px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-wrapper input:focus {
+            border-color: #3b82f6;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .search-wrapper input::placeholder {
+            color: #64748b;
+        }
+
+        .filter-select {
+            padding: 14px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .filter-select option {
+            background: #1e293b;
+        }
+
+        .reset-btn {
+            padding: 14px 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-btn:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        /* Messages Grid */
+        .messages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+        }
+
+        .message-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: scaleIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .message-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .message-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sender-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sender-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .message-card:hover .sender-avatar {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .sender-details h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sender-phone {
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .subject-badge {
+            background: rgba(59,130,246,0.2);
+            color: #3b82f6;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+
+        .card-body {
+            margin: 16px 0;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            align-items: center;
+        }
+
+        .info-icon {
+            width: 32px;
+            color: #64748b;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .message-box {
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 12px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .message-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            font-style: italic;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+            color: #64748b;
+            gap: 10px;
+        }
+
+        .timestamp {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .reply-btn {
+            padding: 8px 16px;
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .reply-btn:hover {
+            background: #10b981;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .whatsapp-btn {
+            padding: 8px 16px;
+            background: rgba(37,211,102,0.2);
+            color: #25D366;
+            border: 1px solid rgba(37,211,102,0.3);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .whatsapp-btn:hover {
+            background: #25D366;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .call-btn {
+            padding: 8px 16px;
+            background: rgba(59,130,246,0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .call-btn:hover {
+            background: #3b82f6;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            padding: 8px 16px;
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Reply Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30,41,59,0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            margin-bottom: 24px;
+        }
+
+        .reply-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .reply-info p {
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+
+        .reply-info strong {
+            color: #3b82f6;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 120px;
+            margin-bottom: 16px;
+        }
+
+        .reply-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .reply-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .send-reply-btn {
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-reply-btn:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .cancel-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Loading Skeleton */
+        .loading-skeleton {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+        }
+
+        .skeleton-card {
+            background: rgba(255,255,255,0.02);
+            border-radius: 24px;
+            padding: 24px;
+            height: 300px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Toast Message */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1100;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters-bar {
+                flex-direction: column;
+                border-radius: 30px;
+            }
+            .filter-select {
+                width: 100%;
+            }
+            .reset-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-envelope" style="color: #3b82f6; margin-right: 12px;"></i>Messages Dashboard</h1>
+                <p>View and manage all patient messages from contact portal</p>
+            </div>
+            <div class="date-badge" id="current-date"></div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span class="stat-label">Total Messages</span>
+                </div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-arrow-up"></i> all time
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon amber">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="stat-label">This Week</span>
+                </div>
+                <div class="stat-value" id="stat-week">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-calendar"></i> new messages
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="stat-label">Unique Senders</span>
+                </div>
+                <div class="stat-value" id="stat-senders">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-users"></i> patients
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <span class="stat-label">Subjects</span>
+                </div>
+                <div class="stat-value" id="stat-subjects">0</div>
+                <div class="stat-trend">
+                    <i class="fas fa-hashtag"></i> unique
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, phone, email, subject or message...">
+            </div>
+            <select id="subjectFilter" class="filter-select">
+                <option value="all">All Subjects</option>
+                <option value="Emergency Consultation">🚨 Emergency</option>
+                <option value="Routine Checkup">🩺 Routine</option>
+                <option value="Treatment Query">❓ Treatment Query</option>
+                <option value="Insurance & Billing">💰 Insurance</option>
+                <option value="Other">📝 Other</option>
+            </select>
+            <button class="reset-btn" onclick="resetFilters()">
+                <i class="fas fa-redo-alt"></i> Reset
+            </button>
+        </div>
+
+        <!-- Messages Grid -->
+        <div class="messages-grid" id="messagesGrid">
+            <div class="loading-skeleton" id="loadingSkeleton">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div class="modal-overlay" id="replyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reply to Patient</h2>
+                <button class="modal-close" onclick="closeReplyModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="reply-info" id="replyInfo">
+                    <p><strong>To:</strong> <span id="replyPatientName"></span></p>
+                    <p><strong>Phone:</strong> <span id="replyPatientPhone"></span></p>
+                    <p><strong>Original Message:</strong> <span id="replyOriginalMessage"></span></p>
+                </div>
+                <textarea class="reply-textarea" id="replyMessage" placeholder="Type your reply message here..."></textarea>
+                <div class="reply-actions">
+                    <button class="cancel-btn" onclick="closeReplyModal()">Cancel</button>
+                    <button class="send-reply-btn" onclick="sendReply()">Send Reply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div class="toast" id="toast">Message sent successfully!</div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
+            authDomain: "dentalink-e3d20.firebaseapp.com",
+            databaseURL: "https://dentalink-e3d20-default-rtdb.firebaseio.com",
+            projectId: "dentalink-e3d20",
+            storageBucket: "dentalink-e3d20.firebasestorage.app",
+            messagingSenderId: "22170715728",
+            appId: "1:22170715728:web:d175aa5e780bc3c926f355",
+            measurementId: "G-X3Z8RYKWBM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State
+        let allMessages = [];
+        let currentReplyPatient = null;
+
+        // Set current date
+        document.getElementById('current-date').innerHTML = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Animated counter
+        function animateValue(element, start, end, duration = 1000) {
+            if (!element) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Listen to messages collection
+        onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (snapshot) => {
+            allMessages = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allMessages.push({
+                    id: doc.id,
+                    name: data.name || 'Not provided',
+                    phone: data.phone || 'Not provided',
+                    email: data.email || 'Not provided',
+                    subject: data.subject || 'General',
+                    message: data.message || 'No message',
+                    type: data.type || 'message',
+                    timestamp: data.timestamp || new Date()
+                });
+            });
+            document.getElementById('loadingSkeleton').style.display = 'none';
+            renderMessages();
+            updateStats();
+        }, (error) => {
+            console.error("Firebase error:", error);
+            document.getElementById('messagesGrid').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    <h3>Error Loading Data</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        });
+
+        // Update statistics
+        function updateStats() {
+            const total = allMessages.length;
+            
+            // This week
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const thisWeek = allMessages.filter(m => {
+                try {
+                    const date = m.timestamp?.toDate ? m.timestamp.toDate() : new Date(m.timestamp);
+                    return date >= oneWeekAgo;
+                } catch {
+                    return false;
+                }
+            }).length;
+
+            // Unique senders (by phone)
+            const uniquePhones = new Set(allMessages.map(m => m.phone));
+            
+            // Unique subjects
+            const uniqueSubjects = new Set(allMessages.map(m => m.subject));
+
+            animateValue(document.getElementById('stat-total'), 0, total);
+            animateValue(document.getElementById('stat-week'), 0, thisWeek);
+            animateValue(document.getElementById('stat-senders'), 0, uniquePhones.size);
+            animateValue(document.getElementById('stat-subjects'), 0, uniqueSubjects.size);
+        }
+
+        // Open reply modal
+        window.openReplyModal = function(patient) {
+            currentReplyPatient = patient;
+            document.getElementById('replyPatientName').textContent = patient.name;
+            document.getElementById('replyPatientPhone').textContent = patient.phone;
+            document.getElementById('replyOriginalMessage').textContent = patient.message.substring(0, 100) + (patient.message.length > 100 ? '...' : '');
+            document.getElementById('replyMessage').value = '';
+            document.getElementById('replyModal').classList.add('active');
+        };
+
+        // Close reply modal
+        window.closeReplyModal = function() {
+            document.getElementById('replyModal').classList.remove('active');
+            currentReplyPatient = null;
+        };
+
+        // Send reply via WhatsApp
+        window.sendReply = function() {
+            if (!currentReplyPatient) return;
+            
+            const replyText = document.getElementById('replyMessage').value.trim();
+            if (!replyText) {
+                alert('Please enter a reply message');
+                return;
+            }
+
+            // Prepare WhatsApp message
+            const patientName = currentReplyPatient.name;
+            const patientPhone = currentReplyPatient.phone.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            
+            // Format phone number for WhatsApp
+            let whatsappNumber = patientPhone;
+            if (!whatsappNumber.startsWith('91') && whatsappNumber.length === 10) {
+                whatsappNumber = '91' + whatsappNumber;
+            }
+            
+            // Create WhatsApp message
+            const message = `*Swami Dental Care*\n\nHello ${patientName},\n\n${replyText}\n\nThank you for contacting us.`;
+            
+            // Open WhatsApp
+            window.open(`https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`, '_blank');
+            
+            // Save reply to Firebase (optional)
+            saveReplyToFirebase(currentReplyPatient, replyText);
+            
+            // Show success message
+            showToast('Reply sent via WhatsApp!');
+            
+            // Close modal
+            closeReplyModal();
+        };
+
+        // Save reply to Firebase (optional)
+        async function saveReplyToFirebase(patient, replyText) {
+            try {
+                await addDoc(collection(db, "replies"), {
+                    patientName: patient.name,
+                    patientPhone: patient.phone,
+                    originalMessage: patient.message,
+                    replyMessage: replyText,
+                    timestamp: serverTimestamp(),
+                    type: 'reply'
+                });
+                console.log('Reply saved to Firebase');
+            } catch (error) {
+                console.error('Error saving reply:', error);
+            }
+        }
+
+        // Direct WhatsApp reply
+        window.replyViaWhatsApp = function(phone, name) {
+            const cleanPhone = phone.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            let whatsappNumber = cleanPhone;
+            if (!whatsappNumber.startsWith('91') && whatsappNumber.length === 10) {
+                whatsappNumber = '91' + whatsappNumber;
+            }
+            window.open(`https://web.whatsapp.com/send?phone=${whatsappNumber}`, '_blank');
+        };
+
+        // Direct call
+        window.callPatient = function(phone) {
+            window.location.href = `tel:${phone}`;
+        };
+
+        // Delete message
+        window.deleteMessage = async (id) => {
+            if (confirm('Are you sure you want to delete this message?')) {
+                try {
+                    await deleteDoc(doc(db, "messages", id));
+                    showToast('Message deleted successfully');
+                } catch (error) {
+                    console.error('Error deleting message:', error);
+                    showToast('Error deleting message', 'error');
+                }
+            }
+        };
+
+        // Render messages
+        function renderMessages() {
+            let filtered = [...allMessages];
+
+            // Apply search
+            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+            if (searchTerm) {
+                filtered = filtered.filter(m => 
+                    m.name.toLowerCase().includes(searchTerm) ||
+                    m.phone.toLowerCase().includes(searchTerm) ||
+                    m.email.toLowerCase().includes(searchTerm) ||
+                    m.subject.toLowerCase().includes(searchTerm) ||
+                    m.message.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply subject filter
+            const subjectFilter = document.getElementById('subjectFilter')?.value || 'all';
+            if (subjectFilter !== 'all') {
+                filtered = filtered.filter(m => m.subject === subjectFilter);
+            }
+
+            const grid = document.getElementById('messagesGrid');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <h3>No messages found</h3>
+                        <p>${searchTerm ? 'Try adjusting your search' : 'New messages will appear here'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((m, index) => {
+                let dateStr = 'Recently';
+                try {
+                    const date = m.timestamp?.toDate ? m.timestamp.toDate() : new Date(m.timestamp);
+                    if (!isNaN(date.getTime())) {
+                        dateStr = date.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                } catch (e) {}
+
+                // Get subject color
+                let subjectColor = '#3b82f6';
+                if (m.subject.includes('Emergency')) subjectColor = '#ef4444';
+                else if (m.subject.includes('Routine')) subjectColor = '#10b981';
+                else if (m.subject.includes('Treatment')) subjectColor = '#f59e0b';
+                else if (m.subject.includes('Insurance')) subjectColor = '#8b5cf6';
+
+                return `
+                    <div class="message-card" style="animation: scaleIn 0.5s ease-out ${index * 0.1}s both;">
+                        <div class="card-header">
+                            <div class="sender-info">
+                                <div class="sender-avatar" style="background: linear-gradient(135deg, ${subjectColor}, #2563eb);">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="sender-details">
+                                    <h3>${escapeHtml(m.name)}</h3>
+                                    <div class="sender-phone">
+                                        <i class="fas fa-phone-alt"></i> ${escapeHtml(m.phone)}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="subject-badge" style="background: ${subjectColor}20; color: ${subjectColor}; border-color: ${subjectColor}40;">
+                                ${escapeHtml(m.subject)}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <div class="info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">${escapeHtml(m.email) || 'Not provided'}</div>
+                                </div>
+                            </div>
+                            <div class="message-box">
+                                <div class="message-label">
+                                    <i class="fas fa-quote-right"></i> Message
+                                </div>
+                                <div class="message-text">"${escapeHtml(m.message)}"</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span class="timestamp">
+                                <i class="far fa-calendar"></i> ${dateStr}
+                            </span>
+                            <div class="action-buttons">
+                                <button onclick='openReplyModal(${JSON.stringify(m).replace(/'/g, "\\'")})' class="reply-btn" title="Reply to patient">
+                                    <i class="fas fa-reply"></i> Reply
+                                </button>
+                                <a href="https://web.whatsapp.com/send?phone=91${m.phone.replace(/\s+/g, '')}" target="_blank" class="whatsapp-btn" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="tel:${m.phone}" class="call-btn" title="Call">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                                <button onclick="deleteMessage('${m.id}')" class="delete-btn" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper functions
+        function escapeHtml(s) {
+            if (!s) return '';
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        // Reset filters
+        window.resetFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('subjectFilter').value = 'all';
+            renderMessages();
+        };
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderMessages);
+        document.getElementById('subjectFilter').addEventListener('change', renderMessages);
+    </script>
+</body>
+</html>
