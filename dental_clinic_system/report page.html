@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>DentalCare Pro | Smart Medical Reports Portal</title>
     
-    <!-- Core Libraries (Tailwind, Fonts, Icons, Charts, PDF, Excel) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS v3 (Production-ready CDN - stable) -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <!-- Custom Tailwind Config Override to suppress console warning (safe for demo) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Slab:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -53,6 +66,12 @@
         @media print { .no-print { display: none !important; } .med-card { break-inside: avoid; box-shadow: none; } }
         .animate-slide-in { animation: slideUp 0.25s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -84,7 +103,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div class="relative">
-                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                    <button onclick="window.toggleUserMenu && window.toggleUserMenu()" class="flex items-center gap-2 bg-gray-100 p-2 rounded-full hover:bg-gray-200">
                         <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
                             <span class="text-white text-sm font-bold" id="userInitials">RP</span>
                         </div>
@@ -93,7 +112,7 @@
                     <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border z-50">
                         <div class="p-2"><a href="#" class="block px-4 py-2 hover:bg-gray-50 rounded-lg"><i class="fas fa-user mr-2"></i>Profile</a>
                         <a href="#" class="block px-4 py-2 hover:bg-gray-50 rounded-lg"><i class="fas fa-cog mr-2"></i>Settings</a>
-                        <hr class="my-1"><button onclick="logout()" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button></div>
+                        <hr class="my-1"><button onclick="window.logout && window.logout()" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button></div>
                     </div>
                 </div>
             </div>
@@ -108,9 +127,9 @@
                 <p class="text-gray-500 mt-1">Comprehensive dental records & insights</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="exportToExcel()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-emerald-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export Excel</button>
-                <button onclick="generateFullPDF()" class="bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-blue-800 flex items-center gap-2"><i class="fas fa-file-pdf"></i> PDF Report</button>
-                <button onclick="refreshData()" class="border border-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-50"><i class="fas fa-sync-alt"></i> Sync</button>
+                <button onclick="window.exportToExcel && window.exportToExcel()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-emerald-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button onclick="window.generateFullPDF && window.generateFullPDF()" class="bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-blue-800 flex items-center gap-2"><i class="fas fa-file-pdf"></i> PDF Report</button>
+                <button onclick="window.refreshData && window.refreshData()" class="border border-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-50"><i class="fas fa-sync-alt"></i> Sync</button>
             </div>
         </div>
 
@@ -135,7 +154,7 @@
             <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="totalReportsCount">0</div><div class="text-gray-500">Total Reports</div></div><i class="fas fa-folder-open text-3xl text-blue-400"></i></div><div class="mt-2 text-xs">Completed: <span id="completedCount">0</span> / Pending: <span id="pendingCount">0</span></div></div>
             <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="recentMonthCount">0</div><div class="text-gray-500">This Month</div></div><i class="fas fa-calendar-week text-3xl text-emerald-400"></i></div><div class="mt-2 text-xs">X-Ray: <span id="xrayCountStat">0</span> | Lab: <span id="labCountStat">0</span></div></div>
             <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-3xl font-bold" id="healthScore">92</div><div class="text-gray-500">Oral Health Index</div></div><i class="fas fa-heartbeat text-3xl text-rose-400"></i></div><div class="w-full bg-gray-100 rounded-full h-1.5 mt-2"><div class="bg-blue-600 h-1.5 rounded-full" id="healthBar" style="width:92%"></div></div></div>
-            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-xl font-bold" id="nextAppt">20 Dec 2024</div><div class="text-gray-500">Next Checkup</div></div><i class="fas fa-tooth text-3xl text-indigo-400"></i></div><button class="mt-2 w-full text-sm bg-blue-50 py-2 rounded-lg text-blue-700" onclick="showNotification('Appointment details: Dr. Vijay Wagh, 10:30 AM')">View Details</button></div>
+            <div class="med-card p-5"><div class="flex justify-between"><div><div class="text-xl font-bold" id="nextAppt">20 Dec 2024</div><div class="text-gray-500">Next Checkup</div></div><i class="fas fa-tooth text-3xl text-indigo-400"></i></div><button class="mt-2 w-full text-sm bg-blue-50 py-2 rounded-lg text-blue-700" onclick="window.showNotification && window.showNotification('Appointment details: Dr. Vijay Wagh, 10:30 AM')">View Details</button></div>
         </div>
 
         <!-- Reports & Analytics Grid -->
@@ -143,9 +162,9 @@
             <!-- Reports list (left 2 cols) -->
             <div class="lg:col-span-2">
                 <div class="med-card p-5 mb-6 flex flex-wrap gap-3 justify-between items-center">
-                    <div class="relative flex-1 min-w-[200px]"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchReports" placeholder="Search reports by title, doctor..." class="w-full pl-10 pr-4 py-2.5 border rounded-xl" onkeyup="filterReportsDebounced()"></div>
-                    <select id="filterType" class="border rounded-xl px-4 py-2.5 bg-white" onchange="filterReports()"><option value="all">All Types</option><option value="radiology">X-Ray</option><option value="pathology">Lab</option><option value="treatment">Treatment</option></select>
-                    <select id="filterStatus" class="border rounded-xl px-4 py-2.5" onchange="filterReports()"><option value="all">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option></select>
+                    <div class="relative flex-1 min-w-[200px]"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="searchReports" placeholder="Search reports by title, doctor..." class="w-full pl-10 pr-4 py-2.5 border rounded-xl" onkeyup="window.filterReportsDebounced && window.filterReportsDebounced()"></div>
+                    <select id="filterType" class="border rounded-xl px-4 py-2.5 bg-white" onchange="window.filterReports && window.filterReports()"><option value="all">All Types</option><option value="radiology">X-Ray</option><option value="pathology">Lab</option><option value="treatment">Treatment</option></select>
+                    <select id="filterStatus" class="border rounded-xl px-4 py-2.5" onchange="window.filterReports && window.filterReports()"><option value="all">All Status</option><option value="completed">Completed</option><option value="pending">Pending</option></select>
                 </div>
                 <div id="reportsListContainer" class="space-y-4">
                     <div class="text-center py-12"><div class="animate-spin w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full mx-auto"></div><p class="mt-3 text-gray-500">Loading reports...</p></div>
@@ -162,8 +181,8 @@
                 </div>
                 <div class="med-card p-5">
                     <h3 class="font-bold mb-3">Quick Actions</h3>
-                    <button onclick="requestNewReport()" class="w-full mb-2 py-3 bg-blue-600 text-white rounded-xl flex items-center justify-center gap-2"><i class="fas fa-plus-circle"></i> Request New Report</button>
-                    <button onclick="shareMedicalSummary()" class="w-full py-3 bg-emerald-100 text-emerald-800 rounded-xl flex items-center justify-center gap-2"><i class="fas fa-share-alt"></i> Share Summary</button>
+                    <button onclick="window.requestNewReport && window.requestNewReport()" class="w-full mb-2 py-3 bg-blue-600 text-white rounded-xl flex items-center justify-center gap-2"><i class="fas fa-plus-circle"></i> Request New Report</button>
+                    <button onclick="window.shareMedicalSummary && window.shareMedicalSummary()" class="w-full py-3 bg-emerald-100 text-emerald-800 rounded-xl flex items-center justify-center gap-2"><i class="fas fa-share-alt"></i> Share Summary</button>
                 </div>
                 <div class="med-card p-5">
                     <h3 class="font-bold">Upcoming Tests</h3>
@@ -178,7 +197,7 @@
 
     <!-- Modal Structure -->
     <div id="reportModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-auto"><div class="p-6" id="modalContent"></div><div class="p-4 border-t flex justify-end"><button onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Close</button></div></div>
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-auto"><div class="p-6" id="modalContent"></div><div class="p-4 border-t flex justify-end"><button onclick="window.closeModal && window.closeModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Close</button></div></div>
     </div>
 
     <footer class="text-center text-gray-500 text-xs py-8 mt-12 border-t no-print">© 2025 DentalCare Pro — Secure & HIPAA Aligned</footer>
@@ -218,7 +237,16 @@
 
         async function loadData() {
             const user = auth.currentUser;
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { 
+                // Mock for demo if no user signed in (for testing UI)
+                globalReports = [...demoReports];
+                filteredReports = [...globalReports];
+                renderReports();
+                updateStats();
+                initCharts();
+                document.getElementById('loadingOverlay')?.remove();
+                return;
+            }
             document.getElementById('userInitials').innerText = (user.displayName?.charAt(0) || 'U') + (user.displayName?.split(' ')[1]?.charAt(0) || '');
             document.getElementById('patientInitialsCard').innerText = (user.displayName?.charAt(0) || 'R') + (user.displayName?.split(' ')[1]?.charAt(0) || 'P');
             document.getElementById('patientNameCard').innerText = user.displayName || "Rajesh Patil";
@@ -242,14 +270,16 @@
             const container = document.getElementById('reportsListContainer');
             if(filteredReports.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No reports found</div>`; return; }
             container.innerHTML = filteredReports.map(r => `
-                <div class="med-card p-5 hover:shadow-md transition cursor-pointer" onclick="viewReportDetail('${r.id}')">
-                    <div class="flex flex-wrap justify-between items-start gap-2"><div><div class="font-bold text-lg">${r.title}</div><div class="flex gap-3 text-sm text-gray-500 mt-1"><span><i class="fas fa-user-md"></i> ${r.doctor?.name || 'Dr. Unknown'}</span><span><i class="far fa-calendar-alt"></i> ${r.date}</span></div></div>
+                <div class="med-card p-5 hover:shadow-md transition cursor-pointer" onclick="window.viewReportDetail && window.viewReportDetail('${r.id}')">
+                    <div class="flex flex-wrap justify-between items-start gap-2"><div><div class="font-bold text-lg">${escapeHtml(r.title)}</div><div class="flex gap-3 text-sm text-gray-500 mt-1"><span><i class="fas fa-user-md"></i> ${escapeHtml(r.doctor?.name || 'Dr. Unknown')}</span><span><i class="far fa-calendar-alt"></i> ${r.date}</span></div></div>
                     <span class="status-badge status-${r.status}">${r.status === 'completed' ? 'Completed' : r.status === 'pending' ? 'Pending' : 'Active'}</span></div>
-                    <p class="text-gray-600 text-sm mt-2 line-clamp-2">${r.description || 'No description'}</p>
-                    <div class="mt-3 flex gap-2 text-xs"><button onclick="event.stopPropagation(); downloadReportJson('${r.id}')" class="text-blue-600"><i class="fas fa-download"></i> JSON</button>
-                    <button onclick="event.stopPropagation(); shareSingleReport('${r.id}')" class="text-green-600"><i class="fas fa-share"></i> Share</button></div>
+                    <p class="text-gray-600 text-sm mt-2 line-clamp-2">${escapeHtml(r.description || 'No description')}</p>
+                    <div class="mt-3 flex gap-2 text-xs"><button onclick="event.stopPropagation(); window.downloadReportJson && window.downloadReportJson('${r.id}')" class="text-blue-600"><i class="fas fa-download"></i> JSON</button>
+                    <button onclick="event.stopPropagation(); window.shareSingleReport && window.shareSingleReport('${r.id}')" class="text-green-600"><i class="fas fa-share"></i> Share</button></div>
                 </div>`).join('');
         }
+
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
 
         function updateStats() {
             const total = globalReports.length;
@@ -282,32 +312,49 @@
             gaugeChart = new Chart(gaugeCtx, { type: 'doughnut', data: { labels: ['Oral Health', 'Remaining'], datasets: [{ data: [92, 8], backgroundColor: ['#3b82f6', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '70%', plugins: { legend: { display: false } } } });
         }
 
+        // Expose functions globally to avoid module scope issues
         window.viewReportDetail = (id) => {
             const report = globalReports.find(r=> r.id === id);
             if(!report) return;
             document.getElementById('reportsListContainer').classList.add('hidden');
             const detailDiv = document.getElementById('reportDetailsView');
             detailDiv.classList.remove('hidden');
-            detailDiv.innerHTML = `<div class="med-card p-6"><button onclick="backToList()" class="text-blue-600 mb-4"><i class="fas fa-arrow-left"></i> Back</button><h2 class="text-2xl font-bold">${report.title}</h2><div class="mt-3 grid grid-cols-2 gap-3"><div><span class="font-semibold">Doctor:</span> ${report.doctor?.name}</div><div><span class="font-semibold">Date:</span> ${report.date}</div><div><span class="font-semibold">Status:</span> ${report.status}</div><div><span class="font-semibold">Type:</span> ${report.type}</div></div><div class="mt-4"><p class="font-semibold">Findings:</p><p>${report.findings || 'N/A'}</p><p class="font-semibold mt-2">Recommendations:</p><p>${report.recommendations || 'Regular follow-up'}</p></div><div class="mt-6 flex gap-3"><button onclick="downloadReportJson('${report.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Download JSON</button><button onclick="printSpecificReport('${report.id}')" class="bg-gray-700 text-white px-4 py-2 rounded-lg">Print</button></div></div>`;
+            detailDiv.innerHTML = `<div class="med-card p-6"><button onclick="window.backToList && window.backToList()" class="text-blue-600 mb-4"><i class="fas fa-arrow-left"></i> Back</button><h2 class="text-2xl font-bold">${escapeHtml(report.title)}</h2><div class="mt-3 grid grid-cols-2 gap-3"><div><span class="font-semibold">Doctor:</span> ${escapeHtml(report.doctor?.name)}</div><div><span class="font-semibold">Date:</span> ${report.date}</div><div><span class="font-semibold">Status:</span> ${report.status}</div><div><span class="font-semibold">Type:</span> ${report.type}</div></div><div class="mt-4"><p class="font-semibold">Findings:</p><p>${escapeHtml(report.findings || 'N/A')}</p><p class="font-semibold mt-2">Recommendations:</p><p>${escapeHtml(report.recommendations || 'Regular follow-up')}</p></div><div class="mt-6 flex gap-3"><button onclick="window.downloadReportJson('${report.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Download JSON</button><button onclick="window.printSpecificReport('${report.id}')" class="bg-gray-700 text-white px-4 py-2 rounded-lg">Print</button></div></div>`;
         };
         window.backToList = () => { document.getElementById('reportsListContainer').classList.remove('hidden'); document.getElementById('reportDetailsView').classList.add('hidden'); };
-        window.downloadReportJson = (id) => { const rep = globalReports.find(r=>r.id===id); const dataStr = JSON.stringify(rep,null,2); const blob = new Blob([dataStr], {type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`report_${id}.json`; a.click(); URL.revokeObjectURL(url); showNotification("Report downloaded","success"); };
-        window.shareSingleReport = (id) => { const rep = globalReports.find(r=>r.id===id); if(navigator.share) navigator.share({title:rep.title, text:rep.description}); else { navigator.clipboard.writeText(`${rep.title} - ${rep.description}`); showNotification("Copied to clipboard"); } };
+        window.downloadReportJson = (id) => { const rep = globalReports.find(r=>r.id===id); const dataStr = JSON.stringify(rep,null,2); const blob = new Blob([dataStr], {type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`report_${id}.json`; a.click(); URL.revokeObjectURL(url); window.showNotification("Report downloaded","success"); };
+        window.shareSingleReport = (id) => { const rep = globalReports.find(r=>r.id===id); if(navigator.share) navigator.share({title:rep.title, text:rep.description}); else { navigator.clipboard.writeText(`${rep.title} - ${rep.description}`); window.showNotification("Copied to clipboard"); } };
         window.filterReports = () => { const type = document.getElementById('filterType').value; const status = document.getElementById('filterStatus').value; filteredReports = globalReports.filter(r=> (type==='all' || r.type===type) && (status==='all' || r.status===status)); renderReports(); };
         window.filterReportsDebounced = () => { const term = document.getElementById('searchReports').value.toLowerCase(); filteredReports = globalReports.filter(r=> r.title.toLowerCase().includes(term) || r.doctor?.name?.toLowerCase().includes(term)); renderReports(); };
-        window.exportToExcel = () => { const wsData = globalReports.map(r=>({ ID:r.id, Title:r.title, Type:r.type, Date:r.date, Doctor:r.doctor?.name, Status:r.status })); const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Reports"); XLSX.writeFile(wb, `DentalReports_${new Date().toISOString().slice(0,10)}.xlsx`); showNotification("Excel exported","success"); };
-        window.generateFullPDF = async () => { showNotification("Generating PDF summary..."); const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text("DentalCare Pro Medical Summary", 20, 20); doc.setFontSize(12); doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30); doc.text(`Total Reports: ${globalReports.length}`, 20, 40); doc.save(`Full_Report_${Date.now()}.pdf`); };
-        window.refreshData = () => { loadData(); showNotification("Data synced","success"); };
-        window.requestNewReport = () => { document.getElementById('modalContent').innerHTML = `<h3 class="text-xl font-bold mb-4">Request Medical Report</h3><form id="reqForm"><input type="text" placeholder="Report title" class="w-full border p-2 rounded mb-3" id="reqTitle"><select id="reqType" class="w-full border p-2 rounded mb-3"><option>radiology</option><option>pathology</option></select><textarea placeholder="Reason" class="w-full border p-2 rounded mb-3" rows="2"></textarea><button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Submit Request</button></form>`; document.getElementById('reqForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const newReport = { id: "RPT-"+Date.now(), title: document.getElementById('reqTitle').value, type: document.getElementById('reqType').value, date: new Date().toISOString().slice(0,10), doctor:{name:"Assigned Doctor"}, status:"pending", description:"Request submitted", findings:"Awaiting analysis", recommendations:"Pending", attachments:[], userId: auth.currentUser?.uid }; globalReports.unshift(newReport); filteredReports = [...globalReports]; renderReports(); updateStats(); closeModal(); showNotification("Request submitted","success"); if(auth.currentUser) try{ await addDoc(collection(db,"reports"), {...newReport, createdAt: serverTimestamp()}); }catch(e){console.warn(e);} }); openModal(); };
-        window.shareMedicalSummary = () => { const summary = `Dental Health Summary: ${globalReports.length} total reports, ${globalReports.filter(r=>r.status==='completed').length} completed. Last report: ${globalReports[0]?.date}`; navigator.clipboard.writeText(summary); showNotification("Summary copied to clipboard"); };
+        window.exportToExcel = () => { const wsData = globalReports.map(r=>({ ID:r.id, Title:r.title, Type:r.type, Date:r.date, Doctor:r.doctor?.name, Status:r.status })); const ws = XLSX.utils.json_to_sheet(wsData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Reports"); XLSX.writeFile(wb, `DentalReports_${new Date().toISOString().slice(0,10)}.xlsx`); window.showNotification("Excel exported","success"); };
+        window.generateFullPDF = async () => { window.showNotification("Generating PDF summary..."); const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(18); doc.text("DentalCare Pro Medical Summary", 20, 20); doc.setFontSize(12); doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30); doc.text(`Total Reports: ${globalReports.length}`, 20, 40); doc.save(`Full_Report_${Date.now()}.pdf`); };
+        window.refreshData = () => { loadData(); window.showNotification("Data synced","success"); };
+        window.requestNewReport = () => { 
+            document.getElementById('modalContent').innerHTML = `<h3 class="text-xl font-bold mb-4">Request Medical Report</h3><form id="reqForm"><input type="text" placeholder="Report title" class="w-full border p-2 rounded mb-3" id="reqTitle"><select id="reqType" class="w-full border p-2 rounded mb-3"><option>radiology</option><option>pathology</option></select><textarea placeholder="Reason" class="w-full border p-2 rounded mb-3" rows="2" id="reqReason"></textarea><button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Submit Request</button></form>`; 
+            document.getElementById('reqForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const newReport = { id: "RPT-"+Date.now(), title: document.getElementById('reqTitle').value, type: document.getElementById('reqType').value, date: new Date().toISOString().slice(0,10), doctor:{name:"Assigned Doctor"}, status:"pending", description: document.getElementById('reqReason').value || "Request submitted", findings:"Awaiting analysis", recommendations:"Pending", attachments:[], userId: auth.currentUser?.uid }; globalReports.unshift(newReport); filteredReports = [...globalReports]; renderReports(); updateStats(); window.closeModal(); window.showNotification("Request submitted","success"); if(auth.currentUser) try{ await addDoc(collection(db,"reports"), {...newReport, createdAt: serverTimestamp()}); }catch(e){console.warn(e);} }); 
+            window.openModal(); 
+        };
+        window.shareMedicalSummary = () => { const summary = `Dental Health Summary: ${globalReports.length} total reports, ${globalReports.filter(r=>r.status==='completed').length} completed. Last report: ${globalReports[0]?.date}`; navigator.clipboard.writeText(summary); window.showNotification("Summary copied to clipboard"); };
         window.printSpecificReport = (id) => { const rep = globalReports.find(r=>r.id===id); const printWin = window.open('','_blank'); printWin.document.write(`<html><head><title>${rep.title}</title></head><body><h1>${rep.title}</h1><p>Doctor: ${rep.doctor?.name}</p><p>Date: ${rep.date}</p><p>Findings: ${rep.findings}</p></body></html>`); printWin.print(); };
-        function openModal() { document.getElementById('reportModal').classList.remove('hidden'); document.getElementById('reportModal').classList.add('flex'); }
+        window.openModal = () => { document.getElementById('reportModal').classList.remove('hidden'); document.getElementById('reportModal').classList.add('flex'); };
         window.closeModal = () => { document.getElementById('reportModal').classList.add('hidden'); document.getElementById('reportModal').classList.remove('flex'); };
-        function showNotification(msg, type="info") { Swal.fire({ toast:true, icon:type, title:msg, timer:2500, showConfirmButton:false }); }
+        window.showNotification = (msg, type="info") => { Swal.fire({ toast:true, icon:type, title:msg, timer:2500, showConfirmButton:false, position:'top-end' }); };
         window.toggleUserMenu = () => { document.getElementById('userMenu').classList.toggle('hidden'); };
-        window.logout = () => { signOut(auth).then(()=>{ window.location.href='login.html'; }); };
-        onAuthStateChanged(auth, (user) => { if(user) loadData(); else window.location.href='login.html'; });
-        window.showNotification = showNotification;
+        window.logout = () => { signOut(auth).then(()=>{ window.location.href='login.html'; }).catch(()=>{ window.location.href='login.html'; }); };
+        
+        // Initialize auth state
+        onAuthStateChanged(auth, (user) => { 
+            if(user) loadData(); 
+            else { 
+                // Demo mode for standalone testing
+                globalReports = [...demoReports];
+                filteredReports = [...globalReports];
+                renderReports();
+                updateStats();
+                initCharts();
+                document.getElementById('loadingOverlay')?.remove();
+            }
+        });
     </script>
 </body>
 </html>
