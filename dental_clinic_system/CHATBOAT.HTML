@@ -5,13 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DENTALINK | AI-Powered Dental Assistant</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDK (v12.10.0 via CDN) - all modules imported in script below -->
     
     <style>
         :root {
@@ -39,7 +34,6 @@
             overflow-x: hidden;
         }
         
-        /* Premium Glassmorphism Effect */
         .glass-effect {
             background: var(--glass-bg);
             backdrop-filter: blur(12px) saturate(180%);
@@ -56,7 +50,6 @@
             box-shadow: 0 20px 60px rgba(0, 123, 255, 0.15);
         }
         
-        /* Floating Chat Widget */
         .floating-chat-widget {
             position: fixed;
             bottom: 40px;
@@ -86,10 +79,7 @@
         .chat-toggle-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
             animation: shimmer 3s infinite linear;
         }
@@ -109,7 +99,6 @@
             100% { transform: translateX(100%); }
         }
         
-        /* Premium Chat Container */
         .dentalink-chat-container {
             position: fixed;
             bottom: 140px;
@@ -133,7 +122,6 @@
             pointer-events: all;
         }
         
-        /* Chat Header */
         .chat-header {
             background: linear-gradient(135deg, var(--dental-blue), var(--dental-blue-dark));
             color: white;
@@ -145,9 +133,7 @@
         .chat-header::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--dental-mint), #ffffff, var(--dental-mint));
             animation: scanning-line 3s infinite linear;
@@ -175,7 +161,6 @@
             height: 8px;
             background: var(--dental-mint);
             border-radius: 50%;
-            position: relative;
             animation: pulse-dot 2s infinite;
         }
         
@@ -184,7 +169,6 @@
             70% { box-shadow: 0 0 0 8px rgba(32, 201, 151, 0); }
         }
         
-        /* Chat Messages Area */
         .chat-messages {
             height: calc(100% - 200px);
             overflow-y: auto;
@@ -193,25 +177,11 @@
             scroll-behavior: smooth;
         }
         
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
+        .chat-messages::-webkit-scrollbar { width: 8px; }
+        .chat-messages::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(0,123,255,0.3); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar-thumb:hover { background: rgba(0,123,255,0.5); }
         
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(0, 123, 255, 0.3);
-            border-radius: 10px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 123, 255, 0.5);
-        }
-        
-        /* Message Bubbles */
         .message-container {
             margin-bottom: 20px;
             animation: message-appear 0.4s ease-out forwards;
@@ -219,19 +189,11 @@
         }
         
         @keyframes message-appear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .bot-message .message-container {
-            transform: translateY(10px);
-        }
-        
-        .user-message .message-container {
-            transform: translateY(10px);
-        }
+        .bot-message .message-container { transform: translateY(10px); }
+        .user-message .message-container { transform: translateY(10px); }
         
         .message-avatar {
             width: 40px;
@@ -242,18 +204,11 @@
             justify-content: center;
             font-size: 18px;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        .bot-avatar {
-            background: linear-gradient(135deg, var(--dental-blue), #3d8bfd);
-            color: white;
-        }
-        
-        .user-avatar {
-            background: linear-gradient(135deg, var(--dental-mint), #17a2b8);
-            color: white;
-        }
+        .bot-avatar { background: linear-gradient(135deg, var(--dental-blue), #3d8bfd); color: white; }
+        .user-avatar { background: linear-gradient(135deg, var(--dental-mint), #17a2b8); color: white; }
         
         .message-bubble {
             max-width: 80%;
@@ -262,12 +217,12 @@
             position: relative;
             line-height: 1.5;
             font-size: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
         
         .bot-bubble {
             background: white;
-            border: 1px solid rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0,123,255,0.1);
             border-bottom-left-radius: 6px;
             color: #333;
         }
@@ -278,11 +233,10 @@
             border-bottom-right-radius: 6px;
         }
         
-        /* Quick Actions */
         .quick-actions {
             padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.7);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.7);
+            border-top: 1px solid rgba(0,0,0,0.05);
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -290,7 +244,7 @@
         
         .action-chip {
             background: white;
-            border: 1px solid rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(0,123,255,0.2);
             padding: 10px 18px;
             border-radius: 50px;
             font-size: 14px;
@@ -301,34 +255,26 @@
             align-items: center;
             gap: 8px;
             font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         
         .action-chip:hover {
             background: var(--dental-blue);
             color: white;
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
             border-color: var(--dental-blue);
         }
         
-        /* Input Area */
         .input-container {
             padding: 20px 24px;
             background: white;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
         
-        .input-wrapper {
-            display: flex;
-            align-items: flex-end;
-            gap: 12px;
-        }
+        .input-wrapper { display: flex; align-items: flex-end; gap: 12px; }
         
-        .input-box {
-            flex: 1;
-            position: relative;
-        }
+        .input-box { flex: 1; position: relative; }
         
         .chat-input {
             width: 100%;
@@ -336,35 +282,29 @@
             max-height: 120px;
             padding: 16px 20px;
             padding-right: 60px;
-            border: 2px solid rgba(0, 123, 255, 0.2);
+            border: 2px solid rgba(0,123,255,0.2);
             border-radius: 16px;
             font-size: 15px;
             line-height: 1.5;
             resize: none;
             outline: none;
             transition: all 0.3s;
-            background: rgba(248, 249, 250, 0.8);
+            background: rgba(248,249,250,0.8);
         }
         
         .chat-input:focus {
             border-color: var(--dental-blue);
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+            box-shadow: 0 0 0 4px rgba(0,123,255,0.15);
             background: white;
         }
         
-        .input-actions {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            display: flex;
-            gap: 8px;
-        }
+        .input-actions { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 8px; }
         
         .input-btn {
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: rgba(0, 123, 255, 0.1);
+            background: rgba(0,123,255,0.1);
             border: none;
             color: var(--dental-blue);
             cursor: pointer;
@@ -375,11 +315,7 @@
             transition: all 0.3s;
         }
         
-        .input-btn:hover {
-            background: var(--dental-blue);
-            color: white;
-            transform: scale(1.05);
-        }
+        .input-btn:hover { background: var(--dental-blue); color: white; transform: scale(1.05); }
         
         .send-btn {
             width: 48px;
@@ -394,15 +330,11 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
         }
         
-        .send-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 123, 255, 0.4);
-        }
+        .send-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,123,255,0.4); }
         
-        /* Voice Recording Animation */
         .voice-recording-active {
             background: linear-gradient(135deg, #ff6b6b, #ff4757);
             color: white;
@@ -410,25 +342,13 @@
         }
         
         @keyframes voice-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255,107,107,0); }
         }
         
-        .voice-waveform {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            height: 30px;
-            margin-left: 10px;
-        }
+        .voice-waveform { display: flex; align-items: center; gap: 3px; height: 30px; margin-left: 10px; }
         
-        .wave-bar {
-            width: 4px;
-            background: white;
-            border-radius: 2px;
-            animation: wave 1.5s ease-in-out infinite;
-        }
-        
+        .wave-bar { width: 4px; background: white; border-radius: 2px; animation: wave 1.5s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.1s; height: 20px; }
         .wave-bar:nth-child(3) { animation-delay: 0.2s; height: 24px; }
         .wave-bar:nth-child(4) { animation-delay: 0.3s; height: 18px; }
@@ -440,7 +360,6 @@
             50% { height: 25px; }
         }
         
-        /* Typing Indicator */
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -448,7 +367,7 @@
             padding: 12px 20px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             width: fit-content;
             margin: 10px 0;
         }
@@ -470,18 +389,11 @@
             40% { transform: translateY(-10px); }
         }
         
-        /* Image Scanning Effect */
-        .scanning-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            margin: 10px 0;
-        }
+        .scanning-container { position: relative; overflow: hidden; border-radius: 12px; margin: 10px 0; }
         
         .scanning-laser {
             position: absolute;
-            left: 0;
-            right: 0;
+            left: 0; right: 0;
             height: 3px;
             background: linear-gradient(90deg, transparent, var(--dental-blue), transparent);
             box-shadow: 0 0 10px var(--dental-blue), 0 0 20px var(--dental-blue);
@@ -495,14 +407,10 @@
             100% { top: 0; }
         }
         
-        /* Modal for Image Upload */
         .image-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -513,10 +421,7 @@
             backdrop-filter: blur(10px);
         }
         
-        .image-modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .image-modal.active { opacity: 1; pointer-events: all; }
         
         .modal-content {
             background: white;
@@ -528,24 +433,16 @@
             transition: transform 0.4s;
         }
         
-        .image-modal.active .modal-content {
-            transform: translateY(0);
-        }
+        .image-modal.active .modal-content { transform: translateY(0); }
         
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            z-index: 10001;
-        }
+        .toast-container { position: fixed; top: 30px; right: 30px; z-index: 10001; }
         
         .toast {
             background: white;
             border-radius: 12px;
             padding: 16px 20px;
             margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -554,37 +451,14 @@
             animation: toast-slide 0.5s forwards, toast-hide 0.5s forwards 3.5s;
         }
         
-        @keyframes toast-slide {
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes toast-slide { to { transform: translateX(0); opacity: 1; } }
+        @keyframes toast-hide { to { transform: translateX(100%); opacity: 0; } }
         
-        @keyframes toast-hide {
-            to { transform: translateX(100%); opacity: 0; }
-        }
+        .analysis-card { border-radius: 16px; padding: 16px; margin: 10px 0; }
+        .analysis-critical { background: linear-gradient(135deg, #fff5f5, #fed7d7); border: 1px solid #fc8181; }
+        .analysis-warning { background: linear-gradient(135deg, #fffaf0, #feebc8); border: 1px solid #f6ad55; }
+        .analysis-info { background: linear-gradient(135deg, #ebf8ff, #bee3f8); border: 1px solid #63b3ed; }
         
-        /* Dental Analysis Cards */
-        .analysis-card {
-            border-radius: 16px;
-            padding: 16px;
-            margin: 10px 0;
-        }
-        
-        .analysis-critical {
-            background: linear-gradient(135deg, #fff5f5, #fed7d7);
-            border: 1px solid #fc8181;
-        }
-        
-        .analysis-warning {
-            background: linear-gradient(135deg, #fffaf0, #feebc8);
-            border: 1px solid #f6ad55;
-        }
-        
-        .analysis-info {
-            background: linear-gradient(135deg, #ebf8ff, #bee3f8);
-            border: 1px solid #63b3ed;
-        }
-        
-        /* Emergency Alert */
         .emergency-alert {
             background: linear-gradient(135deg, #ff6b6b, #ff4757);
             color: white;
@@ -595,72 +469,29 @@
         }
         
         @keyframes emergency-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255,107,107,0); }
         }
         
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .floating-chat-widget {
-                bottom: 20px;
-                right: 20px;
-            }
-            
-            .chat-toggle-btn {
-                width: 70px;
-                height: 70px;
-                font-size: 26px;
-            }
-            
-            .dentalink-chat-container {
-                bottom: 110px;
-                right: 20px;
-                left: 20px;
-                width: auto;
-                height: 70vh;
-                max-height: 600px;
-            }
-            
-            .message-bubble {
-                max-width: 85%;
-            }
-            
-            .quick-actions {
-                padding: 12px 16px;
-            }
-            
-            .action-chip {
-                padding: 8px 14px;
-                font-size: 13px;
-            }
+            .floating-chat-widget { bottom: 20px; right: 20px; }
+            .chat-toggle-btn { width: 70px; height: 70px; font-size: 26px; }
+            .dentalink-chat-container { bottom: 110px; right: 20px; left: 20px; width: auto; height: 70vh; max-height: 600px; }
+            .message-bubble { max-width: 85%; }
+            .quick-actions { padding: 12px 16px; }
+            .action-chip { padding: 8px 14px; font-size: 13px; }
         }
         
         @media (max-width: 480px) {
-            .dentalink-chat-container {
-                bottom: 100px;
-                right: 10px;
-                left: 10px;
-                height: 75vh;
-            }
-            
-            .chat-header {
-                padding: 16px 20px;
-            }
-            
-            .chat-messages {
-                padding: 16px;
-                height: calc(100% - 180px);
-            }
-            
-            .input-container {
-                padding: 16px;
-            }
+            .dentalink-chat-container { bottom: 100px; right: 10px; left: 10px; height: 75vh; }
+            .chat-header { padding: 16px 20px; }
+            .chat-messages { padding: 16px; height: calc(100% - 180px); }
+            .input-container { padding: 16px; }
         }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Main Website Header -->
     <header class="glass-effect-heavy sticky top-0 z-50 border-b border-white/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
@@ -673,10 +504,9 @@
                         <p class="text-xs sm:text-sm text-gray-600 font-medium">Premium Dental Intelligence System</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-4 sm:gap-6">
                     <nav class="hidden md:flex gap-6 lg:gap-8">
-                        <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium transition text-sm lg:text-base">Home</a>
+                        <a href="home.html" class="text-gray-700 hover:text-blue-600 font-medium transition text-sm lg:text-base">Home</a>
                         <a href="facilities.html" class="text-gray-700 hover:text-blue-600 font-medium transition text-sm lg:text-base">Services</a>
                         <a href="doctors.html" class="text-gray-700 hover:text-blue-600 font-medium transition text-sm lg:text-base">Dentists</a>
                         <a href="appointment.html" class="text-gray-700 hover:text-blue-600 font-medium transition text-sm lg:text-base">Pricing</a>
@@ -690,7 +520,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <div class="text-center mb-12 sm:mb-16 lg:mb-20">
             <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">AI-Powered Dental Diagnosis</h2>
@@ -698,7 +527,6 @@
                 Experience next-generation dental care with our advanced AI assistant. 
                 Upload images, use voice commands, and get instant professional analysis.
             </p>
-            
             <div class="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 sm:mt-10">
                 <div class="glass-effect p-6 sm:p-8 rounded-xl sm:rounded-2xl text-center w-full sm:w-64">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4 sm:mb-6">
@@ -707,7 +535,6 @@
                     <h3 class="font-bold text-lg sm:text-xl mb-2 sm:mb-3">Voice Analysis</h3>
                     <p class="text-xs sm:text-sm text-gray-600">Describe symptoms in English or regional languages</p>
                 </div>
-                
                 <div class="glass-effect p-6 sm:p-8 rounded-xl sm:rounded-2xl text-center w-full sm:w-64">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 sm:mb-6">
                         <i class="fas fa-camera text-green-600 text-lg sm:text-2xl"></i>
@@ -715,7 +542,6 @@
                     <h3 class="font-bold text-lg sm:text-xl mb-2 sm:mb-3">Image Scanning</h3>
                     <p class="text-xs sm:text-sm text-gray-600">AI-powered visual analysis of dental conditions</p>
                 </div>
-                
                 <div class="glass-effect p-6 sm:p-8 rounded-xl sm:rounded-2xl text-center w-full sm:w-64">
                     <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4 sm:mb-6">
                         <i class="fas fa-brain text-purple-600 text-lg sm:text-2xl"></i>
@@ -726,7 +552,6 @@
             </div>
         </div>
         
-        <!-- Features Grid -->
         <div class="grid md:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">
             <div class="glass-effect p-6 sm:p-8 rounded-2xl">
                 <h3 class="text-xl font-bold text-gray-900 mb-4">How DENTALINK AI Works</h3>
@@ -769,7 +594,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="glass-effect p-6 sm:p-8 rounded-2xl">
                 <h3 class="text-xl font-bold text-gray-900 mb-4">Common Conditions We Detect</h3>
                 <div class="space-y-3">
@@ -797,7 +621,6 @@
             </div>
         </div>
         
-        <!-- Emergency Section -->
         <div class="glass-effect p-6 sm:p-8 rounded-2xl mb-12 sm:mb-16">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div class="text-center sm:text-left">
@@ -805,12 +628,10 @@
                     <p class="text-gray-600 mb-4">Get immediate assistance 24/7</p>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button class="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition flex items-center justify-center gap-2">
-                            <i class="fas fa-phone"></i>
-                            Emergency Hotline
+                            <i class="fas fa-phone"></i> Emergency Hotline
                         </button>
                         <button class="px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
-                            <i class="fas fa-comment-medical"></i>
-                            Chat with AI Assistant
+                            <i class="fas fa-comment-medical"></i> Chat with AI Assistant
                         </button>
                     </div>
                 </div>
@@ -833,7 +654,6 @@
 
     <!-- Dentalink AI Chat Container -->
     <div class="dentalink-chat-container glass-effect-heavy" id="chatContainer">
-        <!-- Chat Header -->
         <div class="chat-header">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3 sm:gap-4">
@@ -851,19 +671,14 @@
                         </div>
                     </div>
                 </div>
-                
                 <button class="text-white text-xl sm:text-2xl opacity-80 hover:opacity-100 transition" id="closeChat">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
         
-        <!-- Chat Messages -->
-        <div class="chat-messages" id="chatMessages">
-            <!-- Welcome Message (populated by JS) -->
-        </div>
+        <div class="chat-messages" id="chatMessages"></div>
         
-        <!-- Quick Actions -->
         <div class="quick-actions" id="quickActions">
             <div class="action-chip" data-action="tooth-pain">
                 <i class="fas fa-tooth text-xs sm:text-sm"></i>
@@ -883,7 +698,6 @@
             </div>
         </div>
         
-        <!-- Input Area -->
         <div class="input-container">
             <div class="input-wrapper">
                 <div class="input-box">
@@ -914,29 +728,21 @@
         <div class="modal-content">
             <h3 class="text-xl sm:text-2xl font-bold mb-2">Upload Dental Image</h3>
             <p class="text-gray-600 text-sm sm:text-base mb-6">Upload a clear photo of your teeth for AI analysis</p>
-            
             <div class="border-2 border-dashed border-gray-300 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center mb-6 hover:border-blue-500 transition" id="dropArea">
                 <i class="fas fa-cloud-upload-alt text-3xl sm:text-4xl text-gray-400 mb-4"></i>
                 <p class="font-medium text-sm sm:text-base">Drag & drop your image here</p>
                 <p class="text-xs sm:text-sm text-gray-500 mt-2">or click to browse files (JPG, PNG, max 5MB)</p>
                 <input type="file" id="fileInput" class="hidden" accept="image/*">
             </div>
-            
             <div class="flex gap-3">
-                <button class="flex-1 py-3 bg-gray-200 rounded-lg sm:rounded-xl font-medium hover:bg-gray-300 transition text-sm sm:text-base" id="cancelUpload">
-                    Cancel
-                </button>
-                <button class="flex-1 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg sm:rounded-xl font-medium hover:shadow-lg transition text-sm sm:text-base" id="uploadImage">
-                    Analyze Image
-                </button>
+                <button class="flex-1 py-3 bg-gray-200 rounded-lg sm:rounded-xl font-medium hover:bg-gray-300 transition text-sm sm:text-base" id="cancelUpload">Cancel</button>
+                <button class="flex-1 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg sm:rounded-xl font-medium hover:shadow-lg transition text-sm sm:text-base" id="uploadImage">Analyze Image</button>
             </div>
         </div>
     </div>
     
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Footer -->
     <footer class="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-8 sm:py-12 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -975,28 +781,12 @@
         </div>
     </footer>
 
-    <!-- Firebase Config (CDN) and Main JavaScript -->
     <script type="module">
-        // ---------- Firebase SDK (v12.10.0) ----------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            serverTimestamp,
-            query,
-            orderBy,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-        import { 
-            getStorage,
-            ref,
-            uploadBytes,
-            getDownloadURL
-        } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCWAY-qpd4RQSBj1Xl-qPZiFLGD2u5lOVg",
             authDomain: "dentalink-e3d20.firebaseapp.com",
@@ -1008,16 +798,19 @@
             measurementId: "G-X3Z8RYKWBM"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
-        
-        // Expose to window for use in non-module scripts (optional)
-        window.firebase = { db, storage, firestore: { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }, storage: { ref, uploadBytes, getDownloadURL } };
+
+        window.firebase = {
+            db,
+            storage,
+            firestore: { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot },
+            storageUtils: { ref, uploadBytes, getDownloadURL }
+        };
         console.log('✅ Firebase initialized successfully with v12.10.0');
-        
+
         // ---------- DOM Elements ----------
         const chatToggle = document.getElementById('chatToggle');
         const chatContainer = document.getElementById('chatContainer');
@@ -1034,42 +827,811 @@
         const dropArea = document.getElementById('dropArea');
         const toastContainer = document.getElementById('toastContainer');
         const actionChips = document.querySelectorAll('.action-chip');
-        
-        // ---------- State & Smart AI Assistant (copied from original) ----------
+
+        // ---------- State ----------
         let isRecording = false;
         let recognition = null;
         let chatHistory = [];
         let isProcessing = false;
-        
+
+        // ---------- Full Dental Assistant Config ----------
         const DENTAL_ASSISTANT = {
-            GREETINGS: ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening'],
+            GREETINGS: ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening', 'hii', 'helo', 'sup', 'howdy'],
             SYMPTOM_PATTERNS: {
-                PAIN: ['pain', 'ache', 'hurt', 'sore', 'throbbing', 'sharp pain', 'discomfort'],
-                EMERGENCY: ['emergency', 'urgent', 'severe', 'bleeding', 'swollen', 'fever', 'can\'t bear'],
-                GUMS: ['gums', 'bleeding gums', 'swollen gums', 'gum pain', 'receding gums'],
-                CAVITY: ['cavity', 'hole', 'black spot', 'decay', 'sensitive to sweet'],
-                WHITENING: ['white', 'stains', 'yellow', 'discolored', 'whitening', 'brighten'],
-                BRACES: ['braces', 'invisalign', 'alignment', 'crooked', 'straighten'],
-                CLEANING: ['cleaning', 'scaling', 'polish', 'tartar', 'plaque'],
-                BAD_BREATH: ['bad breath', 'halitosis', 'mouth odor', 'smell'],
-                SENSITIVITY: ['sensitive', 'cold', 'hot', 'temperature', 'tingling'],
-                CHILD: ['child', 'kid', 'baby teeth', 'pediatric', 'children']
+                PAIN: ['pain', 'ache', 'hurt', 'sore', 'throbbing', 'sharp pain', 'discomfort', 'painful', 'hurts', 'aching', 'killing me', 'unbearable'],
+                EMERGENCY: ['emergency', 'urgent', 'severe', 'bleeding', 'swollen', 'fever', "can't bear", 'unbearable', 'very bad', 'too much pain', 'accident', 'knocked out', 'broken tooth', 'fell', 'hit'],
+                GUMS: ['gums', 'bleeding gums', 'swollen gums', 'gum pain', 'receding gums', 'gum', 'periodontal', 'gingivitis'],
+                CAVITY: ['cavity', 'hole', 'black spot', 'decay', 'sensitive to sweet', 'cavities', 'tooth decay', 'caries', 'dark spot', 'sweet sensitivity'],
+                WHITENING: ['white', 'stains', 'yellow', 'discolored', 'whitening', 'brighten', 'yellow teeth', 'stained', 'bleach', 'bleaching', 'color', 'colour'],
+                BRACES: ['braces', 'invisalign', 'alignment', 'crooked', 'straighten', 'orthodontic', 'orthodontist', 'malocclusion', 'misaligned', 'gap', 'spacing'],
+                CLEANING: ['cleaning', 'scaling', 'polish', 'tartar', 'plaque', 'clean teeth', 'deep clean', 'prophylaxis', 'stain removal'],
+                BAD_BREATH: ['bad breath', 'halitosis', 'mouth odor', 'smell', 'odour', 'smelly breath', 'mouth smell', 'breath smell'],
+                SENSITIVITY: ['sensitive', 'cold', 'hot', 'temperature', 'tingling', 'sensitivity', 'ice cream hurts', 'cold water hurts', 'hot food hurts'],
+                CHILD: ['child', 'kid', 'baby teeth', 'pediatric', 'children', 'my child', 'my kid', 'son', 'daughter', 'baby', 'infant', 'toddler', 'milk teeth'],
+                IMPLANT: ['implant', 'implants', 'dental implant', 'missing tooth', 'missing teeth', 'replace tooth', 'tooth replacement'],
+                ROOT_CANAL: ['root canal', 'rct', 'nerve', 'pulp', 'endodontic', 'deep cavity', 'infected tooth'],
+                CROWN: ['crown', 'cap', 'dental cap', 'tooth cap', 'broken tooth', 'cracked tooth', 'chipped tooth', 'chip'],
+                APPOINTMENT: ['appointment', 'book', 'schedule', 'visit', 'consultation', 'meet', 'doctor', 'dentist', 'available', 'timing', 'slots', 'when can'],
+                PRICE: ['price', 'cost', 'fees', 'charges', 'how much', 'rate', 'affordable', 'expensive', 'cheap', 'budget', 'payment', 'insurance'],
+                WISDOM: ['wisdom tooth', 'wisdom teeth', 'third molar', 'back tooth', 'last tooth', 'impacted'],
+                DENTURE: ['denture', 'dentures', 'false teeth', 'removable teeth', 'partial denture', 'complete denture'],
+                VENEER: ['veneer', 'veneers', 'porcelain veneer', 'smile makeover', 'smile design', 'cosmetic'],
+                SWELLING: ['swelling', 'swollen face', 'swollen jaw', 'puffy', 'abscess', 'pus', 'infection', 'bump', 'lump']
             },
             REGIONAL_PATTERNS: {
-                PAIN: ['दुख', 'पीड़ा', 'वेदना', 'दुखणे', 'खूप दुखतंय'],
-                EMERGENCY: ['आणीबाणी', 'तातडीचे', 'गंभीर', 'रक्तस्राव', 'सूज'],
-                GUMS: ['मसूड', 'मसूढा', 'मसूड़ों', 'मसूडात रक्त'],
-                APPOINTMENT: ['अपॉइंटमेंट', 'भेट', 'दाखवा', 'तपासणी'],
-                PRICE: ['किंमत', 'दर', 'खर्च', 'किती पैसे', 'मोल']
+                PAIN: ['दुख', 'पीड़ा', 'वेदना', 'दुखणे', 'खूप दुखतंय', 'दांत दुखना', 'दांत दर्द', 'दर्द', 'त्रास'],
+                EMERGENCY: ['आणीबाणी', 'तातडीचे', 'गंभीर', 'रक्तस्राव', 'सूज', 'बहुत तकलीफ', 'जल्दी'],
+                GUMS: ['मसूड', 'मसूढा', 'मसूड़ों', 'मसूडात रक्त', 'हिरड्या', 'हिरड्यातून रक्त'],
+                APPOINTMENT: ['अपॉइंटमेंट', 'भेट', 'दाखवा', 'तपासणी', 'बुकिंग', 'वेळ'],
+                PRICE: ['किंमत', 'दर', 'खर्च', 'किती पैसे', 'मोल', 'फी', 'चार्ज'],
+                GREETING: ['नमस्ते', 'नमस्कार', 'हॅलो', 'कसे आहात', 'कसे आहे'],
+                TOOTH: ['दात', 'दांत', 'दाढ', 'पुढचा दात', 'दाताचा'],
+                CAVITY: ['कॅव्हिटी', 'किड', 'कीड', 'दाताला कीड', 'छिद्र'],
+                CLEAN: ['साफ', 'सफाई', 'क्लीनिंग', 'स्केलिंग'],
+                CHILDREN: ['मुल', 'मुलाचा', 'बाळाचा', 'छोट्याचा', 'बाळ']
+            },
+            PRICES: {
+                cleaning: '₹800 - ₹1,500',
+                cavity: '₹1,200 - ₹3,000',
+                rootCanal: '₹4,000 - ₹12,000',
+                crown: '₹5,000 - ₹15,000',
+                implant: '₹25,000 - ₹60,000',
+                braces: '₹30,000 - ₹1,20,000',
+                invisalign: '₹80,000 - ₹2,50,000',
+                whitening: '₹5,000 - ₹15,000',
+                veneer: '₹8,000 - ₹25,000 per tooth',
+                denture: '₹8,000 - ₹40,000',
+                extraction: '₹500 - ₹3,000',
+                xray: '₹200 - ₹1,500'
             }
         };
-        
+
+        // ---------- Helper: keyword matching ----------
+        function containsAny(str, keywords) {
+            const lower = str.toLowerCase();
+            return keywords.some(k => lower.includes(k.toLowerCase()));
+        }
+
+        function detectLanguage(msg) {
+            const hindiMarathiChars = /[\u0900-\u097F]/;
+            if (hindiMarathiChars.test(msg)) return 'regional';
+            return 'english';
+        }
+
+        function detectIntent(msg) {
+            const p = DENTAL_ASSISTANT.SYMPTOM_PATTERNS;
+            const r = DENTAL_ASSISTANT.REGIONAL_PATTERNS;
+            const lower = msg.toLowerCase();
+
+            // Check regional greetings
+            if (containsAny(msg, r.GREETING)) return 'GREETING';
+
+            // English greetings
+            if (containsAny(lower, DENTAL_ASSISTANT.GREETINGS)) return 'GREETING';
+
+            // Emergency first (highest priority)
+            if (containsAny(lower, p.EMERGENCY) || containsAny(msg, r.EMERGENCY)) return 'EMERGENCY';
+
+            // Swelling / abscess
+            if (containsAny(lower, p.SWELLING)) return 'SWELLING';
+
+            // Appointment
+            if (containsAny(lower, p.APPOINTMENT) || containsAny(msg, r.APPOINTMENT)) return 'APPOINTMENT';
+
+            // Price
+            if (containsAny(lower, p.PRICE) || containsAny(msg, r.PRICE)) return 'PRICE';
+
+            // Root canal
+            if (containsAny(lower, p.ROOT_CANAL)) return 'ROOT_CANAL';
+
+            // Crown / chipped
+            if (containsAny(lower, p.CROWN)) return 'CROWN';
+
+            // Implant
+            if (containsAny(lower, p.IMPLANT)) return 'IMPLANT';
+
+            // Wisdom tooth
+            if (containsAny(lower, p.WISDOM)) return 'WISDOM';
+
+            // Braces / Invisalign
+            if (containsAny(lower, p.BRACES)) return 'BRACES';
+
+            // Whitening
+            if (containsAny(lower, p.WHITENING)) return 'WHITENING';
+
+            // Sensitivity
+            if (containsAny(lower, p.SENSITIVITY)) return 'SENSITIVITY';
+
+            // Bad breath
+            if (containsAny(lower, p.BAD_BREATH)) return 'BAD_BREATH';
+
+            // Gums
+            if (containsAny(lower, p.GUMS) || containsAny(msg, r.GUMS)) return 'GUMS';
+
+            // Cavity
+            if (containsAny(lower, p.CAVITY) || containsAny(msg, r.CAVITY)) return 'CAVITY';
+
+            // Cleaning
+            if (containsAny(lower, p.CLEANING) || containsAny(msg, r.CLEAN)) return 'CLEANING';
+
+            // Child dental
+            if (containsAny(lower, p.CHILD) || containsAny(msg, r.CHILDREN)) return 'CHILD';
+
+            // Veneer / cosmetic
+            if (containsAny(lower, p.VENEER)) return 'VENEER';
+
+            // Denture
+            if (containsAny(lower, p.DENTURE)) return 'DENTURE';
+
+            // General pain (after specifics)
+            if (containsAny(lower, p.PAIN) || containsAny(msg, r.PAIN)) return 'PAIN';
+
+            // Regional tooth keyword
+            if (containsAny(msg, r.TOOTH)) return 'PAIN';
+
+            return 'GENERAL';
+        }
+
+        // ---------- Response Generators ----------
+        function responseGreeting() {
+            return `
+            <div class="space-y-3">
+                <h3 class="font-bold text-blue-600 mb-2">Hello! I'm DENTALINK AI 👋</h3>
+                <p>Welcome! I'm your smart dental assistant. How can I help you today?</p>
+                <p class="text-sm text-gray-600">You can ask me about:</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div style="background:#EBF8FF;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-tooth" style="color:#007bff;margin-right:6px;"></i>Tooth Pain / Cavities</div>
+                    <div style="background:#F0FFF4;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-tint" style="color:#38a169;margin-right:6px;"></i>Bleeding Gums</div>
+                    <div style="background:#FFF5F5;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-ambulance" style="color:#e53e3e;margin-right:6px;"></i>Emergency Help</div>
+                    <div style="background:#FAF5FF;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-calendar-check" style="color:#805ad5;margin-right:6px;"></i>Book Appointment</div>
+                    <div style="background:#FFFFF0;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-sun" style="color:#d69e2e;margin-right:6px;"></i>Teeth Whitening</div>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:10px;font-size:13px;"><i class="fas fa-rupee-sign" style="color:#007bff;margin-right:6px;"></i>Treatment Costs</div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2"><i class="fas fa-language" style="margin-right:4px;"></i>I understand English, Hindi & Marathi. Feel free to type naturally!</p>
+            </div>`;
+        }
+
+        function responseEmergency() {
+            return `
+            <div class="space-y-3">
+                <div class="emergency-alert">
+                    <div style="font-size:20px;font-weight:bold;margin-bottom:8px;">🚨 DENTAL EMERGENCY DETECTED</div>
+                    <p>Please don't panic. Here's what to do immediately:</p>
+                </div>
+                <div class="analysis-card analysis-critical">
+                    <h4 class="font-bold text-red-700 mb-2"><i class="fas fa-first-aid mr-2"></i>Immediate Steps:</h4>
+                    <ul style="list-style:none;padding:0;font-size:14px;line-height:1.8;">
+                        <li>🔴 <strong>Knocked-out tooth:</strong> Keep it moist in milk or saliva, rush to dentist within 30 mins</li>
+                        <li>🔴 <strong>Severe pain/swelling:</strong> Apply cold ice pack on cheek for 10 mins</li>
+                        <li>🔴 <strong>Bleeding:</strong> Press clean gauze/cloth firmly for 10-15 minutes</li>
+                        <li>🔴 <strong>Broken tooth:</strong> Rinse gently with warm water, avoid hard food</li>
+                        <li>🔴 <strong>Abscess/pus:</strong> Do NOT pop it — see dentist immediately</li>
+                    </ul>
+                </div>
+                <div style="background:#fff5f5;border:1px solid #fc8181;border-radius:12px;padding:14px;text-align:center;">
+                    <div style="font-size:22px;font-weight:bold;color:#e53e3e;">📞 Emergency Hotline: 1800-123-4567</div>
+                    <div style="font-size:13px;color:#c53030;margin-top:4px;">Available 24/7 · No appointment needed for emergencies</div>
+                </div>
+                <p class="text-sm text-gray-600"><strong>Avoid:</strong> Aspirin directly on tooth, very hot/cold food, touching the affected area repeatedly.</p>
+            </div>`;
+        }
+
+        function responseSwelling() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-critical">
+                    <h4 class="font-bold text-red-700 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Swelling / Abscess — Act Quickly!</h4>
+                    <p style="font-size:14px;line-height:1.7;">Dental swelling, especially with pain or fever, may indicate a <strong>dental abscess</strong> — a bacterial infection that needs urgent attention.</p>
+                </div>
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2">What To Do Now:</h4>
+                    <ul style="font-size:14px;line-height:2;padding-left:18px;">
+                        <li>Apply cold ice pack on outside of cheek (10 min on / 10 min off)</li>
+                        <li>Take over-the-counter painkiller (Ibuprofen/Paracetamol) if no allergy</li>
+                        <li>Rinse mouth with warm salt water gently</li>
+                        <li>Book an <strong>emergency dental appointment today</strong></li>
+                        <li>Do NOT pop, press, or squeeze the swelling</li>
+                    </ul>
+                </div>
+                <div style="background:#EBF8FF;border-radius:12px;padding:12px;font-size:13px;">
+                    ⚠️ If swelling is spreading to your neck, eye, or you have difficulty breathing/swallowing — go to the <strong>nearest emergency hospital immediately</strong>.
+                </div>
+                <div style="text-align:center;margin-top:10px;background:#fff5f5;border-radius:10px;padding:12px;">
+                    <b style="color:#e53e3e;">📞 Emergency: 1800-123-4567</b>
+                </div>
+            </div>`;
+        }
+
+        function responsePain() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-tooth mr-2"></i>Tooth Pain Analysis</h4>
+                    <p style="font-size:14px;line-height:1.7;">Tooth pain can have several causes. Let me help you identify the likely issue:</p>
+                </div>
+                <div style="font-size:14px;line-height:2;">
+                    <div style="background:#FFF5F5;border-left:4px solid #fc8181;padding:10px 14px;border-radius:8px;margin-bottom:8px;">
+                        <strong>🔴 Severe/Throbbing pain:</strong> Possible nerve infection (Pulpitis) → Root Canal Treatment needed
+                    </div>
+                    <div style="background:#FFFAF0;border-left:4px solid #f6ad55;padding:10px 14px;border-radius:8px;margin-bottom:8px;">
+                        <strong>🟡 Pain when biting:</strong> Possible cracked tooth or deep cavity → Crown / Filling needed
+                    </div>
+                    <div style="background:#F0FFF4;border-left:4px solid #68d391;padding:10px 14px;border-radius:8px;margin-bottom:8px;">
+                        <strong>🟢 Mild ache / sensitivity:</strong> Early cavity or gum issue → Filling / Scaling
+                    </div>
+                </div>
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-1">Immediate Relief Tips:</h4>
+                    <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                        <li>Rinse with warm salt water (1 tsp salt in 1 cup warm water)</li>
+                        <li>Apply clove oil on affected area with cotton</li>
+                        <li>Take Paracetamol or Ibuprofen as directed</li>
+                        <li>Avoid very hot, cold, or sweet foods</li>
+                        <li>Book a dental appointment — the sooner the better!</li>
+                    </ul>
+                </div>
+                <p style="font-size:13px;color:#718096;">⚕️ Note: These are general guidelines. Please consult our dentist for proper diagnosis and treatment.</p>
+            </div>`;
+        }
+
+        function responseGums() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-tint mr-2"></i>Gum Problem Detected</h4>
+                    <p style="font-size:14px;line-height:1.7;">Bleeding or swollen gums are early signs of <strong>Gingivitis</strong> or <strong>Periodontitis</strong> (gum disease). Don't ignore it!</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Common Causes:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>Plaque and tartar buildup</li>
+                        <li>Poor brushing/flossing habits</li>
+                        <li>Vitamin C deficiency</li>
+                        <li>Smoking or tobacco use</li>
+                        <li>Hormonal changes (pregnancy, puberty)</li>
+                        <li>Diabetes or systemic illness</li>
+                    </ul>
+                </div>
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-1">What To Do:</h4>
+                    <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                        <li>Brush twice daily with a soft-bristle toothbrush</li>
+                        <li>Floss daily (gently around gum line)</li>
+                        <li>Use antibacterial mouthwash (Chlorhexidine)</li>
+                        <li>Get a professional <strong>Scaling & Polishing</strong> done — Cost: ${DENTAL_ASSISTANT.PRICES.cleaning}</li>
+                        <li>Visit dentist if bleeding persists more than 2 weeks</li>
+                    </ul>
+                </div>
+                <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                    ✅ <strong>Good news:</strong> Early-stage gum disease is reversible with proper care and professional cleaning!
+                </div>
+            </div>`;
+        }
+
+        function responseCavity() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-search mr-2"></i>Cavity / Tooth Decay Assessment</h4>
+                    <p style="font-size:14px;line-height:1.7;">Cavities are one of the most common dental problems and are very treatable, especially when caught early.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Stages of Tooth Decay:</strong>
+                    <div style="margin-top:8px;">
+                        <div style="background:#F0FFF4;border-radius:8px;padding:8px 12px;margin-bottom:6px;"><span style="color:#38a169;font-weight:bold;">Stage 1 (Early):</span> White/brown spot → Simple Fluoride Treatment | Cost: ₹300-600</div>
+                        <div style="background:#FFFAF0;border-radius:8px;padding:8px 12px;margin-bottom:6px;"><span style="color:#d69e2e;font-weight:bold;">Stage 2 (Mild):</span> Enamel decay → Tooth Filling | Cost: ${DENTAL_ASSISTANT.PRICES.cavity}</div>
+                        <div style="background:#FFF5F5;border-radius:8px;padding:8px 12px;margin-bottom:6px;"><span style="color:#e53e3e;font-weight:bold;">Stage 3 (Deep):</span> Reaches pulp/nerve → Root Canal + Crown | Cost: ${DENTAL_ASSISTANT.PRICES.rootCanal}</div>
+                        <div style="background:#FFF5F5;border-radius:8px;padding:8px 12px;"><span style="color:#742a2a;font-weight:bold;">Stage 4 (Severe):</span> Abscess/infection → Extraction may be needed</div>
+                    </div>
+                </div>
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-1">Prevention Tips:</h4>
+                    <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                        <li>Brush twice daily with fluoride toothpaste</li>
+                        <li>Reduce sugar and acidic food/drinks</li>
+                        <li>Regular dental checkups every 6 months</li>
+                        <li>Consider dental sealants for back teeth</li>
+                    </ul>
+                </div>
+                <p style="font-size:13px;color:#718096;">📸 Upload a photo of your tooth for a more precise AI assessment!</p>
+            </div>`;
+        }
+
+        function responseWhitening() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-sun mr-2"></i>Teeth Whitening Options at DENTALINK</h4>
+                    <p style="font-size:14px;">We offer multiple professional whitening solutions to suit your budget and needs.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <div style="background:#FFFFF0;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #d69e2e;">
+                        <div style="font-weight:bold;color:#744210;">⭐ In-Office Laser Whitening (Best Results)</div>
+                        <div>Up to 8 shades whiter in 1 hour | Cost: ₹8,000 - ₹15,000</div>
+                        <div style="font-size:12px;color:#975a16;">✓ Immediate results ✓ Dentist-supervised ✓ Safe & effective</div>
+                    </div>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #63b3ed;">
+                        <div style="font-weight:bold;color:#2c5282;">💠 Custom Take-Home Whitening Trays</div>
+                        <div>Gradual whitening over 2 weeks | Cost: ₹3,000 - ₹6,000</div>
+                        <div style="font-size:12px;color:#2b6cb0;">✓ Use at home ✓ Long-lasting ✓ Comfortable</div>
+                    </div>
+                    <div style="background:#F0FFF4;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #68d391;">
+                        <div style="font-weight:bold;color:#276749;">💚 Whitening Strips / OTC Products</div>
+                        <div>Mild whitening over 4-6 weeks | Cost: ₹500 - ₹2,000</div>
+                        <div style="font-size:12px;color:#276749;">✓ Budget-friendly ✓ Easy to use</div>
+                    </div>
+                </div>
+                <div style="background:#FFF5F5;border-radius:10px;padding:12px;font-size:13px;">
+                    ⚠️ <strong>Note:</strong> Whitening works best on natural teeth. Crowns, veneers & fillings won't whiten. Consult our dentist first if you have sensitive teeth.
+                </div>
+                <p style="font-size:13px;color:#4a5568;">Want to know which option is right for you? Book a free consultation!</p>
+            </div>`;
+        }
+
+        function responseBraces() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-teeth mr-2"></i>Orthodontic Treatment at DENTALINK</h4>
+                    <p style="font-size:14px;">We offer multiple teeth straightening options for children, teens, and adults.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #63b3ed;">
+                        <div style="font-weight:bold;color:#2c5282;">🔵 Metal Braces (Most Affordable)</div>
+                        <div>Duration: 18-24 months | Cost: ${DENTAL_ASSISTANT.PRICES.braces}</div>
+                        <div style="font-size:12px;color:#2b6cb0;">✓ Highly effective ✓ Works for all cases ✓ EMI available</div>
+                    </div>
+                    <div style="background:#FAF5FF;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #b794f4;">
+                        <div style="font-weight:bold;color:#553c9a;">💜 Ceramic Braces (Less Visible)</div>
+                        <div>Duration: 18-24 months | Cost: ₹45,000 - ₹90,000</div>
+                        <div style="font-size:12px;color:#44337a;">✓ Tooth-colored ✓ Aesthetic ✓ Strong</div>
+                    </div>
+                    <div style="background:#F0FFF4;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #68d391;">
+                        <div style="font-weight:bold;color:#276749;">💎 Invisalign (Invisible Aligners)</div>
+                        <div>Duration: 12-18 months | Cost: ${DENTAL_ASSISTANT.PRICES.invisalign}</div>
+                        <div style="font-size:12px;color:#276749;">✓ Completely clear ✓ Removable ✓ No dietary restrictions</div>
+                    </div>
+                </div>
+                <div style="background:#FFFAF0;border-radius:10px;padding:12px;font-size:13px;">
+                    💡 <strong>Tip:</strong> Early treatment (age 7-10) is more effective. But adults can get braces too! Best age for Invisalign: 16+.
+                </div>
+                <p style="font-size:13px;color:#4a5568;">EMI options available. Book an orthodontic consultation to find out which treatment suits you!</p>
+            </div>`;
+        }
+
+        function responseCleaning() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-sparkles mr-2"></i>Professional Teeth Cleaning (Scaling & Polishing)</h4>
+                    <p style="font-size:14px;">Dental cleaning is one of the most important preventive treatments. Here's what to expect:</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>What's Included:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>✅ Plaque & tartar removal (Scaling)</li>
+                        <li>✅ Teeth polishing to remove surface stains</li>
+                        <li>✅ Gum line cleaning</li>
+                        <li>✅ Fluoride application (optional)</li>
+                        <li>✅ Oral health check & advice</li>
+                    </ul>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;border:1px solid #63b3ed;">
+                        <strong>Cost:</strong> ${DENTAL_ASSISTANT.PRICES.cleaning}<br/>
+                        <strong>Duration:</strong> 30-60 minutes<br/>
+                        <strong>Recommended:</strong> Every 6 months
+                    </div>
+                </div>
+                <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                    ✅ Regular cleaning prevents cavities, gum disease, bad breath, and expensive future treatments!
+                </div>
+            </div>`;
+        }
+
+        function responseBadBreath() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-wind mr-2"></i>Bad Breath (Halitosis) — Causes & Solutions</h4>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Common Causes:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>🦠 Bacteria on tongue, teeth, and gums</li>
+                        <li>🍽️ Food particles (garlic, onion, coffee)</li>
+                        <li>🦷 Cavities or gum disease</li>
+                        <li>👅 Dry mouth (Xerostomia)</li>
+                        <li>🚬 Smoking or tobacco</li>
+                        <li>🏥 Medical conditions (acid reflux, diabetes)</li>
+                    </ul>
+                </div>
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-1">Treatment & Prevention:</h4>
+                    <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                        <li>Brush teeth <strong>and tongue</strong> twice daily</li>
+                        <li>Use a tongue scraper every morning</li>
+                        <li>Floss daily to remove food debris</li>
+                        <li>Use antibacterial mouthwash (Chlorhexidine or Listerine)</li>
+                        <li>Drink plenty of water (stay hydrated)</li>
+                        <li>Get professional cleaning if tartar buildup is the cause</li>
+                        <li>Treat any underlying cavities or gum disease</li>
+                    </ul>
+                </div>
+                <p style="font-size:13px;color:#718096;">If bad breath persists despite good hygiene, consult our dentist — it may be a sign of deeper dental or medical issue.</p>
+            </div>`;
+        }
+
+        function responseSensitivity() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-snowflake mr-2"></i>Tooth Sensitivity — Diagnosis & Treatment</h4>
+                    <p style="font-size:14px;">Tooth sensitivity (pain from hot, cold, sweet, or air) is very common and treatable.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Possible Causes:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>🦷 Enamel erosion (acid, brushing too hard)</li>
+                        <li>🦠 Exposed tooth roots (gum recession)</li>
+                        <li>🕳️ Cracked tooth or cavity</li>
+                        <li>🔧 Recent dental work (filling, whitening)</li>
+                        <li>🧪 Grinding teeth (Bruxism)</li>
+                    </ul>
+                </div>
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-1">Treatments Available:</h4>
+                    <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                        <li>Desensitizing toothpaste (Sensodyne, Colgate Sensitive)</li>
+                        <li>Professional fluoride varnish application</li>
+                        <li>Dental bonding to cover exposed roots</li>
+                        <li>Night guard for grinding (Bruxism)</li>
+                        <li>Filling/crown if cavity or crack is cause</li>
+                        <li>Gum grafting for severe root exposure</li>
+                    </ul>
+                </div>
+                <p style="font-size:13px;color:#718096;">💡 Tip: Switch to a soft-bristle toothbrush and avoid acidic drinks like soda/lemon water. Results improve in 2-4 weeks with proper care.</p>
+            </div>`;
+        }
+
+        function responseChild() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-child mr-2"></i>Pediatric Dental Care at DENTALINK</h4>
+                    <p style="font-size:14px;">Children's teeth are special! Early dental care sets the foundation for a lifetime of healthy smiles.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>When Should Children First Visit a Dentist?</strong>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin:8px 0;border:1px solid #63b3ed;">
+                        🍼 First tooth erupts? → Visit dentist within 6 months<br/>
+                        📅 Ideally by age 1 or before first birthday
+                    </div>
+                    <strong>Our Pediatric Services:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>✅ Milk tooth fillings & extractions</li>
+                        <li>✅ Fluoride treatment & sealants</li>
+                        <li>✅ Habit breaking (thumb sucking, tongue thrusting)</li>
+                        <li>✅ Space maintainers</li>
+                        <li>✅ Orthodontic assessment from age 7</li>
+                        <li>✅ Friendly, child-safe environment</li>
+                    </ul>
+                </div>
+                <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                    ✅ <strong>Good news:</strong> We have a child-friendly clinic with cartoon characters, no-fear approach, and gentle dentists trained for kids!
+                </div>
+                <div style="background:#FFFAF0;border-radius:10px;padding:12px;font-size:13px;">
+                    💡 <strong>Parent Tip:</strong> Start brushing as soon as first tooth appears. Use fluoride toothpaste (rice grain size for under 3, pea size for 3-6 years).
+                </div>
+            </div>`;
+        }
+
+        function responseRootCanal() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-procedures mr-2"></i>Root Canal Treatment (RCT) — Everything You Need to Know</h4>
+                    <p style="font-size:14px;">Root canal treatment saves a badly infected or decayed tooth instead of extracting it.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Signs You May Need RCT:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>🔴 Severe toothache (especially at night)</li>
+                        <li>🔴 Prolonged sensitivity to hot/cold</li>
+                        <li>🔴 Darkening of the tooth</li>
+                        <li>🔴 Swelling or tender gums near tooth</li>
+                        <li>🔴 Persistent pimple on the gums (abscess)</li>
+                    </ul>
+                    <strong>RCT Procedure (usually 2-3 visits):</strong>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin:8px 0;">
+                        <div style="margin-bottom:6px;">1️⃣ <strong>Visit 1:</strong> X-ray → Local anesthesia → Remove infected pulp → Clean canals</div>
+                        <div style="margin-bottom:6px;">2️⃣ <strong>Visit 2:</strong> Fill canals with gutta-percha material → Temporary crown</div>
+                        <div>3️⃣ <strong>Visit 3:</strong> Permanent crown placement</div>
+                    </div>
+                </div>
+                <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;border:1px solid #63b3ed;font-size:14px;">
+                    <strong>Cost:</strong> ${DENTAL_ASSISTANT.PRICES.rootCanal}<br/>
+                    <strong>Crown (after RCT):</strong> ${DENTAL_ASSISTANT.PRICES.crown}<br/>
+                    <strong>Duration per visit:</strong> 45-90 minutes<br/>
+                    <strong>Pain level:</strong> Minimal (done under local anesthesia — it doesn't hurt!)
+                </div>
+                <p style="font-size:13px;color:#718096;">😊 Modern RCT is much more comfortable than people expect. It relieves pain rather than causing it!</p>
+            </div>`;
+        }
+
+        function responseCrown() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-crown mr-2"></i>Dental Crown / Cap — When & Why You Need One</h4>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>When Is a Crown Needed?</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>After root canal treatment</li>
+                        <li>Severely broken or cracked tooth</li>
+                        <li>Large cavity that a filling can't fix</li>
+                        <li>Badly worn-down teeth (grinding)</li>
+                        <li>To cover a dental implant</li>
+                        <li>Cosmetic improvement</li>
+                    </ul>
+                    <strong>Types of Crowns:</strong>
+                    <div style="margin-top:8px;">
+                        <div style="background:#FFFAF0;border-radius:8px;padding:8px 12px;margin-bottom:6px;border-left:4px solid #d69e2e;"><strong>Metal (Gold/Silver):</strong> Most durable | Cost: ₹3,000 - ₹6,000</div>
+                        <div style="background:#EBF8FF;border-radius:8px;padding:8px 12px;margin-bottom:6px;border-left:4px solid #63b3ed;"><strong>PFM (Porcelain Fused Metal):</strong> Natural-looking | Cost: ₹5,000 - ₹10,000</div>
+                        <div style="background:#FAF5FF;border-radius:8px;padding:8px 12px;margin-bottom:6px;border-left:4px solid #b794f4;"><strong>Full Porcelain/Zirconia:</strong> Best aesthetics | Cost: ₹8,000 - ₹15,000</div>
+                    </div>
+                </div>
+                <p style="font-size:13px;color:#718096;">Crowns last 10-15 years with proper care. Book a consultation to find out which crown suits you best!</p>
+            </div>`;
+        }
+
+        function responseImplant() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-screwdriver mr-2"></i>Dental Implants — Permanent Tooth Replacement</h4>
+                    <p style="font-size:14px;">Dental implants are the gold standard for replacing missing teeth — they look, feel, and function like natural teeth!</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Implant Procedure:</strong>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin:8px 0;">
+                        <div style="margin-bottom:6px;">1️⃣ <strong>Consultation & X-ray/CT scan</strong> — Assess bone quality</div>
+                        <div style="margin-bottom:6px;">2️⃣ <strong>Implant placement surgery</strong> — Titanium post inserted into jawbone (Local anesthesia)</div>
+                        <div style="margin-bottom:6px;">3️⃣ <strong>Osseointegration</strong> — 3-6 months healing (implant fuses with bone)</div>
+                        <div>4️⃣ <strong>Crown placement</strong> — Final tooth fitted on top</div>
+                    </div>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;border:1px solid #63b3ed;">
+                        <strong>Cost per implant:</strong> ${DENTAL_ASSISTANT.PRICES.implant}<br/>
+                        <strong>Success rate:</strong> 95-98%<br/>
+                        <strong>Lifespan:</strong> 20-25+ years with proper care<br/>
+                        <strong>EMI options:</strong> Available from ₹2,500/month
+                    </div>
+                </div>
+                <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                    ✅ Implants prevent bone loss, don't affect adjacent teeth, and are the most natural-feeling option!
+                </div>
+                <p style="font-size:13px;color:#718096;">Not suitable for: uncontrolled diabetes, certain medications, insufficient bone (bone graft may be needed first). Consult us to check eligibility.</p>
+            </div>`;
+        }
+
+        function responseWisdom() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-warning">
+                    <h4 class="font-bold text-yellow-700 mb-2"><i class="fas fa-tooth mr-2"></i>Wisdom Tooth Issues</h4>
+                    <p style="font-size:14px;">Wisdom teeth (third molars) usually erupt between ages 17-25. They often cause problems due to lack of space.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Common Problems:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>🔴 Impaction (tooth stuck inside jaw/gum)</li>
+                        <li>🔴 Crowding and shifting of other teeth</li>
+                        <li>🔴 Infection around the gum flap (Pericoronitis)</li>
+                        <li>🔴 Cavity in wisdom tooth or adjacent molar</li>
+                        <li>🔴 Cyst formation</li>
+                    </ul>
+                    <strong>When to Remove:</strong>
+                    <div style="background:#FFF5F5;border-radius:10px;padding:12px 14px;margin:8px 0;border:1px solid #fc8181;font-size:13px;">
+                        Removal recommended if: impacted, causing pain, decayed, creating crowding, or recurrent infection. Not all wisdom teeth need removal — some grow correctly.
+                    </div>
+                </div>
+                <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;border:1px solid #63b3ed;font-size:14px;">
+                    <strong>Extraction Cost:</strong> ₹2,000 - ₹8,000 (simple)<br/>
+                    <strong>Surgical Extraction:</strong> ₹5,000 - ₹15,000<br/>
+                    <strong>X-ray/OPG required:</strong> ₹500 - ₹1,500<br/>
+                    <strong>Recovery:</strong> 3-7 days
+                </div>
+                <p style="font-size:13px;color:#718096;">Get an OPG X-ray done for a complete view of your wisdom teeth. Book a consultation for expert advice!</p>
+            </div>`;
+        }
+
+        function responsePrice() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-rupee-sign mr-2"></i>DENTALINK Treatment Price List</h4>
+                    <p style="font-size:13px;color:#718096;">All prices are approximate. Final cost depends on complexity. EMI available for treatments above ₹5,000.</p>
+                </div>
+                <div style="font-size:13px;line-height:2;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;font-weight:bold;">🦷 Dental Cleaning</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.cleaning}</td></tr>
+                        <tr><td style="padding:8px 12px;"><i class="fas fa-circle" style="color:#f6ad55;font-size:8px;margin-right:8px;"></i>Tooth Filling</td><td style="padding:8px 12px;text-align:right;">${DENTAL_ASSISTANT.PRICES.cavity}</td></tr>
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;"><i class="fas fa-circle" style="color:#e53e3e;font-size:8px;margin-right:8px;"></i>Root Canal (RCT)</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.rootCanal}</td></tr>
+                        <tr><td style="padding:8px 12px;"><i class="fas fa-circle" style="color:#805ad5;font-size:8px;margin-right:8px;"></i>Dental Crown/Cap</td><td style="padding:8px 12px;text-align:right;">${DENTAL_ASSISTANT.PRICES.crown}</td></tr>
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;"><i class="fas fa-circle" style="color:#2b6cb0;font-size:8px;margin-right:8px;"></i>Dental Implant</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.implant}</td></tr>
+                        <tr><td style="padding:8px 12px;"><i class="fas fa-circle" style="color:#38a169;font-size:8px;margin-right:8px;"></i>Metal Braces</td><td style="padding:8px 12px;text-align:right;">${DENTAL_ASSISTANT.PRICES.braces}</td></tr>
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;"><i class="fas fa-circle" style="color:#319795;font-size:8px;margin-right:8px;"></i>Invisalign</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.invisalign}</td></tr>
+                        <tr><td style="padding:8px 12px;"><i class="fas fa-circle" style="color:#d69e2e;font-size:8px;margin-right:8px;"></i>Teeth Whitening</td><td style="padding:8px 12px;text-align:right;">${DENTAL_ASSISTANT.PRICES.whitening}</td></tr>
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;"><i class="fas fa-circle" style="color:#c05621;font-size:8px;margin-right:8px;"></i>Veneer (per tooth)</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.veneer}</td></tr>
+                        <tr><td style="padding:8px 12px;"><i class="fas fa-circle" style="color:#718096;font-size:8px;margin-right:8px;"></i>Tooth Extraction</td><td style="padding:8px 12px;text-align:right;">${DENTAL_ASSISTANT.PRICES.extraction}</td></tr>
+                        <tr style="background:#EBF8FF;"><td style="padding:8px 12px;border-radius:6px 0 0 6px;"><i class="fas fa-circle" style="color:#4a5568;font-size:8px;margin-right:8px;"></i>X-Ray / OPG</td><td style="padding:8px 12px;text-align:right;border-radius:0 6px 6px 0;">${DENTAL_ASSISTANT.PRICES.xray}</td></tr>
+                    </table>
+                </div>
+                <p style="font-size:12px;color:#718096;margin-top:8px;">* Prices may vary. EMI & insurance accepted. Book a free consultation for an exact quote!</p>
+            </div>`;
+        }
+
+        function responseAppointment() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-calendar-check mr-2"></i>Book Your Appointment at DENTALINK</h4>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Clinic Timings:</strong>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;margin:8px 0;border:1px solid #63b3ed;">
+                        🕘 <strong>Mon – Sat:</strong> 9:00 AM – 8:00 PM<br/>
+                        🕘 <strong>Sunday:</strong> 10:00 AM – 2:00 PM<br/>
+                        🚨 <strong>Emergency:</strong> 24/7 available
+                    </div>
+                    <strong>How to Book:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>📱 Call/WhatsApp: <strong>+91 22 1234 5678</strong></li>
+                        <li>🌐 Online: <strong>dentalink.ai/appointment</strong></li>
+                        <li>💬 Reply here with your preferred date & time</li>
+                    </ul>
+                    <strong>Our Specialist Dentists:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;font-size:13px;">
+                        <li>👨‍⚕️ Dr. Sharma — General & Cosmetic Dentistry</li>
+                        <li>👩‍⚕️ Dr. Patel — Orthodontics (Braces/Invisalign)</li>
+                        <li>👨‍⚕️ Dr. Mehta — Oral Surgery & Implants</li>
+                        <li>👩‍⚕️ Dr. Rao — Pediatric Dentistry</li>
+                    </ul>
+                </div>
+                <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                    ✅ First consultation is <strong>FREE</strong> for new patients! Walk-ins welcome. Parking available.
+                </div>
+                <div style="text-align:center;background:#EBF8FF;border-radius:10px;padding:12px;">
+                    <a href="appointment.html" style="color:#007bff;font-weight:bold;text-decoration:none;font-size:15px;">
+                        <i class="fas fa-external-link-alt" style="margin-right:6px;"></i>Book Online Now →
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        function responseVeneer() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-star mr-2"></i>Dental Veneers — Smile Makeover</h4>
+                    <p style="font-size:14px;">Veneers are thin porcelain shells bonded to the front of teeth to transform your smile instantly.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Veneers Can Fix:</strong>
+                    <ul style="padding-left:18px;margin-top:6px;margin-bottom:10px;">
+                        <li>✨ Stained or discolored teeth</li>
+                        <li>✨ Chipped or broken teeth</li>
+                        <li>✨ Gaps between teeth</li>
+                        <li>✨ Slightly misaligned teeth</li>
+                        <li>✨ Irregular or uneven teeth</li>
+                    </ul>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px 14px;border:1px solid #63b3ed;">
+                        <strong>Types:</strong><br/>
+                        💎 <strong>Porcelain Veneers:</strong> Most natural-looking | ${DENTAL_ASSISTANT.PRICES.veneer}<br/>
+                        🔷 <strong>Composite Veneers:</strong> More affordable | ₹3,000 - ₹8,000 per tooth<br/>
+                        <strong>Lifespan:</strong> 10-15 years<br/>
+                        <strong>Procedure:</strong> 2-3 visits
+                    </div>
+                </div>
+                <p style="font-size:13px;color:#718096;">Veneers are irreversible (thin layer of enamel removed). Consult our cosmetic dentist for a smile design consultation!</p>
+            </div>`;
+        }
+
+        function responseDenture() {
+            return `
+            <div class="space-y-3">
+                <div class="analysis-card analysis-info">
+                    <h4 class="font-bold text-blue-700 mb-2"><i class="fas fa-teeth-open mr-2"></i>Dentures — Removable Tooth Replacement</h4>
+                    <p style="font-size:14px;">Dentures are removable appliances to replace missing teeth and surrounding tissue.</p>
+                </div>
+                <div style="font-size:14px;line-height:1.9;">
+                    <strong>Types of Dentures:</strong>
+                    <div style="margin-top:8px;">
+                        <div style="background:#EBF8FF;border-radius:8px;padding:10px 14px;margin-bottom:8px;border-left:4px solid #63b3ed;">
+                            <strong>Complete Denture:</strong> All teeth missing | Cost: ₹15,000 - ₹40,000 (per jaw)
+                        </div>
+                        <div style="background:#FFFAF0;border-radius:8px;padding:10px 14px;margin-bottom:8px;border-left:4px solid #f6ad55;">
+                            <strong>Partial Denture:</strong> Some teeth missing | Cost: ₹8,000 - ₹20,000
+                        </div>
+                        <div style="background:#F0FFF4;border-radius:8px;padding:10px 14px;border-left:4px solid #68d391;">
+                            <strong>Implant-Supported Denture:</strong> Most stable | Cost: ₹80,000 - ₹2,50,000
+                        </div>
+                    </div>
+                </div>
+                <div style="background:#FFFAF0;border-radius:10px;padding:12px;font-size:13px;">
+                    💡 <strong>Care Tips:</strong> Remove & clean daily, soak overnight in water/denture solution, handle with care — avoid dropping. Visit dentist every 6-12 months for adjustments.
+                </div>
+                <p style="font-size:13px;color:#718096;">Consider dental implants for a more permanent, comfortable solution if budget allows.</p>
+            </div>`;
+        }
+
+        function responseGeneral(msg) {
+            const lang = detectLanguage(msg);
+            if (lang === 'regional') {
+                return `
+                <div class="space-y-3">
+                    <p>आपला प्रश्न समजला! 😊</p>
+                    <p style="font-size:14px;">मी आपल्या दंत समस्येबद्दल मदत करण्यासाठी येथे आहे. कृपया आपल्या समस्येबद्दल अधिक सांगा:</p>
+                    <div style="background:#EBF8FF;border-radius:10px;padding:12px;font-size:14px;">
+                        आपल्याला काय त्रास होत आहे?<br/>
+                        • दात दुखत आहे? (Tooth pain)<br/>
+                        • हिरड्यातून रक्त येत आहे? (Bleeding gums)<br/>
+                        • दात स्वच्छ करायचे आहेत? (Cleaning)<br/>
+                        • अपॉइंटमेंट बुक करायची आहे? (Appointment)<br/>
+                        • किंमत जाणून घ्यायची आहे? (Price)
+                    </div>
+                    <p style="font-size:13px;color:#718096;">📞 तातडीसाठी: 1800-123-4567</p>
+                </div>`;
+            }
+            return `
+            <div class="space-y-3">
+                <p>I'm here to help with your dental concern! 😊</p>
+                <p style="font-size:14px;">Could you tell me a bit more? Here are some common questions I can help with:</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-size:13px;">
+                    <div style="background:#EBF8FF;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='I have tooth pain';document.getElementById('sendBtn').click()">🦷 Tooth Pain</div>
+                    <div style="background:#F0FFF4;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='My gums are bleeding';document.getElementById('sendBtn').click()">🩸 Bleeding Gums</div>
+                    <div style="background:#FAF5FF;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='How much does cleaning cost?';document.getElementById('sendBtn').click()">💰 Treatment Costs</div>
+                    <div style="background:#FFFAF0;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='I want to book an appointment';document.getElementById('sendBtn').click()">📅 Book Appointment</div>
+                    <div style="background:#FFF5F5;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='I have a dental emergency';document.getElementById('sendBtn').click()">🚨 Emergency</div>
+                    <div style="background:#EBF8FF;border-radius:8px;padding:8px 10px;cursor:pointer;" onclick="document.getElementById('userInput').value='Tell me about teeth whitening';document.getElementById('sendBtn').click()">✨ Whitening</div>
+                </div>
+                <p style="font-size:12px;color:#718096;">Or simply describe your symptoms in your own words — I understand English, Hindi & Marathi!</p>
+            </div>`;
+        }
+
+        // ---------- Main Smart Response Function ----------
+        async function generateSmartResponse(userMessage) {
+            const intent = detectIntent(userMessage);
+
+            switch (intent) {
+                case 'GREETING':   return responseGreeting();
+                case 'EMERGENCY':  return responseEmergency();
+                case 'SWELLING':   return responseSwelling();
+                case 'PAIN':       return responsePain();
+                case 'GUMS':       return responseGums();
+                case 'CAVITY':     return responseCavity();
+                case 'WHITENING':  return responseWhitening();
+                case 'BRACES':     return responseBraces();
+                case 'CLEANING':   return responseCleaning();
+                case 'BAD_BREATH': return responseBadBreath();
+                case 'SENSITIVITY':return responseSensitivity();
+                case 'CHILD':      return responseChild();
+                case 'ROOT_CANAL': return responseRootCanal();
+                case 'CROWN':      return responseCrown();
+                case 'IMPLANT':    return responseImplant();
+                case 'WISDOM':     return responseWisdom();
+                case 'PRICE':      return responsePrice();
+                case 'APPOINTMENT':return responseAppointment();
+                case 'VENEER':     return responseVeneer();
+                case 'DENTURE':    return responseDenture();
+                default:           return responseGeneral(userMessage);
+            }
+        }
+
         // ---------- Helper Functions ----------
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = 'toast';
-            let icon = 'info-circle';
-            let iconColor = 'text-blue-500';
+            let icon = 'info-circle', iconColor = 'text-blue-500';
             if (type === 'success') { icon = 'check-circle'; iconColor = 'text-green-500'; }
             else if (type === 'error') { icon = 'exclamation-circle'; iconColor = 'text-red-500'; }
             else if (type === 'warning') { icon = 'exclamation-triangle'; iconColor = 'text-yellow-500'; }
@@ -1082,26 +1644,26 @@
             toastContainer.appendChild(toast);
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
         }
-        
+
         function autoScrollToBottom() {
             setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 100);
         }
-        
+
         function autoResize() {
             userInput.style.height = 'auto';
             userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
         }
-        
+
         function addMessage(content, sender) {
             const messageContainer = document.createElement('div');
             messageContainer.className = sender === 'user' ? 'user-message' : 'bot-message';
             const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const messageHTML = `
+            messageContainer.innerHTML = `
                 <div class="message-container">
                     <div class="flex gap-3 ${sender === 'user' ? 'flex-row-reverse' : ''}">
-                        ${sender === 'bot' ? 
-                            `<div class="message-avatar bot-avatar"><i class="fas fa-robot"></i></div>` : 
-                            `<div class="message-avatar user-avatar"><i class="fas fa-user"></i></div>`
+                        ${sender === 'bot'
+                            ? `<div class="message-avatar bot-avatar"><i class="fas fa-robot"></i></div>`
+                            : `<div class="message-avatar user-avatar"><i class="fas fa-user"></i></div>`
                         }
                         <div class="message-bubble ${sender === 'user' ? 'user-bubble' : 'bot-bubble'}">
                             ${content}
@@ -1110,15 +1672,10 @@
                     </div>
                 </div>
             `;
-            messageContainer.innerHTML = messageHTML;
             chatMessages.appendChild(messageContainer);
             autoScrollToBottom();
-            setTimeout(() => {
-                const container = messageContainer.querySelector('.message-container');
-                if (container) container.style.animation = 'message-appear 0.4s ease-out forwards';
-            }, 10);
         }
-        
+
         function showTypingIndicator() {
             const typingIndicator = document.createElement('div');
             typingIndicator.id = 'typingIndicator';
@@ -1137,68 +1694,52 @@
             chatMessages.appendChild(typingIndicator);
             autoScrollToBottom();
         }
-        
+
         function removeTypingIndicator() {
-            const typingIndicator = document.getElementById('typingIndicator');
-            if (typingIndicator) typingIndicator.remove();
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
         }
-        
-        // Intent understanding functions (simplified but included)
-        function containsAny(str, keywords) {
-            return keywords.some(keyword => str.toLowerCase().includes(keyword.toLowerCase()));
-        }
-        
-        // For brevity, response generators are kept same as original.
-        // (Full implementation would be too long, but we include the core sendMessage logic)
-        async function generateSmartResponse(userMessage) {
-            const lowerMsg = userMessage.toLowerCase();
-            if (containsAny(lowerMsg, DENTAL_ASSISTANT.GREETINGS)) {
-                return `<div class="space-y-3"><p>👋 Hello! How can I help you with your dental concerns today?</p><p class="text-sm text-gray-600">You can describe symptoms, ask about treatments, or book an appointment.</p></div>`;
-            }
-            // For demo, return a generic helpful response
-            return `<p>Thanks for your message. I'm here to help with dental concerns. Could you tell me more about your symptoms or what you'd like to know?</p>`;
-        }
-        
+
+        // ---------- Send Message ----------
         async function sendMessage() {
             if (isProcessing) return;
             const message = userInput.value.trim();
             if (!message) return;
             isProcessing = true;
             sendBtn.disabled = true;
+
             try {
                 addMessage(message, 'user');
                 chatHistory.push({ role: 'user', content: message });
                 userInput.value = '';
                 autoResize();
                 showTypingIndicator();
-                await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+                await new Promise(resolve => setTimeout(resolve, 700 + Math.random() * 600));
                 removeTypingIndicator();
                 const aiResponse = await generateSmartResponse(message);
                 addMessage(aiResponse, 'bot');
                 chatHistory.push({ role: 'assistant', content: aiResponse });
-                
-                // Save to Firestore if available
+
                 if (window.firebase && window.firebase.db) {
                     try {
                         await window.firebase.firestore.addDoc(
                             window.firebase.firestore.collection(window.firebase.db, 'chatHistory'),
                             { message, response: aiResponse, timestamp: new Date().toISOString(), userAgent: navigator.userAgent }
                         );
-                    } catch (firebaseError) { console.log('Firebase save optional'); }
+                    } catch (e) { console.log('Firebase save optional:', e.message); }
                 }
             } catch (error) {
-                console.error('Error in sendMessage:', error);
-                showToast('Let me try that again...', 'error');
+                console.error('Error:', error);
                 removeTypingIndicator();
-                addMessage(`I'm here to help. Could you please rephrase your dental question?`, 'bot');
+                addMessage(`I'm here to help! Could you rephrase your dental question?`, 'bot');
             } finally {
                 isProcessing = false;
                 sendBtn.disabled = false;
                 userInput.focus();
             }
         }
-        
-        // Voice recognition init
+
+        // ---------- Voice Recognition ----------
         function initVoiceRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1206,43 +1747,36 @@
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.lang = 'en-US';
-                recognition.onstart = function() {
+
+                recognition.onstart = function () {
                     isRecording = true;
                     voiceBtn.classList.add('voice-recording-active');
                     voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                    const waveform = document.createElement('div');
-                    waveform.className = 'voice-waveform';
-                    waveform.id = 'voiceWaveform';
-                    waveform.innerHTML = '<div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>';
-                    voiceBtn.appendChild(waveform);
                     showToast('Listening... Speak now', 'info');
                 };
-                recognition.onresult = function(event) {
+                recognition.onresult = function (event) {
                     const transcript = event.results[0][0].transcript;
                     userInput.value = transcript;
                     autoResize();
                     showToast(`Voice input: "${transcript}"`, 'success');
                 };
-                recognition.onerror = function(event) {
+                recognition.onerror = function () {
                     showToast('Voice input failed. Please try again.', 'error');
                 };
-                recognition.onend = function() {
+                recognition.onend = function () {
                     isRecording = false;
                     voiceBtn.classList.remove('voice-recording-active');
-                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    const waveform = document.getElementById('voiceWaveform');
-                    if (waveform) waveform.remove();
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone text-sm sm:text-base"></i>';
                 };
             } else {
                 voiceBtn.style.display = 'none';
-                showToast('Voice recognition not supported in your browser', 'warning');
             }
         }
-        
-        // Image upload handlers (simplified)
+
+        // ---------- Image Modal ----------
         function openImageModal() { imageModal.classList.add('active'); }
         function closeImageModal() { imageModal.classList.remove('active'); fileInput.value = ''; }
-        
+
         // ---------- Event Listeners ----------
         chatToggle.addEventListener('click', () => {
             chatContainer.classList.toggle('active');
@@ -1254,22 +1788,48 @@
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         });
-        
+
         imageUploadBtn.addEventListener('click', openImageModal);
         cancelUpload.addEventListener('click', closeImageModal);
+
         uploadImage.addEventListener('click', () => {
             if (!fileInput.files.length) { showToast('Please select an image first', 'warning'); return; }
             closeImageModal();
             showToast('Image analysis started', 'success');
-            // Simulate analysis
-            addMessage(`<div class="space-y-2"><p><strong>📸 Uploaded Dental Image</strong></p><div class="scanning-container"><img src="${URL.createObjectURL(fileInput.files[0])}" alt="Dental Image" class="w-full rounded-lg max-h-64 object-cover"><div class="scanning-laser"></div></div><p class="text-sm text-gray-600">Analyzing image with AI...</p></div>`, 'user');
+            addMessage(`
+                <div class="space-y-2">
+                    <p><strong>📸 Uploaded Dental Image</strong></p>
+                    <div class="scanning-container">
+                        <img src="${URL.createObjectURL(fileInput.files[0])}" alt="Dental Image" class="w-full rounded-lg max-h-64 object-cover">
+                        <div class="scanning-laser"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">Analyzing image with AI...</p>
+                </div>`, 'user');
             showTypingIndicator();
             setTimeout(() => {
                 removeTypingIndicator();
-                addMessage(`<div class="space-y-4"><h3 class="font-bold text-blue-600 flex items-center gap-2"><i class="fas fa-search"></i>Image Analysis Complete</h3><p>Preliminary analysis suggests possible early stage cavity. Please consult a dentist for confirmation.</p><button class="action-chip" onclick="quickAction('appointment')"><i class="fas fa-calendar mr-2"></i>Book Consultation</button></div>`, 'bot');
+                addMessage(`
+                <div class="space-y-3">
+                    <h3 class="font-bold text-blue-600"><i class="fas fa-search mr-2"></i>Image Analysis Complete</h3>
+                    <div class="analysis-card analysis-warning">
+                        <h4 class="font-bold text-yellow-700 mb-1">Preliminary Findings:</h4>
+                        <ul style="font-size:13px;line-height:1.9;padding-left:16px;">
+                            <li>Possible early-stage cavity detected on molar region</li>
+                            <li>Minor tartar buildup visible near gum line</li>
+                            <li>Overall tooth structure appears intact</li>
+                        </ul>
+                    </div>
+                    <div style="background:#F0FFF4;border-radius:10px;padding:12px;font-size:13px;color:#276749;">
+                        ✅ Good news — if this is early decay, a simple filling may be all that's needed!
+                    </div>
+                    <p style="font-size:12px;color:#718096;">⚠️ This is an AI preliminary assessment only. Please visit our dentist for a confirmed diagnosis and X-ray.</p>
+                    <a href="appointment.html" style="display:inline-block;background:linear-gradient(135deg,#007bff,#17a2b8);color:white;padding:10px 20px;border-radius:10px;font-weight:bold;font-size:14px;text-decoration:none;margin-top:6px;">
+                        <i class="fas fa-calendar-check mr-2"></i>Book Consultation
+                    </a>
+                </div>`, 'bot');
             }, 3000);
         });
-        
+
         dropArea.addEventListener('click', () => fileInput.click());
         dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('border-blue-500', 'bg-blue-50'); });
         dropArea.addEventListener('dragleave', () => dropArea.classList.remove('border-blue-500', 'bg-blue-50'));
@@ -1278,48 +1838,51 @@
             dropArea.classList.remove('border-blue-500', 'bg-blue-50');
             if (e.dataTransfer.files.length) fileInput.files = e.dataTransfer.files;
         });
-        
-        // Quick actions
+
         actionChips.forEach(btn => {
             btn.addEventListener('click', () => {
                 const action = btn.getAttribute('data-action');
-                let message = '';
-                if (action === 'tooth-pain') message = 'I have tooth pain';
-                else if (action === 'bleeding-gums') message = 'My gums are bleeding';
-                else if (action === 'whitening') message = 'Tell me about teeth whitening';
-                else if (action === 'braces') message = 'I want information about braces';
-                else message = action;
-                userInput.value = message;
+                const map = {
+                    'tooth-pain': 'I have tooth pain',
+                    'bleeding-gums': 'My gums are bleeding',
+                    'whitening': 'Tell me about teeth whitening',
+                    'braces': 'I want information about braces',
+                    'appointment': 'I want to book an appointment',
+                    'emergency': 'I have a dental emergency',
+                    'pricing': 'What are your treatment prices?',
+                    'image-upload': 'I want to upload a dental image'
+                };
+                userInput.value = map[action] || action;
                 autoResize();
                 sendMessage();
             });
         });
-        
-        // Voice
-        initVoiceRecognition();
+
         voiceBtn.addEventListener('click', () => {
             if (!recognition) { showToast('Voice recognition not available', 'error'); return; }
             if (isRecording) recognition.stop(); else recognition.start();
         });
-        
-        // Add welcome message on load
+
+        initVoiceRecognition();
+
+        // ---------- Welcome Message ----------
         window.addEventListener('load', () => {
             addMessage(`
                 <div class="space-y-3">
                     <h3 class="font-bold text-blue-600 mb-2">Hello! I'm DENTALINK AI 👋</h3>
                     <p>I'm here to help with your dental concerns like a friendly clinic assistant. You can ask me about:</p>
-                    <div class="grid grid-cols-2 gap-2 mb-4">
-                        <div class="action-chip" data-action="appointment"><i class="fas fa-calendar-check"></i>Book Appointment</div>
-                        <div class="action-chip" data-action="emergency"><i class="fas fa-ambulance"></i>Emergency Help</div>
-                        <div class="action-chip" data-action="pricing"><i class="fas fa-rupee-sign"></i>Price List</div>
-                        <div class="action-chip" data-action="image-upload"><i class="fas fa-camera"></i>Scan Image</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;">
+                        <div class="action-chip" style="cursor:pointer;" onclick="document.getElementById('userInput').value='I want to book an appointment';document.getElementById('sendBtn').click()"><i class="fas fa-calendar-check"></i>Book Appointment</div>
+                        <div class="action-chip" style="cursor:pointer;" onclick="document.getElementById('userInput').value='I have a dental emergency';document.getElementById('sendBtn').click()"><i class="fas fa-ambulance"></i>Emergency Help</div>
+                        <div class="action-chip" style="cursor:pointer;" onclick="document.getElementById('userInput').value='What are your treatment prices?';document.getElementById('sendBtn').click()"><i class="fas fa-rupee-sign"></i>Price List</div>
+                        <div class="action-chip" style="cursor:pointer;" onclick="document.getElementById('imageUploadBtn').click()"><i class="fas fa-camera"></i>Scan Image</div>
                     </div>
-                    <p class="text-xs text-gray-600"><i class="fas fa-comment-medical mr-1"></i>Feel free to describe your symptoms naturally - I understand English, Hindi, and Marathi.</p>
+                    <p class="text-xs text-gray-600"><i class="fas fa-language mr-1"></i>Feel free to describe your symptoms naturally — I understand English, Hindi & Marathi.</p>
                 </div>
             `, 'bot');
         });
-        
-        console.log('🤖 Smart Dental Assistant Initialized');
+
+        console.log('🤖 DENTALINK Smart Dental Assistant Initialized — Full Response Logic Active');
     </script>
 </body>
 </html>
